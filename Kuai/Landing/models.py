@@ -63,7 +63,7 @@ class AccountManager(BaseUserManager):
         print(username_)
         return self.get(username=username_)
 
-class User(AbstractBaseUser):
+class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=40, unique=True, validators=[
         validate_user
     ])

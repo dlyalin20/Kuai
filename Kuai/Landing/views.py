@@ -63,23 +63,23 @@ def index(request):
 
 def login_view(request):
     if request.user.is_authenticated:
-        return HttpResponseRedirect(index)
+        return HttpResponseRedirect('/')
     if request.method == 'POST':
         username = request.POST["username"]
         password = request.POST["password"]
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return HttpResponseRedirect(index)
+            return HttpResponseRedirect('/')
     return render(request, "landing/login.html", {
         "form":UserLoginForm()
     })
 
 def logout_view(request):
     if not request.is_authenticated:
-        return HttpResponseRedirect(login_view)
+        return HttpResponseRedirect('/login')
     logout(request)
-    return HttpResponseRedirect(index)
+    return HttpResponseRedirect('/')
 
 def register_view(request):
     if request.user.is_authenticated:
@@ -91,7 +91,7 @@ def register_view(request):
         username = request.POST["username"]
         password = request.POST["password"]
         User.objects.create_user(username, email=email, password=password, first_name=first_name, last_name=last_name)
-        return HttpResponseRedirect(index)
+        return HttpResponseRedirect('/')
     return render(request, "landing/register.html", {
        "form":RegisterForm()
     })

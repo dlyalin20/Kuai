@@ -58,7 +58,7 @@ class RegisterForm(forms.Form):
 def index(request):
     # same landing page; change top right display based on whether logged in or not
     if request.user.is_authenticated:
-        pass
+        return HttpResponse("Hello authenticated!")
     return HttpResponse("Hello world!")
 
 def login_view(request):
@@ -83,7 +83,7 @@ def logout_view(request):
 
 def register_view(request):
     if request.user.is_authenticated:
-        return HttpResponseRedirect("index")
+        return HttpResponseRedirect('')
     if request.method == 'POST':
         first_name = request.POST["first_name"]
         last_name = request.POST["last_name"]

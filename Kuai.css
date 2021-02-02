@@ -19,3 +19,28 @@
     height: 450px;
     border-radius: 25px;
     }
+.landing {
+    position: relative; 
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.landing::before {    
+      content: "";
+      background-image: url("https://images.pexels.com/photos/2983101/pexels-photo-2983101.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260");
+      background-size: cover;
+      position: absolute;
+      top: 0px;
+      right: 0px;
+      bottom: 0px;
+      left: 0px;
+      opacity: 0.6;
+}
+
+#landing-text {
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bolder;
+}

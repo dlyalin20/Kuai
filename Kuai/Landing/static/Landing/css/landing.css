@@ -4,6 +4,7 @@
 }
 
 .landing {
+    flex-direction: column;
     position: relative; 
     height: 100vh;
     width: 100%;
@@ -31,15 +32,23 @@
 }
 
 #search-input {
+    margin-right: 10px;
+    z-index: 1;
     text-align: center;
     box-sizing: border-box;
-    width: 100%;
-    height: 25px;
-    border-radius: 5px;
-    border: 4px solid;
+    width: 350px;
+    height: 35px;
+    border-radius: 7px;
+    border: 1px solid;
     font-family: Arial, Helvetica, sans-serif;
     font-size: large;
 } 
+
+#search-submit {
+    z-index: 1;
+    border-radius: 7px;
+    border: 1px solid;
+}
 
 #mission-statement {
     font-family: Arial, Helvetica, sans-serif;
@@ -50,4 +59,9 @@
 .placeholder {
     font-family: Arial, Helvetica, sans-serif;
     text-align: center;
+}
+
+#Main-Search {
+    width: 25%;
+    display: flex;
 }

@@ -1,0 +1,21 @@
+.kuai {
+    text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+#login {
+    text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bolder;
+    margin-top: 50px;
+    margin-bottom: 30px;
+}
+
+#login-button-surrounding {
+    background-color: darkgrey;
+    padding: 20px;
+    margin: auto;
+    width: 30%;
+    height: 450px;
+    border-radius: 25px;
+}

@@ -1,0 +1,67 @@
+.kuai {
+    text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.landing {
+    flex-direction: column;
+    position: relative; 
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.landing::before {    
+      content: "";
+      background-image: url("https://images.pexels.com/photos/1092730/pexels-photo-1092730.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260");
+      background-size: cover;
+      position: absolute;
+      top: 0px;
+      right: 0px;
+      bottom: 0px;
+      left: 0px;
+      opacity: 0.45;
+}
+
+#landing-text {
+    position: relative;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bolder;
+}
+
+#search-input {
+    margin-right: 10px;
+    z-index: 1;
+    text-align: center;
+    box-sizing: border-box;
+    width: 350px;
+    height: 35px;
+    border-radius: 7px;
+    border: 1px solid;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: large;
+} 
+
+#search-submit {
+    z-index: 1;
+    border-radius: 7px;
+    border: 1px solid;
+}
+
+#mission-statement {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 20px;
+    text-align: center;
+}
+
+.placeholder {
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: center;
+}
+
+#Main-Search {
+    width: 25%;
+    display: flex;
+}

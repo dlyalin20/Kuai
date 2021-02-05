@@ -57,9 +57,9 @@ class RegisterForm(forms.Form):
 # Create your views here.
 def index(request):
     # same landing page; change top right display based on whether logged in or not
-    if request.user.is_authenticated:
-        return HttpResponse("Hello authenticated!")
-    return HttpResponse("Hello world!")
+    # if request.user.is_authenticated:
+    #     return HttpResponse("Hello authenticated!")
+    return render(request, "landing/landing.html")
 
 def login_view(request):
     if request.user.is_authenticated:

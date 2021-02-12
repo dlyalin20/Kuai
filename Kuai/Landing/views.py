@@ -63,15 +63,15 @@ def index(request):
     return render(request, "landing/landing.html")
 
 def login_view(request):
-    if request.user.is_authenticated:
-        return HttpResponseRedirect('/')
-    if request.method == 'POST':
-        username = request.POST["username"]
-        password = request.POST["password"]
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            return HttpResponseRedirect('/')
+    # if request.user.is_authenticated:
+    #     return HttpResponseRedirect('/')
+    # if request.method == 'POST':
+    #     username = request.POST["username"]
+    #     password = request.POST["password"]
+    #     user = authenticate(request, username=username, password=password)
+    #     if user is not None:
+    #         login(request, user)
+    #         return HttpResponseRedirect('/')
     return render(request, "Landing/login.html", {
         "form":UserLoginForm()
     })

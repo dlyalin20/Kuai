@@ -1,3 +1,4 @@
+{% load socialaccount %}
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -14,12 +15,15 @@
         <div>
             <h1 id="login">Login</h1>
         </div>
-
-        <form action="{% url 'login' %}" method="post">
+        <!-- dont do our own login -->
+        <form action="{% url 'Landing:login' %}" method="post">
             {% csrf_token %}
             {{ form }} 
             <input type="submit">
-     </form>
+        </form>
+
+        <h1>My Google Login Project</h1>
+        <a href="{% provider_login_url 'google' %}">Login with Google</a>
 
         <div id="login-button-surrounding">
         </div>

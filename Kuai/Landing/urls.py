@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
 app_name = 'Landing'
 urlpatterns = [
@@ -9,4 +9,7 @@ urlpatterns = [
     path('search', views.search, name='search'),
     path('autocomplete', views.autocomplete_view, name="autocomplete"),
     path('<int:location_id>/go', views.go, name="go"),
+    #     # new code
+    # path('accounts/', include('allauth.urls')),
+
 ]

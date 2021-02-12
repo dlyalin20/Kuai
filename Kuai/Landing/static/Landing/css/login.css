@@ -1,0 +1,152 @@
+.kuai {
+    text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+}
+body{
+    margin: 0;
+}
+
+h1{
+    margin-top: 0;
+}
+#login {
+    text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bolder;
+    margin-top: 50px;
+    margin-bottom: 30px;
+}
+
+#login-button-surrounding {
+    background-color: darkgrey;
+    padding: 20px;
+    margin: auto;
+    width: 30%;
+    height: 450px;
+    border-radius: 25px;
+}
+
+#main-div{
+    width: 100vw;
+    /* subtract from nav later */
+    height: 100vh;
+    display: flex;
+    flex-direction: row;
+}
+:root{
+    /* find and replace later in production */
+    --formWidth: 500px;
+}
+#left{
+    background-color: white;
+    width: var(--formWidth);
+    height: inherit;
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: nowrap;
+}
+
+#left > #title{
+    position: absolute;
+    width: 156px;
+    height: 106px;
+    left: 176px;
+    top: 141px;
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 62px;
+    line-height: 73px;
+    text-align: center;
+    color: #000000;
+}
+
+#left > #loginForm{
+    position: absolute;
+    width: 410px;
+    height: 252px;
+    left: 49px;
+    top: 247px;
+    background: #C4C4C4;
+}
+#loginForm > a >#GoogleSignIn{
+    position: absolute;
+    width: 342px;
+    height: 83px;
+    left: 33px;
+    top: 43px;
+}
+#loginForm > #rememberMe{
+    position: absolute;
+    width: 330.41px;
+    height: 40px;
+    top: 154px;
+    left: 39.79px;
+    /* background-color: red; */
+    text-align: center;
+}
+
+#rememberMe > #RMcheckbox {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    left: 3px;
+    top: 2px;
+
+    border: 1px solid #BDBDBD;
+    box-sizing: border-box;
+    border-radius: 2px;
+}
+
+#rememberMe > #SSI{
+    position: absolute;
+    left: 49.21px;
+    right: -4.54%;
+    top: 0%;
+    bottom: 0%;
+    font-family: Rubik;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 34px;
+    line-height: 40px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #023F62;
+}
+#loginForm > #goButton{
+    position: absolute;
+    width: 410px;
+    height: 87px;
+    top: 209px;
+    background: #9B9BC1;
+    border-radius: 50%;
+    text-align: center;
+}
+
+#goButton > #goText{
+    position: absolute;
+    width: 168.82px;
+    height: 61px;
+    left: 123px;
+    top: 13px;
+    
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 62px;
+    line-height: 73px;
+    text-align: center;
+    
+    color: #000000;
+    
+}
+
+#right{
+    display: flex;
+    background-color: #D6B2B2;
+    height: inherit;
+    width: calc(100vw - var(--formWidth));
+}

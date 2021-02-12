@@ -4,8 +4,11 @@
 <html lang="en">
     <head>
         <title>Landing</title>
-        <link rel="stylesheet" type="text/css" href="{% static 'Landing/landing.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'Landing/css/landing.css' %}">
         <!-- <link rel="stylesheet" href="landing.css"> -->
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"> </script> 
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js" type="text/javascript"></script>
+
     </head>
     <body>
         
@@ -17,7 +20,7 @@
 
             <h1 id="landing-text">Be serviced faster!<br/></h1>
 
-            <form>
+            <form id="search" action="{% url 'Landing:search' %}">
                 <input id="search-input" type="text" placeholder="Name, Location, or Product" name="Main-Search">
                 <input id="search-submit" type="submit" value="Go">
             </form>
@@ -35,4 +38,17 @@
         </div>
 
     </body>
+    <script>
+        $(document).ready(function(){ 
+            $("#search-input").autocomplete({
+                source: "{% url 'Landing:autocomplete' %}",
+                minLength: 2,
+                open: function(){
+                    setTimeout(function () {
+                        $('.ui-autocomplete').css('z-index', 99);
+                    }, 0);
+                }
+              });
+        });
+    </script>
 </html>

@@ -11,5 +11,5 @@ urlpatterns = [
     path('<int:location_id>/go', views.go, name="go"),
     #     # new code
     # path('accounts/', include('allauth.urls')),
-
+    path('test', views.test, name="test"),
 ]

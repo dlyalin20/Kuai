@@ -136,3 +136,7 @@ def go(request, location_id):
     return render(request, "Landing/go.html", {
         # business location + name => start loading map
     })
+
+# test view for testing out html elements
+def test(request):
+    return render(request, "Landing/navbar.html")

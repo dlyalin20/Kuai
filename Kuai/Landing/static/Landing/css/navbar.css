@@ -1,0 +1,66 @@
+#nav{
+    position: relative;
+    width: 100vw;
+    height: 106px;
+    background-color: pink;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+html, body{
+    margin: 0;
+}
+#nav > #hamburger{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 135px;
+    height: 103px;
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 62px;
+    line-height: 73px;
+    color: #000000;
+}
+#nav > #hamburger > #dropdown-menu{
+    font-size: 40px;
+    position: absolute;
+    font-family: Roboto;
+    line-height: 73px;
+    left: 0;
+    top: 103;
+    z-index: 1;
+    padding: 0 1em;
+    background: #C4C4C4;
+}
+#nav > #logo{
+    width: 36px;
+    height: 71px;
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 62px;
+    line-height: 73px;
+
+    color: #000000;
+}
+
+#nav > #SignIn_Acc{
+    width: 220px;
+    height: 62px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    background-color: C4C4C4;
+    border-top-left-radius: 50% 100px;
+    border-bottom-left-radius: 50% 100px;
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 49px;
+    line-height: 57px;
+}

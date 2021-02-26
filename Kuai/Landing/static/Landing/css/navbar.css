@@ -2,7 +2,7 @@
     position: relative;
     width: 100vw;
     height: 106px;
-    background-color: pink;
+    background-color: white;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -42,9 +42,8 @@ html, body{
     font-family: Roboto;
     font-style: normal;
     font-weight: normal;
-    font-size: 62px;
+    font-size: 42px;
     line-height: 73px;
-
     color: #000000;
 }
 
@@ -55,12 +54,12 @@ html, body{
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    background-color: C4C4C4;
+    background-color: #C4C4C4;
     border-top-left-radius: 50% 100px;
     border-bottom-left-radius: 50% 100px;
     font-family: Roboto;
     font-style: normal;
     font-weight: normal;
-    font-size: 49px;
+    font-size: 40px;
     line-height: 57px;
 }

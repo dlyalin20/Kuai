@@ -1,8 +1,12 @@
-from django.db import models
-from django.core.validators import MaxValueValidator, MinValueValidator
-from django.core.exceptions import ValidationError
-from django.contrib.auth.models import User, PermissionsMixin, AbstractBaseUser, BaseUserManager
 import re
+from django.db import models
+from django.db.models.deletion import CASCADE
+from django.dispatch import receiver
+from django.db.models.signals import post_save
+from django.core.exceptions import ValidationError
+from django.contrib.postgres.fields import ArrayField
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.contrib.auth.models import User, PermissionsMixin, AbstractBaseUser, BaseUserManager
 
 # validators
 def validate_user(user):
@@ -89,6 +93,30 @@ class User(AbstractBaseUser, PermissionsMixin):
     
     def __str__(self):
         return self.username
+
+# Custom User Profile
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=CASCADE)
+    latitude = models.IntegerField(null = True, validators= [
+        MinValueValidator(-90),
+        MaxValueValidator(90)
+    ])
+    longitude = models.IntegerField(null = True, validators = [
+        MinValueValidator(-180),
+        MaxValueValidator(180)
+    ])
+    birth_date = models.DateField(null = True, blank = True)
+    favorite_businesses = ArrayField(models.CharField(max_length=40, blank=True))
+
+    @receiver(post_save, sender=User)
+    def create_user_profile(sender, instance, created, **kwargs):
+        if created:
+            Profile.objects.create(user = instance)
+    
+    @receiver(post_save, sender=User)
+    def save_user_profile(sender, instance, **kwargs):
+        instance.profile.save()
+
 
 # Create your models here.
 class waitData(models.Model):

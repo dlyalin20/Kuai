@@ -1,0 +1,40 @@
+{% load socialaccount %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        {% load static %}
+        <title>Logout</title>
+        <!--<link rel="stylesheet" type="text/css" href="{% static 'Landing/css/login.css' %}">-->
+    </head>
+    <body>
+        <!-- navbar -->
+
+        <!-- <div>
+            <h2 class="kuai">Kuai</h2>
+        </div> -->
+        <div id="main-div">
+            <!-- 
+                <h1 id="login">Login</h1> 
+            
+            
+            <form action="{% url 'Landing:login' %}" method="post">
+                {% csrf_token %}
+                {{ form }} 
+                <input type="submit">
+            </form> -->
+            <a href="#" onclick="signOut();">Sign out</a>
+            <script>
+            function signOut() {
+                var auth2 = gapi.auth2.getAuthInstance();
+                auth2.signOut().then(function () {
+                console.log('User signed out.');
+                });
+            }
+            </script>
+            <div id="right">
+
+            </div>
+
+        </div>
+    </body>
+</html>

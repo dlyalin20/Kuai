@@ -1,10 +1,11 @@
 import re
+import collections
 from django.db import models
-from django.db.models.deletion import CASCADE
+from jsonfield import JSONField
 from django.dispatch import receiver
+from django.db.models.deletion import CASCADE
 from django.db.models.signals import post_save
 from django.core.exceptions import ValidationError
-from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import User, PermissionsMixin, AbstractBaseUser, BaseUserManager
 
@@ -106,7 +107,7 @@ class Profile(models.Model):
         MaxValueValidator(180)
     ])
     birth_date = models.DateField(null = True, blank = True)
-    favorite_businesses = ArrayField(models.CharField(max_length=40, blank=True))
+    favorite_businesses = JSONField(null = True)
 
     @receiver(post_save, sender=User)
     def create_user_profile(sender, instance, created, **kwargs):

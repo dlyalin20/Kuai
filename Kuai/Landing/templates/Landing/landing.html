@@ -1,26 +1,35 @@
-{% load static %}
 
 <!DOCTYPE html>
 <html lang="en">
     <head>
         <title>Landing</title>
+        {% load static %}
         <link rel="stylesheet" type="text/css" href="{% static 'Landing/css/landing.css' %}">
-        <!-- <link rel="stylesheet" href="landing.css"> -->
-        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"> </script> 
-<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js" type="text/javascript"></script>
-
     </head>
     <body>
-        {% include "landing/navbar.html" %}
-        <!-- <div>
-            <h2 class="kuai">Kuai</h1>
-        </div> -->
+        
+        <nav role="navigation"> 
+            <div id="menu">
+                <input type="checkbox" />
+                <span></span>
+                <span></span>
+                <span></span>
+                <ul id="options">
+                    <a href="#"><li>Login</li></a>
+                    <a href="#"><li>Register</li></a>
+                    <a href="#"><li>About</li></a>
+                    <a href="#"><li>Contact</li></a>
+                    <a href="#"><li>Terms and Conditions</li></a>
+                </ul>
+            </div>
+            <h2 class="kuai">Kuai</h2></li>
+        </nav>
 
         <div class="landing">
 
             <h1 id="landing-text">Be serviced faster!<br/></h1>
 
-            <form id="search" action="{% url 'Landing:search' %}">
+            <form>
                 <input id="search-input" type="text" placeholder="Name, Location, or Product" name="Main-Search">
                 <input id="search-submit" type="submit" value="Go">
             </form>
@@ -38,17 +47,4 @@
         </div>
 
     </body>
-    <script>
-        $(document).ready(function(){ 
-            $("#search-input").autocomplete({
-                source: "{% url 'Landing:autocomplete' %}",
-                minLength: 2,
-                open: function(){
-                    setTimeout(function () {
-                        $('.ui-autocomplete').css('z-index', 99);
-                    }, 0);
-                }
-              });
-        });
-    </script>
 </html>

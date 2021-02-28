@@ -64,8 +64,8 @@ def index(request):
     return render(request, "landing/landing.html")
 
 def login_view(request):
-    # if request.user.is_authenticated:
-    #     return HttpResponseRedirect('/')
+    if request.user.is_authenticated:
+         return HttpResponseRedirect('/')
     # if request.method == 'POST':
     #     username = request.POST["username"]
     #     password = request.POST["password"]
@@ -78,7 +78,7 @@ def login_view(request):
     })
 
 def logout_view(request):
-    if not request.is_authenticated:
+    if not request.user.is_authenticated:
         return HttpResponseRedirect('/login')
     logout(request)
     return HttpResponseRedirect('/')
@@ -106,7 +106,7 @@ def autocomplete_view(request):
         print(q)
         for r in search_qs:
             results.append(r.name)
-        data = json.dumps(results)
+        data = json.dumps(results) # what is json?
     else:
         data = 'fail'
     mimetype = 'application/json'
@@ -123,7 +123,7 @@ def search(request): #redirect into go if only one result shows
         found = get_object_or_404(search_qs, pk=1)
     except (KeyError): #nothing in input
         return render(request, 'Landing/index.html', {
-            'error_message': "Put somethiang to search for",
+            'error_message': "Put something to search for",
         })
     else:
         # Always return an HttpResponseRedirect after successfully dealing
@@ -133,7 +133,7 @@ def search(request): #redirect into go if only one result shows
 
 def go(request, location_id):
     q = get_object_or_404(User,id=location_id)
-    # return HttpResponse(q.business) // incorportate going to the busniess location later
+    # return HttpResponse(q.business) // incorportate going to the business location later
     return render(request, "Landing/go.html", {
         # business location + name => start loading map
     })

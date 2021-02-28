@@ -1,10 +1,11 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from django import forms
 from django.contrib.auth import authenticate, login, logout
 from django.core.exceptions import ValidationError
 from .models import User, AccountManager
 from .models import waitData, capacityData, waitTimes, Capacity, validate_user, validate_pwd
+from django.urls import reverse
 import re
 
 # format to handle requests and check for integers
@@ -62,16 +63,16 @@ def index(request):
     return render(request, "landing/landing.html")
 
 def login_view(request):
-    if request.user.is_authenticated:
-        return HttpResponseRedirect('/')
-    if request.method == 'POST':
-        username = request.POST["username"]
-        password = request.POST["password"]
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            return HttpResponseRedirect('/')
-    return render(request, "landing/login.html", {
+    # if request.user.is_authenticated:
+    #     return HttpResponseRedirect('/')
+    # if request.method == 'POST':
+    #     username = request.POST["username"]
+    #     password = request.POST["password"]
+    #     user = authenticate(request, username=username, password=password)
+    #     if user is not None:
+    #         login(request, user)
+    #         return HttpResponseRedirect('/')
+    return render(request, "Landing/login.html", {
         "form":UserLoginForm()
     })
 
@@ -92,6 +93,50 @@ def register_view(request):
         password = request.POST["password"]
         User.objects.create_user(username, email=email, password=password, first_name=first_name, last_name=last_name)
         return HttpResponseRedirect('/')
-    return render(request, "landing/register.html", {
+    return render(request, "Landing/register.html", {
        "form":RegisterForm()
     })
+
+def autocomplete_view(request):
+    if request.is_ajax():
+        q = request.GET.get('term', '')
+        search_qs = User.objects.filter(is_business=True).filter(business__startswith=q)
+        results = []
+        print(q)
+        for r in search_qs:
+            results.append(r.name)
+        data = json.dumps(results)
+    else:
+        data = 'fail'
+    mimetype = 'application/json'
+    return HttpResponse(data, mimetype)
+
+def search(request): #redirect into go if only one result shows
+    try:
+        searchWord = request.POST['Main-Search'].strip().lower()
+        print("recived post request, Search Word: "+ searchWord)
+        search_qs = User.objects.filter(is_business=True).filter(business__startswith=q)
+        # if len(search_qs) = 1:
+        # else 
+        # if one object found move to map // other wise to more specific search
+        found = get_object_or_404(search_qs, pk=1)
+    except (KeyError): #nothing in input
+        return render(request, 'Landing/index.html', {
+            'error_message': "Put somethiang to search for",
+        })
+    else:
+        # Always return an HttpResponseRedirect after successfully dealing
+        # with POST data. This prevents data from being posted twice if a
+        # user hits the Back button
+        return HttpResponseRedirect(reverse("Landing:go", args=(found.id,)))# go screen figure out how to not hard code later
+
+def go(request, location_id):
+    q = get_object_or_404(User,id=location_id)
+    # return HttpResponse(q.business) // incorportate going to the busniess location later
+    return render(request, "Landing/go.html", {
+        # business location + name => start loading map
+    })
+
+# test view for testing out html elements
+def test(request):
+    return render(request, "Landing/navbar.html")

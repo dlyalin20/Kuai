@@ -127,3 +127,4 @@ class Capacity(models.Model):
         MinValueValidator(0),
         MaxValueValidator(100)
     ], default = 0)
+

@@ -80,9 +80,8 @@ def login_view(request):
 def logout_view(request):
     if not request.user.is_authenticated:
         return HttpResponseRedirect('/login')
-    return render(request, "Landing/logout.html")
-    #logout(request)
-    #return HttpResponseRedirect('/')
+    logout(request)
+    return HttpResponseRedirect('/')
 
 def register_view(request):
     if request.user.is_authenticated:

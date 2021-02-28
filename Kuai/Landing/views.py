@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from .models import User, AccountManager
 from .models import waitData, capacityData, waitTimes, Capacity, validate_user, validate_pwd
 from django.urls import reverse
+import json
 import re
 
 # format to handle requests and check for integers
@@ -115,7 +116,7 @@ def search(request): #redirect into go if only one result shows
     try:
         searchWord = request.POST['Main-Search'].strip().lower()
         print("recived post request, Search Word: "+ searchWord)
-        search_qs = User.objects.filter(is_business=True).filter(business__startswith=q)
+        search_qs = User.objects.filter(is_business=True).filter(business__startswith=searchWord)
         # if len(search_qs) = 1:
         # else 
         # if one object found move to map // other wise to more specific search

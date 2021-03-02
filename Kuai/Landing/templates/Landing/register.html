@@ -3,7 +3,7 @@
     <head>
         <title>Kuai: Login</title>
     </head>
-
+    {% include 'Landing/navbar.html' %}
     <body>
         <form action="{% url 'register' %}" method="post">
                {% csrf_token %}

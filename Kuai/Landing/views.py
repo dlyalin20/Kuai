@@ -114,7 +114,7 @@ def autocomplete_view(request):
 
 def search(request): #redirect into go if only one result shows
     try:
-        searchWord = request.POST['Main-Search'].strip().lower()
+        searchWord = request.POST['q'].strip().lower()
         print("recived post request, Search Word: "+ searchWord)
         search_qs = User.objects.filter(is_business=True).filter(business__startswith=searchWord)
         # if len(search_qs) = 1:

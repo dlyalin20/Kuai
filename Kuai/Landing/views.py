@@ -61,7 +61,9 @@ def index(request):
     # same landing page; change top right display based on whether logged in or not
     # if request.user.is_authenticated:
     #     return HttpResponse("Hello authenticated!")
-    return render(request, "landing/landing.html")
+    return render(request, "landing/landing.html", {
+        "authenticated" : request.user.is_authenticated
+    })
 
 def login_view(request):
     if request.user.is_authenticated:

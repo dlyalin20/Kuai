@@ -140,6 +140,8 @@ def go(request, location_id):
         # business location + name => start loading map
     })
 
+# Route an account view that passes all arguments to account template; also updates fave-businesses and maybe history; updates pic; figures out time of day
+
 # test view for testing out html elements
 def test(request):
     return render(request, "Landing/navbar.html")

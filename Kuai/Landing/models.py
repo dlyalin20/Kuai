@@ -107,7 +107,9 @@ class Profile(models.Model):
         MaxValueValidator(180)
     ])
     birth_date = models.DateField(null = True, blank = True)
-    favorite_businesses = JSONField(null = True)
+    profile_pic = models.BinaryField(blank = True)
+    favorite_businesses = JSONField(null = True) # Map each business to Name, Category (food, event, etc.), distance from user home point
+    history = JSONField(null = True) #store business name mapped with date/time searched
 
     @receiver(post_save, sender=User)
     def create_user_profile(sender, instance, created, **kwargs):

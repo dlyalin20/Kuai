@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        {% load static %}
+        <title>My Account</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    {% include 'Landing/navbar.html' %}
+    <body>
+        <center>
+            <h1 class="title">Good {{ time }}, {{ name }}</h1>
+            <figure class="image">
+                <img class="is-rounded" src="{{ profile_pic | default('profile.jpg') }}" alt = {{ name }} width="120" height="90" />
+            </figure>
+        </center>
+        <h1 class="title">Favorite Places: </h1> <button class="button is-light is-outlined is-rounded">+</button> <!--Add JS function to add favorite place-->
+        <table class="table is-striped is-hoverable">
+            <thead class="thead">
+                <tr class="tr">
+                    <th class="th">Name</th>
+                    <th class="th">Name</th>
+                    <th class="th">Distance</th>
+                    <th class="th">Wait Time</th>
+                    <th class="th">Sort By: <!---Add input here to sort by dif--></th>
+                </tr>
+            </thead>
+            {% if favorites %}
+                {% for favorite in favorites %}
+                <tr class="tr">
+                    <td class="td">{{ favorite['name'] }}</td>
+                    <td class="td">{{ favorite['category'] }}</td>{# Figure out where to store category #}
+                    <td class="td">{{ favorite['distance'] }}</td>
+                    <td class="td">{{ favorite['wait time'] }}</td>
+                </tr>
+                {% endfor %}
+            {% else %}
+            <tr class="tr">
+                <!--Finish up later-->
+                <td class="td">No Data</td>
+                <td class="td">Add a Favorite to Start!</td>
+            </tr>
+            {% endif %}
+        </table>
+
+        <h1 class="title">My History: </h1>
+        <table class="table is-striped is-hoverable">
+            <thead class="thead">
+                <tr class="tr">
+                    <td class="td">Name</td>
+                    <td class="td">Date Visited</td>
+                </tr>
+            </thead>
+            {% if history %}
+                {% for entry in history %}
+                    <tr class="tr">
+                        <td class="td">{{ entry['name'] }}</td>
+                        <td class="td">{{ entry['date'] }}</td>
+                    </tr>
+                {% endfor %}
+            {% else %}
+            <tr class="tr">
+                <td>No History</td>
+                <td>Use Kuai to Generate a History!</td>
+            </tr>
+            {% endif %}
+        </table>
+    </body>
+</html>

@@ -41,8 +41,6 @@ def addCapacity(request, ID, capacity):
         capacities = Capacity(business = ID, numReviews = 1, average = capacity)
         capacities.save()
     
-
-
 # login form
 class UserLoginForm(forms.Form):
     username = forms.CharField(label="Username: ", required=True, max_length=20)
@@ -55,13 +53,35 @@ class RegisterForm(forms.Form):
     username = forms.CharField(label="Username: ", required=True, max_length=20, validators=[validate_user])
     password = forms.CharField(label="Password: ", widget=forms.PasswordInput, max_length=20, required=True, validators=[validate_pwd])
 
-
 # Create your views here.
 def index(request):
     # same landing page; change top right display based on whether logged in or not
     # if request.user.is_authenticated:
     #     return HttpResponse("Hello authenticated!")
-    return render(request, "landing/landing.html")
+    # simple search handler
+    print('indexRequest')
+    
+    
+    return render(request, "Landing/landing.html")
+
+def search(request): 
+    query = request.GET.get('q', False)
+    if (query):
+        print(query)
+        pass
+    return render(request, "Landing/advanced_search.html")
+    
+
+def go(request):
+    id = request.GET.get('id', False)
+    if (id):
+        #we have id => create custom map
+        print(id)
+        return render(request, "Landing/go.html", {
+            "target_id" : id,
+    })
+    return render(request, "Landing/go.html", {
+    })
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -98,45 +118,6 @@ def register_view(request):
        "form":RegisterForm()
     })
 
-def autocomplete_view(request):
-    if request.is_ajax():
-        q = request.GET.get('term', '')
-        search_qs = User.objects.filter(is_business=True).filter(business__startswith=q)
-        results = []
-        print(q)
-        for r in search_qs:
-            results.append(r.name)
-        data = json.dumps(results) # what is json?
-    else:
-        data = 'fail'
-    mimetype = 'application/json'
-    return HttpResponse(data, mimetype)
-
-def search(request): #redirect into go if only one result shows
-    try:
-        searchWord = request.POST['q'].strip().lower()
-        print("recived post request, Search Word: "+ searchWord)
-        search_qs = User.objects.filter(is_business=True).filter(business__startswith=searchWord)
-        # if len(search_qs) = 1:
-        # else 
-        # if one object found move to map // other wise to more specific search
-        found = get_object_or_404(search_qs, pk=1)
-    except (KeyError): #nothing in input
-        return render(request, 'Landing/index.html', {
-            'error_message': "Put something to search for",
-        })
-    else:
-        # Always return an HttpResponseRedirect after successfully dealing
-        # with POST data. This prevents data from being posted twice if a
-        # user hits the Back button
-        return HttpResponseRedirect(reverse("Landing:go", args=(found.id,)))# go screen figure out how to not hard code later
-
-def go(request, location_id):
-    q = get_object_or_404(User,id=location_id)
-    # return HttpResponse(q.business) // incorportate going to the business location later
-    return render(request, "Landing/go.html", {
-        # business location + name => start loading map
-    })
 
 # test view for testing out html elements
 def test(request):

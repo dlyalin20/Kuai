@@ -5,6 +5,9 @@
         <title>Landing</title>
         {% load static %}
         <link rel="stylesheet" type="text/css" href="{% static 'Landing/css/landing.css' %}">
+
+
+  
     </head>
     <body>
         
@@ -49,4 +52,11 @@
         </div>
 
     </body>
+            <!-- hid api keys later -->
+            <script
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBzd999zA1_gyh7uB6KpUh-hBaYsl0vmIQ&callback=initialize&libraries=places&v=weekly"
+            defer
+          ></script>
+          <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+          <script src="{% static 'Landing/js/landing.js' %}"></script>
 </html>

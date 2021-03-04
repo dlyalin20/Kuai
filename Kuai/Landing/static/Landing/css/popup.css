@@ -1,0 +1,54 @@
+#bizname {
+    position: absolute;
+    width: 471.82px;
+    height: 156.93px;
+    left: 60.92px;
+    top: 150.93px;
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 52px;
+    line-height: 61px;
+    text-align: center;
+}
+
+#specifics {
+    position: absolute;
+    width: 313.19px;
+    height: 101.18px;
+    left: 105.75px;
+    top: 259.45px;
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 42px;
+    line-height: 49px;
+    text-align: center;
+}
+
+#imgarea {
+    position: absolute;
+    width: 574px;
+    height: 659px;
+    left: 531px;
+    top: 151px;
+    background: #C4C4C4;
+    border: 1px solid #000000;
+    box-sizing: border-box;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 66px;
+}
+
+#altrec {
+    position: absolute;
+    width: 922px;
+    height: 99px;
+    left: 151px;
+    top: 892px;
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 62px;
+    line-height: 73px;
+    text-align: center;
+}

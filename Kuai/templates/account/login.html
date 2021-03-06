@@ -1,16 +1,19 @@
-
-{% extends "account/login.html" %}
+{% extends "account/base.html" %}
+{% load i18n %}
 {% load socialaccount %}
-<!DOCTYPE html>
-<html lang="en">
-    <head>
+{% block head_title %}{% trans "Sign In" %}{% endblock %}
+<!-- <!DOCTYPE html>
+<html lang="en"> -->
+    <!-- <head> -->
         {% load static %}
-        <title>Login</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- <title>Login</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1"> -->
         <link rel="stylesheet" type="text/css" href="{% static 'Landing/css/login.css' %}">
-    </head>
+    <!-- </head> -->
+    {% block content %}
     {% include 'Landing/navbar.html' %}
-    <body>
+
+
         <!-- navbar -->
 
         <!-- <div>
@@ -21,7 +24,7 @@
                 <h1 id="login">Login</h1> 
             
             
-            <form action="{% url 'Landing:login' %}" method="post">
+            <form action="#" method="post">
                 {% csrf_token %}
                 {{ form }} 
                 <input type="submit">
@@ -51,5 +54,4 @@
             </div>
 
         </div>
-    </body>
-</html>
+{% endblock %}

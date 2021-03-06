@@ -1,0 +1,55 @@
+
+{% extends "account/login.html" %}
+{% load socialaccount %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        {% load static %}
+        <title>Login</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" type="text/css" href="{% static 'Landing/css/login.css' %}">
+    </head>
+    {% include 'Landing/navbar.html' %}
+    <body>
+        <!-- navbar -->
+
+        <!-- <div>
+            <h2 class="kuai">Kuai</h2>
+        </div> -->
+        <div id="main-div">
+            <!-- 
+                <h1 id="login">Login</h1> 
+            
+            
+            <form action="{% url 'Landing:login' %}" method="post">
+                {% csrf_token %}
+                {{ form }} 
+                <input type="submit">
+            </form> -->
+            <div id="left">
+                <!-- <div id="login-button-surrounding">
+                </div> -->
+                <h1 id="title">Login</h1>
+                <div id="loginForm">    
+                    <a href="{% provider_login_url 'google' %}">
+
+                    <img id="GoogleSignIn" src="{% static 'Landing/imgs/btn_google_signin_light_normal_web@2x.png' %}"/>
+                    </a>
+
+                    <div id="rememberMe">
+                        <input id="RMcheckbox"type="checkbox"/>
+                        <span id="SSI">Stay signed in</span>
+                    </div>
+
+                    <div id="goButton">
+                        <span id="goText">Go</span>
+                    </div>
+                </div>
+            </div>
+            <div id="right">
+
+            </div>
+
+        </div>
+    </body>
+</html>

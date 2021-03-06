@@ -65,40 +65,40 @@ def index(request):
         "authenticated" : request.user.is_authenticated
     })
 
-def login_view(request):
-    if request.user.is_authenticated:
-         return HttpResponseRedirect('/')
-    # if request.method == 'POST':
-    #     username = request.POST["username"]
-    #     password = request.POST["password"]
-    #     user = authenticate(request, username=username, password=password)
-    #     if user is not None:
-    #         login(request, user)
-    #         return HttpResponseRedirect('/')
-    return render(request, "Landing/login.html", {
-        "form":UserLoginForm()
-    })
+# def login_view(request):
+#     if request.user.is_authenticated:
+#          return HttpResponseRedirect('/')
+#     # if request.method == 'POST':
+#     #     username = request.POST["username"]
+#     #     password = request.POST["password"]
+#     #     user = authenticate(request, username=username, password=password)
+#     #     if user is not None:
+#     #         login(request, user)
+#     #         return HttpResponseRedirect('/')
+#     return render(request, "Landing/login.html", {
+#         "form":UserLoginForm()
+#     })
 
-def logout_view(request):
-    if not request.user.is_authenticated:
-        return HttpResponseRedirect('/login')
-    logout(request)
-    return HttpResponseRedirect('/')
+# def logout_view(request):
+#     if not request.user.is_authenticated:
+#         return HttpResponseRedirect('/login')
+#     logout(request)
+#     return HttpResponseRedirect('/')
 
-def register_view(request):
-    if request.user.is_authenticated:
-        return HttpResponseRedirect('')
-    if request.method == 'POST':
-        first_name = request.POST["first_name"]
-        last_name = request.POST["last_name"]
-        email = request.POST["email"]
-        username = request.POST["username"]
-        password = request.POST["password"]
-        User.objects.create_user(username, email=email, password=password, first_name=first_name, last_name=last_name)
-        return HttpResponseRedirect('/')
-    return render(request, "Landing/register.html", {
-       "form":RegisterForm()
-    })
+# def register_view(request):
+#     if request.user.is_authenticated:
+#         return HttpResponseRedirect('')
+#     if request.method == 'POST':
+#         first_name = request.POST["first_name"]
+#         last_name = request.POST["last_name"]
+#         email = request.POST["email"]
+#         username = request.POST["username"]
+#         password = request.POST["password"]
+#         User.objects.create_user(username, email=email, password=password, first_name=first_name, last_name=last_name)
+#         return HttpResponseRedirect('/')
+#     return render(request, "Landing/register.html", {
+#        "form":RegisterForm()
+#     })
 
 def autocomplete_view(request):
     if request.is_ajax():

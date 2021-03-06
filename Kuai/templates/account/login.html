@@ -1,7 +1,5 @@
-{% extends "account/base.html" %}
 {% load i18n %}
 {% load socialaccount %}
-{% block head_title %}{% trans "Sign In" %}{% endblock %}
 <!-- <!DOCTYPE html>
 <html lang="en"> -->
     <!-- <head> -->
@@ -16,12 +14,8 @@
 
         <!-- navbar -->
 
-        <!-- <div>
-            <h2 class="kuai">Kuai</h2>
-        </div> -->
         <div id="main-div">
             <!-- 
-                <h1 id="login">Login</h1> 
             
             
             <form action="#" method="post">
@@ -38,6 +32,11 @@
 
                     <img id="GoogleSignIn" src="{% static 'Landing/imgs/btn_google_signin_light_normal_web@2x.png' %}"/>
                     </a>
+
+                    <p>{% blocktrans with site.name as site_name %}Please sign in with one
+                        of your existing third party accounts. Or, <a href="{{ signup_url }}">sign up</a>
+                        for a {{ site_name }} account and sign in below:{% endblocktrans %}</p>
+ 
 
                     <div id="rememberMe">
                         <input id="RMcheckbox"type="checkbox"/>

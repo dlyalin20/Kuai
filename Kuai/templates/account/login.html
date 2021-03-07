@@ -26,27 +26,27 @@
             <div id="left">
                 <!-- <div id="login-button-surrounding">
                 </div> -->
-                <h1 id="title">Login</h1>
-                <div id="loginForm">    
-                    <a href="{% provider_login_url 'google' %}">
+                    <h1 id="title">Login</h1>
+                    <div id="loginForm">    
+                        <a href="{% provider_login_url 'google' %}">
 
-                    <img id="GoogleSignIn" src="{% static 'Landing/imgs/btn_google_signin_light_normal_web@2x.png' %}"/>
-                    </a>
+                        <img id="GoogleSignIn" src="{% static 'Landing/imgs/btn_google_signin_light_normal_web@2x.png' %}"/>
+                        </a>
 
-                    <p>{% blocktrans with site.name as site_name %}Please sign in with one
-                        of your existing third party accounts. Or, <a href="{{ signup_url }}">sign up</a>
-                        for a {{ site_name }} account and sign in below:{% endblocktrans %}</p>
- 
+                        <p>{% blocktrans with site.name as site_name %}Please sign in with one
+                            of your existing third party accounts. Or, <a href="{{ signup_url }}">sign up</a>
+                            for a {{ site_name }} account and sign in below:{% endblocktrans %}</p>
+    
 
-                    <div id="rememberMe">
-                        <input id="RMcheckbox"type="checkbox"/>
-                        <span id="SSI">Stay signed in</span>
+                        <div id="rememberMe">
+                            <input id="RMcheckbox"type="checkbox"/>
+                            <span id="SSI">Stay signed in</span>
+                        </div>
+
+                        <div id="goButton">
+                            <span id="goText">Go</span>
+                        </div>
                     </div>
-
-                    <div id="goButton">
-                        <span id="goText">Go</span>
-                    </div>
-                </div>
             </div>
             <div id="right">
 

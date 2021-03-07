@@ -38,7 +38,7 @@ h1{
     --formWidth: 500px;
 }
 #left{
-    background-color: white;
+    background-color: pink;
     width: var(--formWidth);
     height: inherit;
     flex-direction: column;
@@ -61,6 +61,7 @@ h1{
     line-height: 73px;
     text-align: center;
     color: #000000;
+    text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 }
 
 #left > #loginForm{

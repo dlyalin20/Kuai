@@ -11,7 +11,7 @@ from django.contrib.auth.models import User, PermissionsMixin, AbstractBaseUser,
 
 # validators
 def validate_user(user):
-    if len(user) <= 8 or len(user) > 20:
+    if len(user) < 8 or len(user) > 20:
         raise ValidationError("Username must be between lengths 8 and 20, inclusive.")
     if len(re.findall("\s", user)) > 0:
         raise ValidationError("Username cannot contain whitespace characters.")
@@ -98,18 +98,18 @@ class User(AbstractBaseUser, PermissionsMixin):
 # Custom User Profile
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=CASCADE)
-    latitude = models.IntegerField(null = True, validators= [
+    latitude = models.IntegerField(null = True, blank = True, validators= [
         MinValueValidator(-90),
         MaxValueValidator(90)
     ])
-    longitude = models.IntegerField(null = True, validators = [
+    longitude = models.IntegerField(null = True, blank = True, validators = [
         MinValueValidator(-180),
         MaxValueValidator(180)
     ])
     birth_date = models.DateField(null = True, blank = True)
-    profile_pic = models.BinaryField(blank = True)
-    favorite_businesses = JSONField(null = True) # Map each business to Name, Category (food, event, etc.), distance from user home point
-    history = JSONField(null = True) #store business name mapped with date/time searched
+    profile_pic = models.BinaryField(blank = True, null = True)
+    favorite_businesses = JSONField(null = True, blank = True) # Map each business to Name, Category (food, event, etc.), distance from user home point
+    history = JSONField(null = True, blank = True) #store business name mapped with date/time searched
 
     @receiver(post_save, sender=User)
     def create_user_profile(sender, instance, created, **kwargs):

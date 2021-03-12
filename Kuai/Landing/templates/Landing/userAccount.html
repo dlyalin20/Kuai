@@ -4,6 +4,7 @@
         {% load static %}
         <title>My Account</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script src="{% static 'Landing/js/sorttable.js' %}"></script>
     </head>
     {% include 'Landing/navbar.html' %}
     <body>
@@ -14,7 +15,7 @@
             </figure>
         </center>
         <h1 class="title">Favorite Places: </h1> <button class="button is-light is-outlined is-rounded">+</button> <!--Add JS function to add favorite place-->
-        <table class="table is-striped is-hoverable">
+        <table class="table is-striped is-hoverable sorttable">
             <thead class="thead">
                 <tr class="tr">
                     <th class="th">Name</th>

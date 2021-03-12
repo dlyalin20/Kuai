@@ -40,7 +40,7 @@ def addCapacity(request, ID, capacity):
     except:
         capacities = Capacity(business = ID, numReviews = 1, average = capacity)
         capacities.save()
-    
+
 
 
 # login form
@@ -61,10 +61,12 @@ def index(request):
     # same landing page; change top right display based on whether logged in or not
     # if request.user.is_authenticated:
     #     return HttpResponse("Hello authenticated!")
-    return render(request, "landing/landing.html", {
+    return render(request, "Landing/landing.html", {
         "authenticated" : request.user.is_authenticated
     })
 
+def profile(request):
+    return render(request, "Landing/profile.html")
 # def login_view(request):
 #     if request.user.is_authenticated:
 #          return HttpResponseRedirect('/')
@@ -120,7 +122,7 @@ def search(request): #redirect into go if only one result shows
         print("recived post request, Search Word: "+ searchWord)
         search_qs = User.objects.filter(is_business=True).filter(business__startswith=searchWord)
         # if len(search_qs) = 1:
-        # else 
+        # else
         # if one object found move to map // other wise to more specific search
         found = get_object_or_404(search_qs, pk=1)
     except (KeyError): #nothing in input

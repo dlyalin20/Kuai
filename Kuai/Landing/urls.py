@@ -10,6 +10,7 @@ urlpatterns = [
     path('search', views.search, name='search'),
     path('autocomplete', views.autocomplete_view, name="autocomplete"),
     path('<int:location_id>/go', views.go, name="go"),
+    path('profile', views.profile, name="profile"),
     #     # new code
     # path('accounts/', include('allauth.urls')),
     path('test', views.test, name="test"),

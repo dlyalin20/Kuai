@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from .models import User, AccountManager
 from .models import waitData, capacityData, waitTimes, Capacity, validate_user, validate_pwd
 from django.urls import reverse
+from django.contrib.auth.decorators import login_required
 import json
 import re
 
@@ -40,7 +41,7 @@ def addCapacity(request, ID, capacity):
     except:
         capacities = Capacity(business = ID, numReviews = 1, average = capacity)
         capacities.save()
-    
+
 
 
 # login form
@@ -61,44 +62,53 @@ def index(request):
     # same landing page; change top right display based on whether logged in or not
     # if request.user.is_authenticated:
     #     return HttpResponse("Hello authenticated!")
-    return render(request, "landing/landing.html", {
+    return render(request, "Landing/landing.html", {
         "authenticated" : request.user.is_authenticated
     })
+@login_required(login_url='/accounts/login/')
+def profile(request):
+    current_user = request.user
+    print(current_user.id)
+    for attr, value in vars(current_user).items():
+        print("Attribute: " + str(attr or ""))
+        print("Value: " + str(value or ""))
+    print(current_user._wrapped.username)
+    return render(request, "Landing/profile.html")
 
-def login_view(request):
-    if request.user.is_authenticated:
-         return HttpResponseRedirect('/')
-    # if request.method == 'POST':
-    #     username = request.POST["username"]
-    #     password = request.POST["password"]
-    #     user = authenticate(request, username=username, password=password)
-    #     if user is not None:
-    #         login(request, user)
-    #         return HttpResponseRedirect('/')
-    return render(request, "Landing/login.html", {
-        "form":UserLoginForm()
-    })
+# def login_view(request):
+#     if request.user.is_authenticated:
+#          return HttpResponseRedirect('/')
+#     # if request.method == 'POST':
+#     #     username = request.POST["username"]
+#     #     password = request.POST["password"]
+#     #     user = authenticate(request, username=username, password=password)
+#     #     if user is not None:
+#     #         login(request, user)
+#     #         return HttpResponseRedirect('/')
+#     return render(request, "Landing/login.html", {
+#         "form":UserLoginForm()
+#     })
 
-def logout_view(request):
-    if not request.user.is_authenticated:
-        return HttpResponseRedirect('/login')
-    logout(request)
-    return HttpResponseRedirect('/')
+# def logout_view(request):
+#     if not request.user.is_authenticated:
+#         return HttpResponseRedirect('/login')
+#     logout(request)
+#     return HttpResponseRedirect('/')
 
-def register_view(request):
-    if request.user.is_authenticated:
-        return HttpResponseRedirect('')
-    if request.method == 'POST':
-        first_name = request.POST["first_name"]
-        last_name = request.POST["last_name"]
-        email = request.POST["email"]
-        username = request.POST["username"]
-        password = request.POST["password"]
-        User.objects.create_user(username, email=email, password=password, first_name=first_name, last_name=last_name)
-        return HttpResponseRedirect('/')
-    return render(request, "Landing/register.html", {
-       "form":RegisterForm()
-    })
+# def register_view(request):
+#     if request.user.is_authenticated:
+#         return HttpResponseRedirect('')
+#     if request.method == 'POST':
+#         first_name = request.POST["first_name"]
+#         last_name = request.POST["last_name"]
+#         email = request.POST["email"]
+#         username = request.POST["username"]
+#         password = request.POST["password"]
+#         User.objects.create_user(username, email=email, password=password, first_name=first_name, last_name=last_name)
+#         return HttpResponseRedirect('/')
+#     return render(request, "Landing/register.html", {
+#        "form":RegisterForm()
+#     })
 
 def autocomplete_view(request):
     if request.is_ajax():
@@ -120,7 +130,7 @@ def search(request): #redirect into go if only one result shows
         print("recived post request, Search Word: "+ searchWord)
         search_qs = User.objects.filter(is_business=True).filter(business__startswith=searchWord)
         # if len(search_qs) = 1:
-        # else 
+        # else
         # if one object found move to map // other wise to more specific search
         found = get_object_or_404(search_qs, pk=1)
     except (KeyError): #nothing in input

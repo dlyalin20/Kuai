@@ -121,6 +121,7 @@ class Profile(models.Model):
         instance.profile.save()
 
 
+
 # Create your models here.
 class waitData(models.Model):
     business = models.CharField(max_length = 40)

@@ -38,7 +38,7 @@ h1{
     --formWidth: 500px;
 }
 #left{
-    background-color: white;
+    background-color: pink;
     width: var(--formWidth);
     height: inherit;
     flex-direction: column;
@@ -61,75 +61,79 @@ h1{
     line-height: 73px;
     text-align: center;
     color: #000000;
+    text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 }
 
 #left > #loginForm{
+    padding: 2em 0em 3em 0;
     position: absolute;
     width: 410px;
-    height: 252px;
     left: 49px;
     top: 247px;
     background: #C4C4C4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 #loginForm > a >#GoogleSignIn{
-    position: absolute;
+    /* position: absolute; */
     width: 342px;
     height: 83px;
-    left: 33px;
-    top: 43px;
+    /* left: 33px; */
+    /* top: 43px; */
 }
 #loginForm > #rememberMe{
-    position: absolute;
-    width: 330.41px;
-    height: 40px;
-    top: 154px;
-    left: 39.79px;
+    /* position: absolute; */
+    /* width: 330.41px; */
+    /* height: 40px; */
+    /* top: 154px; */
+    /* left: 39.79px; */
     /* background-color: red; */
     text-align: center;
 }
 
 #rememberMe > #RMcheckbox {
-    position: absolute;
+    /* position: absolute; */
     width: 30px;
     height: 30px;
-    left: 3px;
-    top: 2px;
-
+    /* left: 3px; */
+    /* top: 2px; */
     border: 1px solid #BDBDBD;
     box-sizing: border-box;
     border-radius: 2px;
 }
 
 #rememberMe > #SSI{
-    position: absolute;
-    left: 49.21px;
-    right: -4.54%;
-    top: 0%;
-    bottom: 0%;
+    /* position: absolute; */
+    /* left: 49.21px; */
+    /* right: -4.54%; */
+    /* top: 0%; */
+    /* bottom: 0%; */
     font-family: Rubik;
     font-style: normal;
     font-weight: normal;
     font-size: 34px;
     line-height: 40px;
-    display: flex;
-    align-items: center;
-    text-align: center;
+    /* display: flex; */
+    /* align-items: center; */
+    /* text-align: center; */
     color: #023F62;
 }
-#loginForm > #goButton{
+#goButton{
     position: absolute;
     width: 410px;
     height: 87px;
-    top: 209px;
+    bottom: -2.8em;
     background: #9B9BC1;
     border-radius: 50%;
     text-align: center;
 }
 
-#goButton > #goText{
-    position: absolute;
+#goText{
+    /* position: absolute; */
     width: 168.82px;
-    height: 61px;
+    /* height: 61px; */
     left: 123px;
     top: 13px;
     font-family: Roboto;

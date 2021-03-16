@@ -1,0 +1,65 @@
+{% load i18n %}
+{% load socialaccount %}
+<!-- <!DOCTYPE html>
+<html lang="en"> -->
+    <!-- <head> -->
+        {% load static %}
+        <!-- <title>Login</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1"> -->
+        <link rel="stylesheet" type="text/css" href="{% static 'Landing/css/login.css' %}">
+    <!-- </head> -->
+    {% block content %}
+    {% include 'Landing/navbar.html' %}
+
+
+        <!-- navbar -->
+
+        <div id="main-div">
+            <!-- 
+            
+            
+            <form action="#" method="post">
+                {% csrf_token %}
+                {{ form }} 
+                <input type="submit">
+            </form> -->
+            <div id="left">
+                <!-- <div id="login-button-surrounding">
+                </div> -->
+                    <h1 id="title">Login</h1>
+                    <div id="loginForm">    
+                        <a href="{% provider_login_url 'google' %}">
+
+                        <img id="GoogleSignIn" src="{% static 'Landing/imgs/btn_google_signin_light_normal_web@2x.png' %}"/>
+                        </a>
+                        <p>Or</p>
+                          
+                            <form class="login" method="POST" action="{% url 'account_login' %}">
+                                {% csrf_token %}
+                                {{ form.as_p }}
+                                {% if redirect_field_value %}
+                                <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+                                {% endif %}
+                                <a class="button secondaryAction" href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
+                                <button class="primaryAction" type="submit">{% trans "Sign In" %}</button>
+                              </form>
+                              <p>{% blocktrans with site.name as site_name %}Please sign in with one
+                                of your existing third party accounts. Or, <a href="{{ signup_url }}">sign up</a>
+                                for a {{ site_name }} account{% endblocktrans %}</p>
+                              
+                        <!-- <div id="rememberMe">
+                            <input id="RMcheckbox"type="checkbox"/>
+                            <span id="SSI">Stay signed in</span>
+                        </div> -->
+
+                        <div id="goButton">
+                            <span id="goText">Go</span>
+                        </div>
+                    </div>
+            </div>
+            <div id="right">
+
+            </div>
+
+        </div>
+{% endblock %}

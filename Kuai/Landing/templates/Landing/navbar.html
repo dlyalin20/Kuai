@@ -45,11 +45,12 @@
         </div>
       </div>
   
-      {% if authenticated %}
+      {% if user.is_authenticated %}
+      <!-- authenticated -->
       <div class="navbar-end">
         <div class="navbar-item">
           <div class="buttons">
-            <a class="button is-primary" href="{% url 'Landing' 'profile' %}">
+            <a class="button is-primary" href="/profile">
               <strong>My Account</strong>
             </a>
             <a class="button is-light" href="{% url 'account_logout' %}">

@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from .models import User, AccountManager
 from .models import waitData, capacityData, waitTimes, Capacity, validate_user, validate_pwd
 from django.urls import reverse
+from django.contrib.auth.decorators import login_required
 import json
 import re
 
@@ -64,9 +65,16 @@ def index(request):
     return render(request, "Landing/landing.html", {
         "authenticated" : request.user.is_authenticated
     })
-
+@login_required(login_url='/accounts/login/')
 def profile(request):
+    current_user = request.user
+    print(current_user.id)
+    for attr, value in vars(current_user).items():
+        print("Attribute: " + str(attr or ""))
+        print("Value: " + str(value or ""))
+    print(current_user._wrapped.username)
     return render(request, "Landing/profile.html")
+
 # def login_view(request):
 #     if request.user.is_authenticated:
 #          return HttpResponseRedirect('/')

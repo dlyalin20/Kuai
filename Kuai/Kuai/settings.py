@@ -56,7 +56,7 @@ INSTALLED_APPS = [
 # ACCOUNT_LOGIN_ATTEMPTS_LIMIT = 5
 # ACCOUNT_LOGIN_ATTEMPTS_TIMEOUT = 86400 # 1 day in seconds
 ACCOUNT_LOGOUT_REDIRECT_URL ='/accounts/login/'
-LOGIN_REDIRECT_URL = '/profile' # default to /accounts/profile
+LOGIN_REDIRECT_URL = '/profile' # redirect to /profile
 SOCIALACCOUNT_AUTO_SIGNUP = False
 
 MIDDLEWARE = [

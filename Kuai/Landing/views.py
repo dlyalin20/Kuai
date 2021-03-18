@@ -72,7 +72,7 @@ def search(request):
     if (query):
         print(query)
         pass
-    return render(request, "Landing/advanced_search.html")
+    return render(request, "Landing/advanced_search.html", {"q" : query})
     
 
 def go(request):

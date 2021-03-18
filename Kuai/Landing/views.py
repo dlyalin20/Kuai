@@ -68,7 +68,7 @@ def index(request):
     return render(request, "Landing/landing.html")
 
 def search(request): 
-    query = request.GET.get('q', False)
+    query = request.GET.get('q', "")
     if (query):
         print(query)
         pass
@@ -76,7 +76,7 @@ def search(request):
     
 
 def go(request):
-    id = request.GET.get('id', False)
+    id = request.GET.get('id', "")
     if (id):
         #we have id => create custom map
         print(id)

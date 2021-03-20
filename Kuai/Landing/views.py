@@ -106,6 +106,7 @@ def profile(request):
     for attr, value in vars(current_user).items():
         print("Attribute: " + str(attr or ""))
         print("Value: " + str(value or ""))
+        print(current_user.profile.birth_date)
     print(current_user._wrapped.username)
     return render(request, "Landing/profile.html")
 

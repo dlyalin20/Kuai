@@ -10,6 +10,7 @@ urlpatterns = [
     # tentative location may put in different project
     path('search', views.search, name='search'),
     path('go', views.go, name="go"),
+    path("profile", views.profile, name="profile"),
     #     # new code
     # path('accounts/', include('allauth.urls')),
     path('test', views.test, name="test"),

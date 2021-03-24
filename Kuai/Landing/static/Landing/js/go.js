@@ -8,7 +8,6 @@ function initialize() {
     // let infowindow;
     const input = document.getElementById('search-input')
     getLocation();
-
     
     function search() {
         advQuery = input.value;
@@ -22,12 +21,10 @@ function initialize() {
                 if (status === google.maps.places.PlacesServiceStatus.OK && results) {
                     console.log(results);
                     var htmlString ="";
-                    console.log("2test");
                     for (let i = 0; i < results.length; i++) {
-                        console.log('test');
                     // createMarker(results[i]);
-                        htmlString += `<div class='option-items'>
-                            ` + (i + 1) + '|' + results[i].name + '|' + results[0].geometry.location +
+                        htmlString += `<div class='option-items' location = `+results[0].geometry.location+`>
+                            ` + (i + 1) + '. ' + results[i].name + '|' + results[0].geometry.location +
                             `
                         </div>`;
                         createMarker(results[i]);
@@ -62,18 +59,41 @@ function initialize() {
         }
         
     }
-    
+    const geocoder = new google.maps.Geocoder();
+
+    function lockOn(targetID){
+        
+        if (targetID ){ //!= ""
+        geocoder.geocode({ placeId: targetID }, (results, status) => {
+          console.log('geocode start');
+          targetingPlace = true;
+          if (status !== "OK" && results) {
+            window.alert("Geocoder failed due to: " + status);
+            return;
+          }
+          // Set the position of the marker using the place ID and location.
+          pos = results[0].geometry.location
+          map.setCenter(pos);
+          createMarker(results[0]);
+        });
+      }
+    }
     function showPosition(position){
-      pos = {lat: position.coords.latitude, lng: position.coords.longitude};
-      console.log("after: " + pos);
       initMap();
       if(!(q==="")){
-        console.log(q);
-        input.value = q;
-        search();
+            console.log("query q= " + q + " targetID = " + targetID);
+            input.value = q;
+            if(!(targetID==="")){
+                lockOn(targetID);
+            }else{
+                search();
+            }
         }
         else{
-            console.log("No query sent in");
+            console.log("No query sent in, Default to user position");
+            pos = {lat: position.coords.latitude, lng: position.coords.longitude};
+            console.log("after: " + pos);
+      
         }
         $('#search-submit').on('click', function(event){
             event.preventDefault();

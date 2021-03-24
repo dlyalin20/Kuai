@@ -21,9 +21,9 @@ function initialize() {
             // User entered the name of a Place that was not suggested and
             // pressed the Enter key, or the Place Details request failed.
             //=> route to advanced search
-            window.location.href = '/search?q=' + autocomplete_input.value;
+            window.location.href = '/go?q=' + autocomplete_input.value;
           }
-        //   good this exists, go to go screen with this data
+        // //   good this exists, go to go screen with this data
         else{
             console.log(place.place_id);
             window.location.href = '/go?q='+ autocomplete_input.value + '&id=' + place.place_id;

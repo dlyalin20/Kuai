@@ -6,7 +6,7 @@ function initialize() {
     var map;
     let service;
     
-    if(!(q==="")){
+    if(!(targetID==="")){
         toggleSidePanel();
     }
     // let infowindow;
@@ -51,49 +51,7 @@ function initialize() {
                 //     createMarker(results[i]);
                 // }
             }
-            // Place autocomplete written in server side code :head smack
-
-
-            // $.getJSON('https://maps.googleapis.com/maps/api/place/autocomplete/json?input='+ advQuery+
-            // '&types=establishment' + location + '&radius=500&key=' + Google_Places_API_KEY, null, gatherResults)
-
-            // function gatherResults(data) { 
-            //     var items = [];
-            //     $.each( data, function( key, val ) {
-            //         items.push(key + " : " + val);
-            //     });
-            //     console.log(items);
-            //     return function(data){
-            //     var p = data.results[0].geometry.location;
-            //     var latlng = new google.maps.LatLng(p.lat, p.lng);
-            //     var marker = new google.maps.Marker({
-            //       position: latlng,
-            //       title: adresa,
-            //       map: map
-
-                  
-            //     }); 
-            //     markers.push(marker); 
-            //   }
-            // }
-        
-            // service = new google.maps.places.PlacesService(map);
-            // service.findPlaceFromQuery(request, (results, status) => {
-            //     if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-            //         console.log(results);
-            //         var htmlString ="";
-            //         for (let i = 0; i < results.length; i++) {
-            //         // createMarker(results[i]);
-            //             htmlString += `<div class='option-items' location = `+results[0].geometry.location+`>
-            //                 ` + (i + 1) + '. ' + results[i].name + '|' + results[0].geometry.location +
-            //                 `
-            //             </div>`;
-            //             createMarker(results[i]);
-            //         }
-            //         console.log(htmlString);
-            //         $("#choices").html(htmlString)
-            //         // set the center for the map to be the best search + apply markers
-            //         map.setCenter(results[0].geometry.location);
+            
                 }
               };
         
@@ -121,25 +79,33 @@ function initialize() {
         
     }
     const geocoder = new google.maps.Geocoder();
-
-    function lockOn(targetID){
-        
+    function queryGeocoder(targetID){
         if (targetID ){ //!= ""
         geocoder.geocode({ placeId: targetID }, (results, status) => {
           console.log('geocode start');
-          targetingPlace = true;
+          
           if (status !== "OK" && results) {
             window.alert("Geocoder failed due to: " + status);
             return;
           }
-          
-          // Set the position of the marker using the place ID and location.
-          pos = results[0].geometry.location
-          map.setCenter(pos);
-          createMarker(results[0]);
+        return results;
         });
-      }
+        return null;
     }
+    }
+    function lockOn(targetID){
+        results= queryGeocoder(targetID);
+        console.log(results);
+        // Set the position of the marker using the place ID and location.
+        if (results){
+            targetingPlace = true;
+            pos = results[0].geometry.location
+            map.setCenter(pos);
+            createMarker(results[0]);
+        }
+        
+      }
+    
     function showPosition(position){
       
         if(!(q==="")){

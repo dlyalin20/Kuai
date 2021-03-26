@@ -16,8 +16,8 @@ function initialize() {
     
     function search() {
         const place = autocomplete.getPlace();
-        console.log(place);
-        if (place == undefined) {
+        // console.log(place.place_id);
+        if (place.place_id == undefined) {
             // User entered the name of a Place that was not suggested and
             // pressed the Enter key, or the Place Details request failed.
             //=> route to advanced search

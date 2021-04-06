@@ -8,7 +8,11 @@ var targetingLocation = false;
 // $( document ).ready(
 var sessionToken;
 var autocomplete;
-
+const options = {
+    enableHighAccuracy: true,
+    // timeout: 5000, // => default infinity // take as much time as you need
+    maximumAge: 500,
+};
 const input = document.getElementById('search-input');
 function initialize(){
     sessionToken = new google.maps.places.AutocompleteSessionToken();
@@ -17,10 +21,25 @@ function initialize(){
     if(!(targetID==="")){
         toggleSidePanel();
     }
+    getLocation();
 
+    
+
+    // ) 
+
+
+
+
+
+}
+
+function mainLoop(position){
+    if (position){
+        UserPos = {lat: position.coords.latitude, lng: position.coords.longitude};
+        console.log(UserPos);
+    }
     // main promise chain
     new Promise(function(resolve, reject){
-        
         let keepSearching = true;
         //locations of markers to be drawn
         let listofMarkers = [];
@@ -48,15 +67,16 @@ function initialize(){
         
         else{
             console.log("No query sent in, Default to user position");
-            getLocation().then(function(){
-                pos = UserPos;
-            });
-            console.log("after: " + pos);
+            pos = UserPos;
+
+            console.log("after: ");
+            console.log(pos);
             
         }
 
         if (!(pos)){
             // all other methods of finding center location failed
+            console.log("all other methods of finding center location failed");
             UserPos = {lat: 40.7180627, lng: -74.0161602} // default center location to stuyvesant
             pos = UserPos;            
         }
@@ -69,7 +89,7 @@ function initialize(){
             return(result[1]);
         }).then(function(result){
             // put down markers
-
+            
 
         }).then(function(result){
             // set up event listeners
@@ -85,28 +105,22 @@ function initialize(){
         }).then(function(result){
             // set 
 
-        });
-            
+        });           
     }
-    // ) 
-
-
-const options = {
-    enableHighAccuracy: true,
-    // timeout: 5000, // => default infinity // take as much time as you need
-    maximumAge: 500,
-};
 //---- get location of user
-async function getLocation(){
+function getLocation(){
     var x=document.getElementById("show");
     if (navigator.geolocation){
-            await navigator.geolocation.getCurrentPosition(updatePosition);
+            navigator.geolocation.getCurrentPosition(mainLoop, function error(msg) {console.log(msg);},options);
         }
     else{
         x.innerHTML="Geolocation is not supported by this browser.";
+        mainLoop(false);
     }
-    return "";
+    
 }
+
+
 // updates the user's location
 function updatePosition(position){
     UserPos = {lat: position.coords.latitude, lng: position.coords.longitude};
@@ -151,9 +165,6 @@ function search() {
         
             }
 };
-    
-
-
 
 var geocoder;
 function queryGeocoder(targetID){
@@ -184,11 +195,6 @@ function lockOn(targetID){
         return null;
     }
 }
-
-
-    
-    
-
 
 function initMap(pos) {
     console.log("pos: " )   
@@ -240,7 +246,6 @@ function initMap(pos) {
     console.log("test");
 
     }
-
 
 var right_arrow = true;
 function toggleSidePanel(params) {

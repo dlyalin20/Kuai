@@ -61,36 +61,42 @@ function mainLoop(position){
             // if we havent found the center location already
             if(keepSearching){
                 // lets see if we can find a pos from the query
-                pos, listofMarkers = search();
+                let pos1, listofMarkers1 = search();
+                if (pos1){
+                    // if we found a valid location - stop
+                    pos = pos1
+                    listofMarkers = listofMarkers1
+                    keepSearching = false;
+                    targetingLocation = true;
+                }
             }
         }
         
         else{
             console.log("No query sent in, Default to user position");
             pos = UserPos;
-
             console.log("after: ");
             console.log(pos);
-            
         }
-
         if (!(pos)){
             // all other methods of finding center location failed
             console.log("all other methods of finding center location failed");
             UserPos = {lat: 40.7180627, lng: -74.0161602} // default center location to stuyvesant
             pos = UserPos;            
         }
-
         // markers only have value if we found a biz or queryied
         resolve([pos, listofMarkers]);
         }).then(function(result){
             // init map
             initMap(result[0]);
             return(result[1]);
-        }).then(function(result){
-            // put down markers
-            
-
+        }).then(result => {
+            console.log(result);
+            // plot markers
+            if (result && result.length > 0){
+                plotListMarkers;
+            }
+            // (result)
         }).then(function(result){
             // set up event listeners
             // let infowindow;
@@ -128,7 +134,6 @@ function updatePosition(position){
 }
 // return [firstpos, listofMarkers ]
 function search() {
-    
     advQuery = input.value;
     var request = {
         input: advQuery,
@@ -142,28 +147,19 @@ function search() {
         request["radius"]= 500;
     }
     if (advQuery){
+        console.log("run search");
         autocomplete.getPlacePredictions(
             request,
-            displaySuggestions);
-        function displaySuggestions(results){
-            console.log(results);
-            
-            // lock on to this center point, and put down markers
-            
-            // // turn this in to plant markers function
-            // htmlString = "";
-            // for (let i = 0; i < results.length; i++) {
-            //     createMarker(results[i]);
-            //     htmlString += `<div class='option-items' location = `+results[0].geometry.location+`>
-            //         ` + (i + 1) + '. ' + results[i].name + '|' + results[0].geometry.location +
-            //         `
-            //     </div>`;
-            //     createMarker(results[i]);
-            // }
-            return [results[0], results];
-        }
-        
-            }
+            function (results){
+                console.log(results);
+                // lock on to this center point, and put down markers
+                return [results[0], results];
+            });
+         
+    }
+    else{
+        console.log("no input value");
+    }
 };
 
 var geocoder;
@@ -263,6 +259,22 @@ function toggleSidePanel(params) {
 
     }
 }
+
+// plots the results + adds them to the nearby search
+function plotListMarkers(results) {
+    // turn this in to plant markers function
+    htmlString = "";
+    for (let i = 0; i < results.length; i++) {
+        createMarker(results[i]);
+        htmlString += `<div class='option-items' location = `+results[0].geometry.location+`>
+            ` + (i + 1) + '. ' + results[i].name + '|' + results[0].geometry.location +
+            `
+        </div>`;
+        createMarker(results[i]);
+    }
+    return true;
+}
+
 function createMarker(place) {
     if (!place.geometry || !place.geometry.location) return;
     const marker = new google.maps.Marker({

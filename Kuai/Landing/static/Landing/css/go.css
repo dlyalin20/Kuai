@@ -126,3 +126,12 @@
       #target {
         width: 345px;
       }
+
+#search-area-button {
+  position: absolute;
+  width: 8em;
+  font-size: 1.5em;
+  height: 1.8em;
+  z-index: 1;
+  bottom: 10%;
+}

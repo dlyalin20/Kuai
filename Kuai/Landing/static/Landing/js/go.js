@@ -9,6 +9,7 @@ var targetingLocation = false;
 var sessionToken;
 var autocomplete;
 var previousSearch = q;
+var markers = new Array();
 const choices = $("#choices");
 const options = {
     enableHighAccuracy: true,
@@ -29,10 +30,11 @@ function initialize(){
 function mainLoop(position){
     if (position){
         UserPos = {lat: position.coords.latitude, lng: position.coords.longitude};
-        console.log(UserPos);
+        console.log("UserPos: " + UserPos.toString());
     }
     // main promise chain
     new Promise(function(resolve, reject){ // try target id
+            console.log("Finding center of map");
             result = {
                 target: false,
                 markers: [],
@@ -53,6 +55,9 @@ function mainLoop(position){
                     }
                 });
                 
+            }
+            else{
+                resolve(result);
             }
             
         }).then(function(result){ // try query
@@ -104,6 +109,7 @@ function mainLoop(position){
         }).then(function(result){ // try user pos
             if (result.keepSearching){
                 console.log("No query sent in, Default to user position");
+                result.keepSearching = false;
                 result.target = UserPos;
                 console.log("after: ");
                 console.log(UserPos);
@@ -134,7 +140,8 @@ function mainLoop(position){
         }).then(function(result){ //set up event listeners
             // set up event listeners
             // let infowindow;
-            $('#search-submit').on('click', function(event){
+            $('#search-submit').click(function(event){ // Gives search results
+                console.log("test");
                 event.preventDefault();
                 search((x, y) => {
                     queryGeocoder(x.place_id, 
@@ -153,12 +160,47 @@ function mainLoop(position){
                     
                 });
             })
-            $("#arrow").click(toggleSidePanel);
-            //  getLocation();
+            $("#arrow").click(toggleSidePanel); // toggles side panel
+            
+            $("#search-area-button").click(nearbySearch); // searches the area around the center of the map
             return true;
         });
     }
 
+
+function nearbySearch(){ //plots the nearby locations
+    let request = {
+        location: map.getCenter(),
+        // add ranked by changed by options
+        rankBy: google.maps.places.RankBy.DISTANCE,
+        // edit the type by options
+        type: "restaurant",
+    }
+
+    service = new google.maps.places.PlacesService(map);
+    const locations = service.nearbySearch(request, (result, status)=>{
+        if (status == google.maps.places.PlacesServiceStatus.OK){
+            placeResultsToMarkers(result);
+        }
+    });
+}
+
+function placeResultsToMarkers(results){
+    choices.html("");
+    clearMarkers();
+    for (let index = 0; index < results.length; index++) {
+        const element = results[index];
+        createMarker(element)
+        newChoice = $(`<div class='option-items' location = `+element.geometry.location+`>
+        ` + (index + 1) + '. ' + element.name + '|' + element.geometry.location +
+        `</div>`).on("click", function(){
+            map.setCenter(element.geometry.location)
+        });
+        choices.append(newChoice);
+  
+
+    }
+}
 
 // return [firstpos, listofMarkers ]
 function search(callback) {
@@ -348,9 +390,11 @@ function toggleSidePanel(params) {
     }
 }
 
-// plots the results + adds them to the nearby search
+//input: list of place results
+//post-condition: plotted markers and result divs
 async function plotListMarkers(results) {
     choices.html("");
+    clearMarkers()
     // turn this in to plant markers function
     for (let i = 0; i < results.length; i++) {
         await new Promise(function(accept, reject){
@@ -381,8 +425,17 @@ function createMarker(place) {
         map,
         position: place.geometry.location,
     });
+    markers.push(marker);
+    infowindow = new google.maps.InfoWindow;
     google.maps.event.addListener(marker, "click", () => {
         infowindow.setContent(place.name || "");
         infowindow.open(map);
     });
+}
+function clearMarkers(){
+    for(var i=0; i<markers.length; i++){
+        markers[i].setMap(null);
+        
+    }
+    markers = new Array();
 }

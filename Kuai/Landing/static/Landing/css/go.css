@@ -2,7 +2,11 @@
        * element that contains the map. */
        #map {
         height: 100%;
-      }
+        width: 100%;
+        height: 100%;
+        width: 100%;
+    }
+      
       
       /* Optional: Makes the sample page fill the window. */
       html,
@@ -11,7 +15,46 @@
         margin: 0;
         padding: 0;
       }
-      
+
+/* search + options */
+#searchAndOptions{
+  width: 40%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: start;
+    
+}
+#search-container{
+  width: 100%;
+  position: relative;
+    text-align: center;
+}
+#arrow{
+  width: 0;
+  height: 0;
+  left:20px;
+  border-top: 15px solid transparent;
+  border-right: 20px solid #555;
+  border-bottom: 15px solid transparent;
+}
+
+#main{
+    display: flex;
+    flex-direction:row;
+    height: 100%;
+    justify-content: space-around;
+}
+
+.option-items{
+  font-size: 1.5vw;
+  margin: 5%;
+  background-color: red;
+  border-radius: 30px;
+  padding: 5%;
+  color: white;
+  text-align: center;
+}
       #description {
         font-family: Roboto;
         font-size: 15px;
@@ -83,3 +126,12 @@
       #target {
         width: 345px;
       }
+
+#search-area-button {
+  position: absolute;
+  width: 8em;
+  font-size: 1.5em;
+  height: 1.8em;
+  z-index: 1;
+  bottom: 10%;
+}

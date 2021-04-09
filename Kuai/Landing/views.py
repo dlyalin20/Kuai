@@ -77,26 +77,29 @@ def index(request):
     
     return render(request, "Landing/landing.html")
 
-def search(request): 
-    query = request.GET.get('q', False)
-    if (query):
-        print(query)
-        pass
-    return render(request, "Landing/advanced_search.html")
+# def search(request): 
+#     query = request.GET.get('q', "")
+#     if (query):
+#         print(query)
+#         pass
+#     return render(request, "Landing/advanced_search.html", {"q" : query})
     
 def business_view(request, ID):
     return render(request, "Landing/go.html") #temp link
 
 
 def go(request):
-    id = request.GET.get('id', False)
+    id = request.GET.get('id', "")
+    query = request.GET.get('q', "")
+    if (query):
+        print(query)
     if (id):
         #we have id => create custom map
         print(id)
-        return render(request, "Landing/go.html", {
-            "target_id" : id,
-    })
+    
     return render(request, "Landing/go.html", {
+        "target_id" : id,
+        "q" : query,
     })
 
 def login_view(request):

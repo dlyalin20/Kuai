@@ -8,7 +8,7 @@ urlpatterns = [
     # path('logout', views.logout_view, name='login'),
     # path('register', views.register_view, name='register'),
     # tentative location may put in different project
-    path('search', views.search, name='search'),
+    # path('search', views.search, name='search'),
     path('go', views.go, name="go"),
     path("profile", views.profile, name="profile"),
     #     # new code

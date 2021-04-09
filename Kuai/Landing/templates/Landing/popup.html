@@ -52,7 +52,7 @@
                                             <p style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;" class="content">Add Wait Time: </p>
                                             <form action="/quickWaitTime"  method="post" style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;">
                                                 {% csrf_token %}
-                                                <input type="hidden" value="a" name="business" />
+                                                <input type="hidden" value="{{ business }}" name="business" />
                                                 <div class="field" style="width: 75px; white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;">
                                                     <input style="width: 75px; white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;" type="number" list="times" name="time"/>
                                                     <datalist id="times">

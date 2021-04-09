@@ -104,7 +104,7 @@ class waitData(models.Model):
         MaxValueValidator(180)
     ], null = False, blank = False)
     author = models.CharField(max_length = 20, null = False, blank = False)
-    timestamp = models.DateTimeField(auto_now = True, null = False, blank = False)
+    timestamp = models.DateTimeField(default = datetime.datetime.utcnow(), null = False, blank = False,)
 
     REQUIRED_FIELDS = ['business', 'wait_time', 'author', 'timestamp']
 

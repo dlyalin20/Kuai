@@ -8,10 +8,10 @@
 
   <h1>Profile</h1>
   {% if user.is_authenticated %}
-  <p>Welcome, {{ user.username }}!</p>
- 
+  <p>Welcome, {{ user.profile.first_name }}!</p>
+  <p></p>
   {% else %}
-  <p>Welcome, frend!</p>
+  <p>Welcome, friend!</p>
   {% endif %}
 
   {% endblock %}

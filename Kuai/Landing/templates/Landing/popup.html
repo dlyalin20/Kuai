@@ -3,18 +3,136 @@
     <head>
         <title>Landing</title>
         {% load static %}
+        {% load Landing_extras %}
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" type="text/css" href="{% static 'Landing/css/popup.css' %}">
     </head>
+    {% include 'Landing/navbar.html' %}
     <body>
-        <div id="bizmane">
-            <p id=>Business Name:</p>
-        </div>
-        <div id="specifics">
-            <p>Wait time <br /> Capacity <br /> Reviews</p>
-        </div>
-        <div id="imgarea">
-        </div>
-        <div id="altrec">
-            <p>Alternative Reccommendations</p>
-        </div>
+        <center>
+            <div class="tile is-ancestor is-2" style="height: 160px; width: 410px;">
+                <div class="tile is-parent">
+                    <article class="tile is-child notification is-white">
+                        <div class="content">
+                                <div class="columns">
+                                    <div class = "column" style="padding: 0; margin: 0;">
+                                        <figure class="image is-96x96">
+                                            <img src="../../bios/Landing/business_imgs/{{ name }}" alt = {% if name %} {{ name }} {% else %} Business Name {% endif %}>
+                                          </figure>
+                                    </div>
+                                    <div class="column" style="padding: 0; margin: 0;">
+                                        <h1 class="title is-5" style="padding: 0; margin-bottom: 0; color: navy;"><b>
+                                            <a href="">
+                                            {% if name %} {{ name }} {% else %} Business Name {% endif %}
+                                            </a>
+                                            </b><br></h1>
+                                        <p style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;" class="content">
+                                            Wait time:
+                                            <span style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;">
+                                                {% if time %} 
+                                                    {% if time >= 0 and time < 30 %}
+                                                    <span style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: lime;">
+                                                        {{ time }}
+                                                    </span>
+                                                    {% elif time >= 30 and time < 60 %}
+                                                    <span style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: orange;">
+                                                        {{ time }}
+                                                    </span>
+                                                    {% else %}
+                                                    <span style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: red;">
+                                                        {{ time }}
+                                                    </span>
+                                                    {% endif %}
+                                                {% else %} 
+                                                <span style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;">
+                                                    No Time
+                                                </span>
+                                                {% endif %}
+                                            </span>
+                                            <p style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;" class="content">Add Wait Time: </p>
+                                            <form action="/quickWaitTime"  method="post" style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;">
+                                                {% csrf_token %}
+                                                <input type="hidden" value="a" name="business" />
+                                                <div class="field" style="width: 75px; white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;">
+                                                    <input style="width: 75px; white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;" type="number" list="times" name="time"/>
+                                                    <datalist id="times">
+                                                            <option> 10 </option>
+                                                            <option> 20 </option>
+                                                            <option> 30 </option>
+                                                            <option> 40 </option>
+                                                            <option> 50 </option>
+                                                            <option> 60 </option>
+                                                    </datalist>
+                                                </div>
+                                                <div class="field">
+                                                    <div class="control">
+                                                        <button class="button is-info is-small" type="submit">Submit</button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                           <!-- <p style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;" class="content"> Add Wait Times: </p>
+                                            <span style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;">
+                                                <div class="table-container" style="width: 100px; white-space: nowrap; padding: 0; margin: 0; font-size: 13px; color: darkblue;">
+                                                    <table class="table is-narrow is-bordered is-striped" style="font-weight: normal; white-space: nowrap; padding: 0; margin: 0; font-size: 14px; color: darkblue;">
+                                                    <tr class="tr">
+                                                        {% for n in range %}
+                                                        <td class="td" style="margin: 0; padding: 0;">
+                                                            {{ n }} Min.
+                                                        </td>
+                                                        {% endfor %}
+                                                        <td class="td">Add Custom</td>
+                                                    </tr>
+                                                    </table>
+                                                </div>
+                                                </span>-->
+                                            <br /></p>
+                                        <!--<p style="padding: 0; margin: 0; font-size: 15px; color: darkblue;" class="content">
+                                            Capacity: 
+                                            {% if capacity %}  
+                                                {% if capacity >= 0 and capacity < 25 %}
+                                                <span style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: lime;">
+                                                    {{ capacity }}
+                                                </span>
+                                                {% elif capacity >= 25 and capacity < 75 %}
+                                                <span style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: orange;">
+                                                    {{ capacity }}
+                                                </span>
+                                                {% else %}
+                                                <span style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: lime;">
+                                                    {{ capacity }}
+                                                </span>
+                                                {% endif %}
+                                            {% else %} 
+                                            <span style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;">
+                                                No Capacity
+                                            </span>
+                                            {% endif %}<br /><br>
+                                        </p>-->
+                                    </b>
+                                    </div>
+                                </div>
+                                 <!--<b>Reviews:</b> <br>{% if reviews %}
+                                 <ul>
+                                    {% for review in reviews %}
+                                    <li>{{ review }}</li>
+                                    {% endfor %}
+                                 </ul>
+                                 {% else %} No Reviews <br>
+                                 {% endif %}<br>
+                                 <b>Alternative Recommendations:</b> <br>{% if recs %}
+                                 <ul>
+                                    {% for rec in recs %}
+                                    <li>{{ rec }}</li>
+                                    {% endfor %}
+                                 </ul>
+                                 {% else %} No Recommendations <br>
+                                 {% endif %}
+                                </p>-->
+                        </div>
+                      </article>
+                </div>
+            </div>
+        </center>
+        
+
+       

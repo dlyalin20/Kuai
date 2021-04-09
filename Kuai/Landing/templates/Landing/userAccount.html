@@ -9,9 +9,9 @@
     {% include 'Landing/navbar.html' %}
     <body>
         <center>
-            <h1 class="title">Good {{ time }}, {{ name }}</h1>
+            <h1 class="title">Good {{ time }}, {{ user.profile.first_name }}</h1>
             <figure class="image">
-                <img class="is-rounded" src="{{ profile_pic | default('profile.jpg') }}" alt = {{ name }} width="120" height="90" />
+                <img class="is-rounded" src="../../bios/Landing/pfps/{{ user.username }}" alt = {{ user.username }} width="120" height="90" />
             </figure>
         </center>
         <h1 class="title">Favorite Places: </h1> <button class="button is-light is-outlined is-rounded">+</button> <!--Add JS function to add favorite place-->
@@ -29,7 +29,7 @@
                 {% for favorite in favorites %}
                 <tr class="tr">
                     <td class="td">{{ favorite['name'] }}</td>
-                    <td class="td">{{ favorite['category'] }}</td>{# Figure out where to store category #}
+                    <td class="td">{% if favorite['category'] %} {{ favorite['category'] }} {% else %} N/A {% endif %}</td>{# Figure out where to store category #}
                     <td class="td">{{ favorite['distance'] }}</td>
                     <td class="td">{{ favorite['wait time'] }}</td>
                 </tr>

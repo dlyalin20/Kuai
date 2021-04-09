@@ -1,4 +1,5 @@
 import re
+import datetime
 import collections
 from django.db import models
 from jsonfield import JSONField
@@ -6,8 +7,10 @@ from django.dispatch import receiver
 from django.db.models.deletion import CASCADE
 from django.db.models.signals import post_save
 from django.core.exceptions import ValidationError
+from django_postgres_extensions.models.fields import ArrayField
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import User, PermissionsMixin, AbstractBaseUser, BaseUserManager
+
 
 # validators
 def validate_user(user):
@@ -78,7 +81,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_business = models.BooleanField(default = False)
     is_staff = models.BooleanField(default = False)
     is_superuser = models.BooleanField(default = False)
-    business = models.CharField(max_length=40, default = None, null=True)
     REQUIRED_FIELDS = ['email', 'first_name', 'last_name']
     USERNAME_FIELD = 'username'
     EMAIL_FIELD = 'email'
@@ -95,9 +97,49 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.username
 
+class waitData(models.Model):
+    business = models.CharField(max_length = 40, null = False, blank = False, unique = False)
+    wait_time = models.FloatField(validators = [
+        MinValueValidator(0),
+        MaxValueValidator(180)
+    ], null = False, blank = False)
+    author = models.CharField(max_length = 20, null = False, blank = False)
+    timestamp = models.DateTimeField(auto_now = True, null = False, blank = False)
+
+    REQUIRED_FIELDS = ['business', 'wait_time', 'author', 'timestamp']
+
+    def get_short_name(self):
+        return self.business
+
+    def natural_key(self):
+        return self.business
+    
+    def __str__(self):
+        return self.business
+
+class capacityData(models.Model):
+    business = models.CharField(max_length = 40, null = False, blank = False, unique = False)
+    capacity = models.FloatField(validators = [
+        MinValueValidator(0),
+        MaxValueValidator(100)
+    ], null = False, blank = False)
+    author = models.CharField(max_length = 20, null = False, blank = False)
+    timestamp = models.DateTimeField(auto_now = True, null = False, blank = False)
+
+    REQUIRED_FIELDS = ['business', 'capacity', 'author', 'timestamp']
+
+    def get_short_name(self):
+        return self.business
+
+    def natural_key(self):
+        return self.business
+    
+    def __str__(self):
+        return self.business
+
 # Custom User Profile
 class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=CASCADE)
+    user = models.OneToOneField(User, on_delete=CASCADE, unique = True)
     latitude = models.IntegerField(null = True, blank = True, validators= [
         MinValueValidator(-90),
         MaxValueValidator(90)
@@ -107,56 +149,147 @@ class Profile(models.Model):
         MaxValueValidator(180)
     ])
     birth_date = models.DateField(null = True, blank = True)
-    profile_pic = models.BinaryField(blank = True, null = True)
+    profile_pic = models.ImageField(blank = True, null = True, upload_to='Landing/pfps')
     favorite_businesses = JSONField(null = True, blank = True) # Map each business to Name, Category (food, event, etc.), distance from user home point
-    history = JSONField(null = True, blank = True) #store business name mapped with date/time searched
+    search_history = JSONField(null = True, blank = True) #store business name mapped with date/time searched
+    last_time_update = models.OneToOneField(waitData, null = True, blank = True, on_delete = models.SET_NULL)
+    last_capacity_update = models.OneToOneField(capacityData, null = True, blank = True, on_delete = models.SET_NULL)
 
     @receiver(post_save, sender=User)
     def create_user_profile(sender, instance, created, **kwargs):
-        if created:
+        if created and not instance.is_business and not instance.is_staff:
             Profile.objects.create(user = instance)
     
     @receiver(post_save, sender=User)
     def save_user_profile(sender, instance, **kwargs):
         instance.profile.save()
 
-
-
-# Create your models here.
-class waitData(models.Model):
-    business = models.CharField(max_length = 40)
-    wait_time = models.IntegerField(validators = [
-        MinValueValidator(0),
-        MaxValueValidator(180)
-    ])
-    author = models.CharField(max_length = 20)
-    timestamp = models.DateTimeField(auto_now = True)
-
-class capacityData(models.Model):
-    business = models.CharField(max_length = 40)
-    capacity = models.IntegerField(validators = [
-        MinValueValidator(0),
-        MaxValueValidator(100)
-    ])
-    author = models.CharField(max_length = 20)
-    timestamp = models.DateTimeField(auto_now = True)
-
 class waitTimes(models.Model):
-    business = models.CharField(max_length = 40)
+    business = models.CharField(max_length = 40, null = False, blank = False, unique = True)
     numReviews = models.IntegerField(validators = [
         MinValueValidator(0)
-    ], default = 0)
-    average = models.IntegerField(validators = [
+    ], default = 0, null = False, blank = False)
+    average = models.FloatField(validators = [
         MinValueValidator(0)
-    ], default = 0)
+    ], default = 0, null = False, blank = False)
+    REQUIRED_FIELDS = ['business', 'numReviews', 'average']
+
+    def get_short_name(self):
+        return self.business
+
+    def natural_key(self):
+        return self.business
+
+    def __str__(self):
+        return self.business
 
 class Capacity(models.Model):
-    business = models.CharField(max_length = 40)
+    business = models.CharField(max_length = 40, null = False, blank = False, unique = True)
     numReviews = models.IntegerField(validators = [
         MinValueValidator(0)
-    ], default = 0)
-    average = models.IntegerField(validators = [
+    ], default = 0, null = False, blank = False)
+    average = models.FloatField(validators = [
         MinValueValidator(0),
         MaxValueValidator(100)
-    ], default = 0)
+    ], default = 0, null = False, blank = False)
+    
+    REQUIRED_FIELDS = ['business', 'numReviews', 'average']
+
+    def get_short_name(self):
+        return self.business
+
+    def natural_key(self):
+        return self.business
+
+    def __str__(self):
+        return self.business
+
+class Business(models.Model):
+    name = models.CharField(max_length = 40, null = False, blank = False, unique = True)
+    xcor = models.FloatField(null = False, blank = False)
+    ycor = models.FloatField(null = False, blank = False)
+    verified = models.BooleanField(default = False)
+    wait_time = models.OneToOneField(waitTimes, null = True, blank = True, on_delete = models.SET_NULL, related_name = 'time')
+    capacity = models.OneToOneField(Capacity, null = True, blank = True, on_delete = models.SET_NULL, related_name='cap')
+
+    REQUIRED_FIELDS = ['name', 'xcor', 'ycor', 'verified']
+
+    def get_short_name(self):
+        return self.name
+
+    def natural_key(self):
+        return self.name
+
+    def __str__(self):
+        return self.name
+
+class Business_Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=CASCADE, unique = True)
+    businesses = models.ManyToManyField(Business, blank = True)
+
+    REQUIRED_FIELDS = ['user']
+
+    @receiver(post_save, sender=User)
+    def create_business(sender, instance, created, **kwargs):
+        if created and instance.is_business:
+            Business_Profile.objects.create(user = instance)
+
+    @receiver(post_save, sender=User)
+    def save_business(sender, instance, **kwargs):
+        instance.profile.save()
+
+    def get_short_name(self):
+        return self.user.username
+
+    def natural_key(self):
+        return self.user.username
+
+    def __str__(self):
+        return self.user.username
+
+
+class Staff_Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=CASCADE, unique = True)
+    staffof = models.OneToOneField(Business, null = False, blank = False, unique = False, on_delete = CASCADE)
+
+    @receiver(post_save, sender=User)
+    def create_staff(sender, instance, created, **kwargs):
+        if created and instance.is_staff:
+            Staff_Profile.objects.create(user = instance)
+
+    @receiver(post_save, sender=User)
+    def save_staff(sender, instance, **kwargs):
+        instance.profile.save()
+
+    def get_short_name(self):
+        return self.user.username
+
+    def natural_key(self):
+        return self.user.username
+    
+    def __str__(self):
+        return self.user.username
+
+class Temp_Business(models.Model):
+    name = models.CharField(max_length=40, unique=True, blank = False, null = False)
+    xcor = models.FloatField(blank = False, null = False)
+    ycor = models.FloatField(blank = False, null = False)
+    verified = models.BooleanField(null = False, blank = False, default = False)
+    cached_time = models.DateTimeField(auto_now = True, null = False, blank = False)
+    wait_time = models.OneToOneField(waitTimes, null = True, blank = True, on_delete = CASCADE)
+    capacity = models.OneToOneField(Capacity, null = True, blank = True, on_delete = CASCADE)
+
+    REQUIRED_FIELDS = ['name', 'xcor', 'ycor', 'verified']
+
+    def twenty_days(self):
+        return (datetime.datetime.now() - self.cached_time).days >= 20
+
+    def get_short_name(self):
+        return self.name
+
+    def natural_key(self):
+        return self.name
+    
+    def __str__(self):
+        return self.name
 

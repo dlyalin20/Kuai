@@ -11,13 +11,18 @@ import json
 import re
 import time
 import datetime
+import pytz
 
 # format to handle requests and check for integers
 # also filter data
 def addWaitTime(request, ID, time):
     user = request.user
-    if int((datetime.datetime.now() - user.profile.last_time_update.timestamp).total_seconds() / 60) < time and user.profile.last_time_update.business == ID:
-        return "Too Soon"
+    try:
+        if int((pytz.utc.localize(datetime.datetime.now()) - user.profile.last_time_update.timestamp).total_seconds() / 60) < float(time) and user.profile.last_time_update.business == ID:
+            print("Too Soon")
+            return
+    except AttributeError:
+        pass
     entry = waitData(business = ID, wait_time = time, author = request.user.username)
     entry.save()
     try:
@@ -37,8 +42,12 @@ def addWaitTime(request, ID, time):
 # also filter data
 def addCapacity(request, ID, capacity):
     user = request.user
-    if int((datetime.datetime.now() - user.profile.last_capacity_update.timestamp).total_seconds() / 60) and user.profile.last_capacity_update.business == ID:
-        return "Too Soon"
+    try:
+        if int((pytz.utc.localize(datetime.datetime.now()) - user.profile.last_capacity_update.timestamp).total_seconds() / 60) and user.profile.last_capacity_update.business == ID:
+            print("Too Soon")
+            return
+    except AttributeError:
+        pass
     entry = capacityData(business = ID, capacity = capacity, author = request.user.username)
     entry.save()
     try:

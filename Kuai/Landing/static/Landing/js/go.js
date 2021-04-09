@@ -8,29 +8,22 @@ var targetingLocation = false;
 // $( document ).ready(
 var sessionToken;
 var autocomplete;
+var previousSearch = q;
+const choices = $("#choices");
 const options = {
     enableHighAccuracy: true,
     // timeout: 5000, // => default infinity // take as much time as you need
     maximumAge: 500,
 };
+var service; // only to be called after maps is initialized
 const input = document.getElementById('search-input');
 function initialize(){
-    sessionToken = new google.maps.places.AutocompleteSessionToken();
     autocomplete = new google.maps.places.AutocompleteService();
     geocoder = new google.maps.Geocoder()
     if(!(targetID==="")){
         toggleSidePanel();
     }
     getLocation();
-
-    
-
-    // ) 
-
-
-
-
-
 }
 
 function mainLoop(position){
@@ -39,80 +32,175 @@ function mainLoop(position){
         console.log(UserPos);
     }
     // main promise chain
-    new Promise(function(resolve, reject){
-        let keepSearching = true;
-        //locations of markers to be drawn
-        let listofMarkers = [];
-        let pos;
-        // get location for center of the map
+    new Promise(function(resolve, reject){ // try target id
+            result = {
+                target: false,
+                markers: [],
+                keepSearching: true,
+                // targetingLocation: false,
+            };
+            if(!(targetID==="")){ // targetID exists => we target the pos at the biz found
+                lockOn(targetID, pos=>{
+                    if (pos){
+                        // if we found a valid location - stop
+                        result.target = pos;
+                        let listofMarkers = [pos];
+                        result.keepSearching = false;
+                        result.markers = listofMarkers;
+                        resolve(result);
+                    }else{
+                        resolve(result);
+                    }
+                });
+                
+            }
+            
+        }).then(function(result){ // try query
+            if(!(q==="")){ // query exists => change default input value
+                console.log("query q= " + q + " targetID = " + targetID);
+                input.value = q;
+                
+                if(result.keepSearching){ // if we havent found the center location already
+                    // lets see if we can find a pos from the query
+                    return new Promise(function(accept, reject){
+                        search(
+                            // push this call back function to it to modify the data
+                            function(pos, markers){
+                                queryGeocoder(pos.place_id, 
+                                    targetLocation =>{
+                                        targetLocation = targetLocation.geometry.location
+                                        console.log("query target location: ");
+                                        console.log(targetLocation);
+                                        if (targetLocation){
+                                            // if we found a valid location - stop
+                                            result.target = targetLocation
+                                            result.markers = markers
+                                            result.keepSearching = false;
+                                            // targetingLocation = true;
+                                            accept(result);
+                                        }
+                                        else{
+                                            // bad query no results found => dont change result
+                                            console.log("bad query no results found");
+                                            accept(result);
+                                        }
+                                    })                             
+                    
 
-        if(!(targetID==="")){ // targetID exists => we target the pos at the biz found
-            pos = lockOn(targetID);
-            if (pos){
-                // if we found a valid location - stop
-                listofMarkers.push(pos);
-                keepSearching = false;
-                targetingLocation = true;
-            }
-        }
-        if(!(q==="")){ // query exists => change default input value
-            console.log("query q= " + q + " targetID = " + targetID);
-            input.value = q;
-            // if we havent found the center location already
-            if(keepSearching){
-                // lets see if we can find a pos from the query
-                let pos1, listofMarkers1 = search();
-                if (pos1){
-                    // if we found a valid location - stop
-                    pos = pos1
-                    listofMarkers = listofMarkers1
-                    keepSearching = false;
-                    targetingLocation = true;
+                            });
+                    }).then(res => {
+                        return (result);
+                    })
                 }
+                else{
+                    // we found the center point already, just what we have
+                    return (result);
+                }            
+            }else{
+                // query does not exist, just take what we have
+                return (result);
             }
-        }
-        
-        else{
-            console.log("No query sent in, Default to user position");
-            pos = UserPos;
-            console.log("after: ");
-            console.log(pos);
-        }
-        if (!(pos)){
+
+        }).then(function(result){ // try user pos
+            if (result.keepSearching){
+                console.log("No query sent in, Default to user position");
+                result.target = UserPos;
+                console.log("after: ");
+                console.log(UserPos);
+            }
+            return result;
+            
+        }).then(function(result){ // default to stuy
             // all other methods of finding center location failed
-            console.log("all other methods of finding center location failed");
-            UserPos = {lat: 40.7180627, lng: -74.0161602} // default center location to stuyvesant
-            pos = UserPos;            
-        }
-        // markers only have value if we found a biz or queryied
-        resolve([pos, listofMarkers]);
-        }).then(function(result){
-            // init map
-            initMap(result[0]);
-            return(result[1]);
-        }).then(result => {
-            console.log(result);
-            // plot markers
-            if (result && result.length > 0){
-                plotListMarkers;
+            if (result.keepSearching){
+                console.log("all other methods of finding center location failed");
+                
+                UserPos = {lat: 40.7178149, lng: -74.0138422} // default center location to stuyvesant
+                result.target = UserPos;
             }
-            // (result)
-        }).then(function(result){
+            return result;
+        }).then(function(result){ //init map
+            initMap(result);
+            service = new google.maps.places.PlacesService(map);
+            return(result);
+        }).then(result => { //plot the markers
+            console.table(result);
+            // plot markers
+            if (result.markers && result.markers.length > 0){
+                // takes array of pos's
+                plotListMarkers(result.markers);
+            }
+            return true;
+        }).then(function(result){ //set up event listeners
             // set up event listeners
             // let infowindow;
-            
             $('#search-submit').on('click', function(event){
                 event.preventDefault();
-                search();
+                search((x, y) => {
+                    queryGeocoder(x.place_id, 
+                        targetLocation =>{
+
+                            targetLocation = targetLocation.geometry.location
+                            map.setCenter(targetLocation);
+                        })   
+                    if (y){
+                        if (input.value != previousSearch){
+                            previousSearch = input.value
+                            plotListMarkers(y);
+                        }
+                        
+                    };
+                    
+                });
             })
             $("#arrow").click(toggleSidePanel);
             //  getLocation();
-
-        }).then(function(result){
-            // set 
-
-        });           
+            return true;
+        });
     }
+
+
+// return [firstpos, listofMarkers ]
+function search(callback) {
+    sessionToken = new google.maps.places.AutocompleteSessionToken();
+
+    advQuery = input.value;
+    var request = {
+        input: advQuery,
+        fields: ["name", "geometry", "place_id"],
+        sessionToken: sessionToken,
+        // 
+        };
+    if (UserPos){
+        console.log("Searching Near: " + UserPos);
+        request["location"] = new google.maps.LatLng(UserPos);
+        request["radius"]= 500;
+    }
+    if (advQuery){
+        console.log("run search");
+        autocomplete.getPlacePredictions(
+            request,
+            function (results){
+                console.table(results);
+                // lock on to this center point, and put down markers
+                return callback(results[0], results);
+            },
+            // fail
+            function (err){
+                console.log(err);
+                return callback(false, false);
+            }  
+        )
+    
+    }
+    else{
+        console.log("no input value");
+        return callback(false, false);
+
+    }
+};
+
+
 //---- get location of user
 function getLocation(){
     var x=document.getElementById("show");
@@ -132,81 +220,81 @@ function updatePosition(position){
     UserPos = {lat: position.coords.latitude, lng: position.coords.longitude};
     console.log("after: " + UserPos);  
 }
-// return [firstpos, listofMarkers ]
-function search() {
-    advQuery = input.value;
-    var request = {
-        input: advQuery,
-        fields: ["name", "geometry", "place_id"],
-        sessionToken: sessionToken,
-        // 
-        };
-    if (UserPos){
-        console.log("Searching Near: " + UserPos);
-        request["location"] = new google.maps.LatLng(UserPos);
-        request["radius"]= 500;
-    }
-    if (advQuery){
-        console.log("run search");
-        autocomplete.getPlacePredictions(
-            request,
-            function (results){
-                console.log(results);
-                // lock on to this center point, and put down markers
-                return [results[0], results];
+var geocoder;
+// returns a results object that you can send a callback into to manipulate
+function queryGeocoder(targetID, callback){
+    if (targetID ){ //!= ""
+        geocoder.geocode({ placeId: targetID }, (results, status) => {
+                console.log('geocode start');
+                if (status !== "OK" && results) {
+                    window.alert("Geocoder failed due to: " + status);
+                    callback(false);
+                }
+                console.log(results[0]);
+                callback(results[0]);
             });
-         
+        
+
     }
     else{
-        console.log("no input value");
+        console.log("no target id");
+        callback(false);
     }
-};
-
-var geocoder;
-function queryGeocoder(targetID){
+}
+function queryService(targetID, callback){
     if (targetID ){ //!= ""
-    geocoder.geocode({ placeId: targetID }, (results, status) => {
-        console.log('geocode start');
-        
-        if (status !== "OK" && results) {
-        window.alert("Geocoder failed due to: " + status);
-        return;
-        }
-    return results;
-    });
-    return null;
-}
-}
-
-function lockOn(targetID){
-    results= queryGeocoder(targetID);
-    console.log(results);
-    // Set the position of the marker using the place ID and location.
-    if (results){
-        targetingPlace = true;
-        let pos = results[0].geometry.location
-        map.setCenter(pos);
-        createMarker(results[0]);
-    }else{
-        return null;
+        const request = {
+            placeId: targetID,
+            fields: ["name", "formatted_address", "place_id", "geometry"],
+          };
+        service.getDetails(request, (place, status) => {
+            if (
+                status === google.maps.places.PlacesServiceStatus.OK &&
+                place &&
+                place.geometry &&
+                place.geometry.location
+            ){
+                // good
+                console.log(place);
+                callback(place);
+            }
+        })
     }
+    else{
+        console.log("no target id");
+        callback(false);
+    }
+
+}
+function lockOn(targetID, callback){
+    queryGeocoder(targetID, results=>{
+        console.log(results);
+        // Set the position of the marker using the place ID and location.
+        if (results){
+            targetingPlace = true;
+            let pos = results.geometry.location
+            callback(pos);
+        }else{
+            callback(null);
+        }
+    });
 }
 
-function initMap(pos) {
+function initMap(result) {
     console.log("pos: " )   
-    console.log(pos);
+    console.log(result.target);
     //setting up map
     map = new google.maps.Map(document.getElementById('map'), {
     zoom: 18,
-    center: pos,
+    center: result.target,
     });
 
     //marker for current location
-    var marker = new google.maps.Marker({position: pos, map: map});
+    var marker = new google.maps.Marker({position: result.target, map: map});
 
     //temp info window
     infoWindow = new google.maps.InfoWindow;
-    infoWindow.setPosition(pos);
+    infoWindow.setPosition(result.target);
     infoWindow.setContent('Location found.');
     infoWindow.open(map);
 
@@ -261,18 +349,30 @@ function toggleSidePanel(params) {
 }
 
 // plots the results + adds them to the nearby search
-function plotListMarkers(results) {
+async function plotListMarkers(results) {
+    choices.html("");
     // turn this in to plant markers function
-    htmlString = "";
     for (let i = 0; i < results.length; i++) {
-        createMarker(results[i]);
-        htmlString += `<div class='option-items' location = `+results[0].geometry.location+`>
-            ` + (i + 1) + '. ' + results[i].name + '|' + results[0].geometry.location +
-            `
-        </div>`;
-        createMarker(results[i]);
+        await new Promise(function(accept, reject){
+            queryService(results[i].place_id, function (thisMarkerLocation){
+                if (thisMarkerLocation){
+                    console.log(thisMarkerLocation);
+                    createMarker(thisMarkerLocation);
+                    newChoice = $(`<div class='option-items' location = `+thisMarkerLocation.geometry.location+`>
+                        ` + (i + 1) + '. ' + thisMarkerLocation.name + '|' + thisMarkerLocation.geometry.location +
+                        `</div>`).on("click", function(){
+                            map.setCenter(thisMarkerLocation.geometry.location)
+                        });  
+                    accept(choices.append(newChoice));
+                    
+                }else{
+                    accept();
+                }
+            
+            });
+            })
+        
     }
-    return true;
 }
 
 function createMarker(place) {

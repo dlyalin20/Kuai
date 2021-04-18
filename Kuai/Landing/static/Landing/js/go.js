@@ -17,7 +17,25 @@ const options = {
     maximumAge: 500,
 };
 var service; // only to be called after maps is initialized
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+const csrftoken = getCookie('csrftoken');
 const input = document.getElementById('search-input');
+var lastsend;
 function initialize(){
     autocomplete = new google.maps.places.AutocompleteService();
     geocoder = new google.maps.Geocoder()
@@ -167,6 +185,32 @@ function mainLoop(position){
         });
     }
 
+/*
+Input in a array of elements
+    - geometry
+        -location
+    - name
+*/
+function createTemps(result = lastsend){    
+    var data = JSON.stringify(result);
+    console.log(data);
+    $.ajax({
+        headers: { "X-CSRFToken": csrftoken },
+        type: "POST",
+        url: window.location.pathname,
+        // The key needs to match your method's input parameter (case-sensitive).
+        data: data,
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        success: function(data){
+            alert(data);
+        },
+        error: function(errMsg) {
+            alert(errMsg);
+        }
+    });
+}
+
 
 function nearbySearch(){ //plots the nearby locations
     let request = {
@@ -181,9 +225,18 @@ function nearbySearch(){ //plots the nearby locations
     const locations = service.nearbySearch(request, (result, status)=>{
         if (status == google.maps.places.PlacesServiceStatus.OK){
             placeResultsToMarkers(result);
+            createTemps(result);
+            lastsend = result;
         }
     });
 }
+
+// take array of objects
+/*element
+    - geometry
+        -location
+    - name
+*/
 
 function placeResultsToMarkers(results){
     choices.html("");

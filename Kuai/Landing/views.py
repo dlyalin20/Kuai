@@ -13,6 +13,7 @@ import time
 import datetime
 import pytz
 
+
 # format to handle requests and check for integers
 # also filter data
 def addWaitTime(request, ID, time):
@@ -98,10 +99,21 @@ def business_view(request, ID):
 
 
 def go(request):
+    print(request.method)
+    if ( request.method == "POST"):
+        # print(request.raw_post_data) // broken
+        json_data = request.read()
+        data = json.loads(json_data)
+        if (data and data.length > 0):
+            print(data) #get py array
+
+        return HttpResponse("recieved")
+
     id = request.GET.get('id', "")
     query = request.GET.get('q', "")
     if (query):
         print(query)
+        
     if (id):
         #we have id => create custom map
         print(id)

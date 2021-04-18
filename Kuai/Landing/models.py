@@ -7,10 +7,10 @@ from django.dispatch import receiver
 from django.db.models.deletion import CASCADE
 from django.db.models.signals import post_save
 from django.core.exceptions import ValidationError
-from django_postgres_extensions.models.fields import ArrayField
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import User, PermissionsMixin, AbstractBaseUser, BaseUserManager
-
+import django.utils
+import PIL
 
 # validators
 def validate_user(user):
@@ -104,7 +104,7 @@ class waitData(models.Model):
         MaxValueValidator(180)
     ], null = False, blank = False)
     author = models.CharField(max_length = 20, null = False, blank = False)
-    timestamp = models.DateTimeField(default = datetime.datetime.utcnow(), null = False, blank = False,)
+    timestamp = models.DateTimeField(default = django.utils.timezone.now, null = False, blank = False,)
 
     REQUIRED_FIELDS = ['business', 'wait_time', 'author', 'timestamp']
 

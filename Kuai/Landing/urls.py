@@ -13,7 +13,7 @@ urlpatterns = [
     path("profile", views.profile, name="profile"),
     #     # new code
     # path('accounts/', include('allauth.urls')),
-    path('popup', views.popup, name="test"),
+    path('popup/<str:placeID>', views.popup, name="test"),
     path('business_view/<int:id>', views.test, name="business_view"),
     path('quickWaitTime', views.quickWaitTime, name="quickWaitTime")
     # archive

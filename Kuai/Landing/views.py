@@ -17,12 +17,12 @@ import pytz
 # also filter data
 def addWaitTime(request, ID, time):
     user = request.user
-    try:
+    """  try:
         if int((pytz.utc.localize(datetime.datetime.now()) - user.profile.last_time_update.timestamp).total_seconds() / 60) < float(time) and user.profile.last_time_update.business == ID:
             print("Too Soon")
             return
     except AttributeError:
-        pass
+        pass """
     entry = waitData(business = ID, wait_time = time, author = request.user.username)
     entry.save()
     try:
@@ -180,8 +180,12 @@ def test(request, id):
         "id":id
     })
 
-def popup(request):
-    return render(request, "Landing/popup.html")
+def popup(request, placeID):
+    business = Business.objects.filter(placeID = placeID)[0]
+    wait_time = business.wait_time
+    return render(request, "Landing/popup.html", {
+        'business' : business
+    })
 
 def userAccount(request):
     times = {0:"night", 1:"night",2:"night",3:"night",4:"night",5:"night",6:"morning",7:"morning",8:"morning",9:"morning",10:"morning",11:"morning",12:"day",13:"day",14:"day",15:"day",16:"day",17:"afternoon",18:"afternoon",19:"afternoon", 20:"afternoon", 21:"night", 22:"ngiht",23:"night",24:"night"}
@@ -197,5 +201,6 @@ def quickWaitTime(request):
         form = request.POST
         id = form["business"]
         time = form["time"]
+        business = Business.objects.filter(placeID = id)[0]
         addWaitTime(request, id, time)
-    return HttpResponseRedirect("/popup")
+    return HttpResponseRedirect(f"/popup/{business.name}")

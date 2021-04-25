@@ -23,24 +23,24 @@
                                     <div class="column" style="padding: 0; margin: 0;">
                                         <h1 class="title is-5" style="padding: 0; margin-bottom: 0; color: navy;"><b>
                                             <a href="">
-                                            {% if name %} {{ name }} {% else %} Business Name {% endif %}
+                                            {% if business.name %} {{ business.name }} {% else %} Business Name {% endif %}
                                             </a>
                                             </b><br></h1>
                                         <p style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;" class="content">
                                             Wait time:
                                             <span style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;">
-                                                {% if time %} 
-                                                    {% if time >= 0 and time < 30 %}
+                                                {% if business.wait_time.wait_time %} 
+                                                    {% if business.wait_time.wait_time >= 0 and business.wait_time.wait_time < 30 %}
                                                     <span style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: lime;">
-                                                        {{ time }}
+                                                        {{ business.wait_time.wait_time }}
                                                     </span>
-                                                    {% elif time >= 30 and time < 60 %}
+                                                    {% elif business.wait_time.wait_time >= 30 and business.wait_time.wait_time < 60 %}
                                                     <span style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: orange;">
-                                                        {{ time }}
+                                                        {{ business.wait_time.wait_time }}
                                                     </span>
                                                     {% else %}
                                                     <span style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: red;">
-                                                        {{ time }}
+                                                        {{ business.wait_time.wait_time }}
                                                     </span>
                                                     {% endif %}
                                                 {% else %} 
@@ -52,7 +52,7 @@
                                             <p style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;" class="content">Add Wait Time: </p>
                                             <form action="/quickWaitTime"  method="post" style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;">
                                                 {% csrf_token %}
-                                                <input type="hidden" value="{{ business }}" name="business" />
+                                                <input type="hidden" value="{{ business.name }}" name="business" />
                                                 <div class="field" style="width: 75px; white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;">
                                                     <input style="width: 75px; white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;" type="number" list="times" name="time"/>
                                                     <datalist id="times">

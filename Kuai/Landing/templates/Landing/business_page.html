@@ -17,13 +17,52 @@
                                 <h1 class="title is-4">Current Wait Time: <br>
                                     {% if wait_time.average %} {{ wait_time.average }} {% else %} 5 {% endif %} Minutes
                                 </h1>
-                                <h1 class="title is-5">Add Wait Times: </h1>
+                                <h1 class="title is-5" style="white-space: nowrap; padding: 0; margin: 0;">Add Wait Times: </h1>
+                                <form action="/longWaitTime"  method="post" style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;">
+                                    {% csrf_token %}
+                                    <input type="hidden" value="{{ business.name }}" name="business" />
+                                    <div class="field" style="width: 130px; white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;">
+                                        <input style="width: 130px; white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;" type="number" list="times" name="time"/>
+                                        <datalist id="times">
+                                                <option> 10 </option>
+                                                <option> 20 </option>
+                                                <option> 30 </option>
+                                                <option> 40 </option>
+                                                <option> 50 </option>
+                                                <option> 60 </option>
+                                        </datalist>
+                                    </div>
+                                    <div class="field">
+                                        <div class="control">
+                                            <button class="button is-info is-small" type="submit">Submit</button>
+                                        </div>
+                                    </div>
+                                </form>
                                 
                             </div>
                             <div class="column">
                                 <h1 class="title is-4">Current Capacity: <br>
                                     {% if capacity.average %} {{ capacity.average }} {% else %} 50 {% endif %}%
                                 </h1>
+                                <h1 class="title is-5" style="white-space: nowrap; padding: 0; margin: 0;">Add Capacity: </h1>
+                                <form action="/longCapacity"  method="post" style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;">
+                                    {% csrf_token %}
+                                    <input type="hidden" value="{{ business.name }}" name="business" />
+                                    <div class="field" style="width: 130px; white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;">
+                                        <input style="width: 130px; white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;" type="number" list="times" name="cap"/>
+                                        <datalist id="times">
+                                                <option> 25 </option>
+                                                <option> 50 </option>
+                                                <option> 75 </option>
+                                                <option> 100 </option>
+                                        </datalist>
+                                    </div>
+                                    <div class="field">
+                                        <div class="control">
+                                            <button class="button is-info is-small" type="submit">Submit</button>
+                                        </div>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                         

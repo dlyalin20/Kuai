@@ -14,8 +14,10 @@ urlpatterns = [
     #     # new code
     # path('accounts/', include('allauth.urls')),
     path('popup/<str:placeID>', views.popup, name="test"),
-    path('business_view/<str:id>', views.test, name="business_view"),
-    path('quickWaitTime', views.quickWaitTime, name="quickWaitTime")
+    path('business_view/<str:placeID>', views.test, name="business_view"),
+    path('quickWaitTime', views.quickWaitTime, name="quickWaitTime"),
+    path('longWaitTime', views.longWaitTime, name="longWaitTime"),
+    path('longCapacity', views.longCapacity, name="longCapacity")
     # archive
     # path('autocomplete', views.autocomplete_view, name="autocomplete"),
 ]

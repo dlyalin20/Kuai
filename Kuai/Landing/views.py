@@ -42,12 +42,12 @@ def addWaitTime(request, ID, time):
 # also filter data
 def addCapacity(request, ID, capacity):
     user = request.user
-    try:
+    """ try:
         if int((pytz.utc.localize(datetime.datetime.now()) - user.profile.last_capacity_update.timestamp).total_seconds() / 60) and user.profile.last_capacity_update.business == ID:
             print("Too Soon")
             return
     except AttributeError:
-        pass
+        pass """
     entry = capacityData(business = ID, capacity = capacity, author = request.user.username)
     entry.save()
     try:
@@ -174,8 +174,8 @@ def profile(request):
 # Route an account view that passes all arguments to account template; also updates fave-businesses and maybe history; updates pic; figures out time of day
 
 # test view for testing out html elements
-def test(request, id):
-    business = Business.objects.filter(placeID = id)[0]
+def test(request, placeID):
+    business = Business.objects.filter(placeID = placeID)[0]
     wait_time = business.wait_time
     capacity = business.capacity
     return render(request, "Landing/business_page.html", {
@@ -208,4 +208,24 @@ def quickWaitTime(request):
         time = form["time"]
         business = Business.objects.filter(placeID = id)[0]
         addWaitTime(request, id, time)
-    return HttpResponseRedirect(f"/popup/{business.name}")
+    return HttpResponseRedirect(f"/popup/{business.placeID}")
+
+def longWaitTime(request):
+    if request.method == 'POST':
+        form = request.POST
+        id = form['business']
+        time = form['time']
+        print(id)
+        business = Business.objects.filter(placeID = id)[0]
+        addWaitTime(request, id, time)
+    return HttpResponseRedirect(f'/business_view/{business.placeID}')
+
+def longCapacity(request):
+    if request.method == 'POST':
+        form = request.POST
+        id = form['business']
+        cap = form['cap']
+        business = Business.objects.filter(placeID = id)[0]
+        addCapacity(request, id, cap)
+    return HttpResponseRedirect(f'/business_view/{business.placeID}')
+

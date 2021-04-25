@@ -153,6 +153,8 @@ class Profile(models.Model):
     profile_pic = models.ImageField(blank = True, null = True, upload_to='Landing/pfps')
     favorite_businesses = JSONField(null = True, blank = True) # Map each business to Name, Category (food, event, etc.), distance from user home point
     search_history = JSONField(null = True, blank = True) #store business name mapped with date/time searched
+    all_time_updates = models.ManyToManyField(waitData, blank=True)
+    all_capacity_updates = models.ManyToManyField(capacityData, blank=True)
     last_time_update = models.OneToOneField(waitData, null = True, blank = True, on_delete = models.SET_NULL)
     last_capacity_update = models.OneToOneField(capacityData, null = True, blank = True, on_delete = models.SET_NULL)
 

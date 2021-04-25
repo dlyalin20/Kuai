@@ -36,6 +36,7 @@ def addWaitTime(request, ID, time):
         times = waitTimes(business = ID, numReviews = 1, average = time)
         times.save()
     user.profile.last_time_update = entry
+    user.profile.all_time_updates.add(entry)
     user.save()
 
 # format to handle requests and check for integers
@@ -61,6 +62,7 @@ def addCapacity(request, ID, capacity):
         capacities = Capacity(business = ID, numReviews = 1, average = capacity)
         capacities.save()
     user.profile.last_capacity_update = entry
+    user.profile.all_capacity_updates.add(entry)
     user.save()
 
 # login form
@@ -228,4 +230,6 @@ def longCapacity(request):
         business = Business.objects.filter(placeID = id)[0]
         addCapacity(request, id, cap)
     return HttpResponseRedirect(f'/business_view/{business.placeID}')
+
+#def verification_collection()
 

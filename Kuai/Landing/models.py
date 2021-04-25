@@ -10,6 +10,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import User, PermissionsMixin, AbstractBaseUser, BaseUserManager
 import django.utils
+from django.contrib import admin
 import PIL
 
 # validators
@@ -270,17 +271,23 @@ class Staff_Profile(models.Model):
     def __str__(self):
         return self.user.username
 
-# class Temp_Business_Manager(models.Manager)
+class Temp_Business_Manager(models.Manager):
+    def search(self, latitude, longitude, radius):
+        # find point around :
+        query= "SELECT ID, NOM, LAT, LON, 3956 * 2 * ASIN(SQRT(POWER(SIN((%s - LAT) * 0.0174532925 / 2), 2) + COS(%s * 0.0174532925) * COS(LAT * 0.0174532925) * POWER(SIN((%s - LON) * 0.0174532925 / 2), 2) )) as distance from POI  having distance < 50 ORDER BY distance ASC " % ( latitude, latitude, longitude)
+        return('test')
+
 
 class Temp_Business(models.Model):
-    xcor = models.FloatField(blank = False, null = False)
-    ycor = models.FloatField(blank = False, null = False)
+    lat = models.FloatField(blank = False, null = False)
+    lon = models.FloatField(blank = False, null = False)
     verified = models.BooleanField(null = False, blank = False, default = False)
     cached_time = models.DateTimeField(auto_now = True, null = False, blank = False)
     wait_time = models.OneToOneField(waitTimes, null = True, blank = True, on_delete = CASCADE)
     capacity = models.OneToOneField(Capacity, null = True, blank = True, on_delete = CASCADE)
     placeID = models.TextField(null = False, blank=False, unique = True, default = False)
-    REQUIRED_FIELDS = ['xcor', 'ycor', 'verified', 'placeID']
+    REQUIRED_FIELDS = ['xcor', 'ycor', 'verified', 'placeID', "cached_time"]
+
     def twenty_days(self):
         return (datetime.datetime.now() - self.cached_time).days >= 20
     def updateTime(self):
@@ -290,8 +297,8 @@ class Temp_Business(models.Model):
 
     def natural_key(self):
         return self.placeID
-    
+     
     def __str__(self):
         return self.placeID
 
-    # objects = Temp_Business_Manager()
+    objects = Temp_Business_Manager()

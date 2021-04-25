@@ -1,5 +1,8 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
+from django.apps import apps
+# from channels.db import database_sync_to_async
+from asgiref.sync import sync_to_async
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -9,10 +12,23 @@ class ChatConsumer(AsyncWebsocketConsumer):
     #     pass
 
     async def receive(self, text_data):
-        text_data_json = json.loads(text_data)
-        message = text_data_json['message']
-        print("recieved" + message)
+        text_data_json = json.loads(text_data) #get sent json
+        lat = text_data_json['lat']
+        lon = text_data_json['lon']
+        radius = text_data_json['radius']
+        print("recieved lat: " + str(lat) + ' lon: ' + str(lon) + " radius: "+ str(radius))
+        # qs = await database_sync_to_async(self.nearbySearch(lat, lon, radius))() #query dbs
+        qs = self.nearbySearch(lat, lon, radius)
+        print(qs)
+
         await self.send(text_data=json.dumps({
-            'message': message
+            'message': 'test'
         }))
-        print("recieved: " + message)
+
+    # @database_sync_to_async
+    @sync_to_async
+    def nearbySearch(self, lat, lon, radius):
+        Temp_Business = apps.get_model('Landing', 'Temp_Business')
+        return Temp_Business.objects.search(lat, lon, radius)
+
+

@@ -435,8 +435,7 @@ function initMap(result) {
     //     newMarker.addListener('click', toggleBounce);
     //     markers.push(newMarker);
     // });
-    
-    console.log("test");
+
 
     }
 

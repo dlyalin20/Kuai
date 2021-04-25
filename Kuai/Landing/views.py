@@ -4,7 +4,7 @@ from django import forms
 from django.contrib.auth import authenticate, login, logout
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from .models import User, AccountManager
-from .models import waitData, capacityData, waitTimes, Capacity, validate_user, validate_pwd
+from .models import waitData, capacityData, waitTimes, Capacity, validate_user, validate_pwd, Business
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 import json
@@ -175,6 +175,7 @@ def profile(request):
 
 # test view for testing out html elements
 def test(request, id):
+    business = Business.objects.get()
     return render(request, "Landing/business_page.html", {
         "id":id
     })

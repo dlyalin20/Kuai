@@ -7,10 +7,11 @@ from django.dispatch import receiver
 from django.db.models.deletion import CASCADE
 from django.db.models.signals import post_save
 from django.core.exceptions import ValidationError
-from django_postgres_extensions.models.fields import ArrayField
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import User, PermissionsMixin, AbstractBaseUser, BaseUserManager
-
+import django.utils
+from django.contrib import admin
+import PIL
 
 # validators
 def validate_user(user):
@@ -104,7 +105,7 @@ class waitData(models.Model):
         MaxValueValidator(180)
     ], null = False, blank = False)
     author = models.CharField(max_length = 20, null = False, blank = False)
-    timestamp = models.DateTimeField(default = datetime.datetime.utcnow(), null = False, blank = False,)
+    timestamp = models.DateTimeField(default = django.utils.timezone.now, null = False, blank = False,)
 
     REQUIRED_FIELDS = ['business', 'wait_time', 'author', 'timestamp']
 
@@ -211,7 +212,7 @@ class Business(models.Model):
     verified = models.BooleanField(default = False)
     wait_time = models.OneToOneField(waitTimes, null = True, blank = True, on_delete = models.SET_NULL, related_name = 'time')
     capacity = models.OneToOneField(Capacity, null = True, blank = True, on_delete = models.SET_NULL, related_name='cap')
-
+    placeID = models.TextField(null = False, blank=False, unique = True, default = False)
     REQUIRED_FIELDS = ['name', 'xcor', 'ycor', 'verified']
 
     def get_short_name(self):
@@ -270,26 +271,34 @@ class Staff_Profile(models.Model):
     def __str__(self):
         return self.user.username
 
+class Temp_Business_Manager(models.Manager):
+    def search(self, latitude, longitude, radius):
+        # find point around :
+        query= "SELECT ID, NOM, LAT, LON, 3956 * 2 * ASIN(SQRT(POWER(SIN((%s - LAT) * 0.0174532925 / 2), 2) + COS(%s * 0.0174532925) * COS(LAT * 0.0174532925) * POWER(SIN((%s - LON) * 0.0174532925 / 2), 2) )) as distance from POI  having distance < 50 ORDER BY distance ASC " % ( latitude, latitude, longitude)
+        return('test')
+
+
 class Temp_Business(models.Model):
-    name = models.CharField(max_length=40, unique=True, blank = False, null = False)
-    xcor = models.FloatField(blank = False, null = False)
-    ycor = models.FloatField(blank = False, null = False)
+    lat = models.FloatField(blank = False, null = False)
+    lon = models.FloatField(blank = False, null = False)
     verified = models.BooleanField(null = False, blank = False, default = False)
     cached_time = models.DateTimeField(auto_now = True, null = False, blank = False)
     wait_time = models.OneToOneField(waitTimes, null = True, blank = True, on_delete = CASCADE)
     capacity = models.OneToOneField(Capacity, null = True, blank = True, on_delete = CASCADE)
-
-    REQUIRED_FIELDS = ['name', 'xcor', 'ycor', 'verified']
+    placeID = models.TextField(null = False, blank=False, unique = True, default = False)
+    REQUIRED_FIELDS = ['xcor', 'ycor', 'verified', 'placeID', "cached_time"]
 
     def twenty_days(self):
         return (datetime.datetime.now() - self.cached_time).days >= 20
-
+    def updateTime(self):
+        self.cached_time = django.utils.timezone.now()
     def get_short_name(self):
-        return self.name
+        return self.placeID
 
     def natural_key(self):
-        return self.name
-    
+        return self.placeID
+     
     def __str__(self):
-        return self.name
+        return self.placeID
 
+    objects = Temp_Business_Manager()

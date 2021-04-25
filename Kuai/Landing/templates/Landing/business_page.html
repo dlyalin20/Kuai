@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>View: {{ name }}</title>
+        <title>View: {{ business.name }}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
     </head>
     {% include 'Landing/navbar.html' %}
@@ -10,19 +10,19 @@
         <div class="columns">
                 <div class="column">
                     <center>
-                        <h1 class="title is-1">{% if name %} {{ name }} {% else %} Business Name {% endif %}</h1>
+                        <h1 class="title is-1">{% if business.name %} {{ business.name }} {% else %} Business Name {% endif %}</h1>
                         <hr>
                         <div class="columns">
                             <div class="column">
                                 <h1 class="title is-4">Current Wait Time: <br>
-                                    {% if time %} {{ time }} {% else %} 5 {% endif %} Minutes
+                                    {% if wait_time.average %} {{ wait_time.average }} {% else %} 5 {% endif %} Minutes
                                 </h1>
-                                <h1 class="title is-5">Update Wait Times: </h1>
+                                <h1 class="title is-5">Add Wait Times: </h1>
                                 
                             </div>
                             <div class="column">
                                 <h1 class="title is-4">Current Capacity: <br>
-                                    {% if capacity %} {{ capacity }} {% else %} 50 {% endif %}%
+                                    {% if capacity.average %} {{ capacity.average }} {% else %} 50 {% endif %}%
                                 </h1>
                             </div>
                         </div>
@@ -31,7 +31,7 @@
                 </div>
                 <div class="column">
                     <figure class="image is-square">
-                        <img src="../../bios/Landing/business_imgs/{{ name }}" alt = {% if name %} {{ name }} {% else %} Business Name {% endif %}>
+                        <img src="../../bios/Landing/business_imgs/{{ name }}" alt = {% if business.name %} {{ business.name }} {% else %} Business Name {% endif %}>
                       </figure>
                 </div>
         </div>

@@ -29,18 +29,18 @@
                                         <p style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;" class="content">
                                             Wait time:
                                             <span style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;">
-                                                {% if business.wait_time.wait_time %} 
-                                                    {% if business.wait_time.wait_time >= 0 and business.wait_time.wait_time < 30 %}
+                                                {% if wait_time.average %} 
+                                                    {% if wait_time.average >= 0 and wait_time.average < 30 %}
                                                     <span style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: lime;">
-                                                        {{ business.wait_time.wait_time }}
+                                                        {{ wait_time.average }}
                                                     </span>
-                                                    {% elif business.wait_time.wait_time >= 30 and business.wait_time.wait_time < 60 %}
+                                                    {% elif wait_time.average >= 30 and wait_time.average < 60 %}
                                                     <span style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: orange;">
-                                                        {{ business.wait_time.wait_time }}
+                                                        {{ wait_time.average }}
                                                     </span>
                                                     {% else %}
                                                     <span style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: red;">
-                                                        {{ business.wait_time.wait_time }}
+                                                        {{ wait_time.average }}
                                                     </span>
                                                     {% endif %}
                                                 {% else %} 

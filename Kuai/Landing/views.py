@@ -175,16 +175,21 @@ def profile(request):
 
 # test view for testing out html elements
 def test(request, id):
-    business = Business.objects.get()
+    business = Business.objects.filter(placeID = id)[0]
+    wait_time = business.wait_time
+    capacity = business.capacity
     return render(request, "Landing/business_page.html", {
-        "id":id
+        "business" : business,
+        'wait_time' : wait_time,
+        'capacity' : capacity
     })
 
 def popup(request, placeID):
     business = Business.objects.filter(placeID = placeID)[0]
     wait_time = business.wait_time
     return render(request, "Landing/popup.html", {
-        'business' : business
+        'business' : business,
+        'wait_time' : wait_time
     })
 
 def userAccount(request):

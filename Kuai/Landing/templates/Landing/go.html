@@ -27,6 +27,8 @@
         Search This Area
         </button>
     </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
     <script>
         var q = "{{q}}"; // get the query
         // console.log(q);
@@ -39,15 +41,15 @@
             document.title = "Kuai Go"
         }
     </script>
-    <script
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBzd999zA1_gyh7uB6KpUh-hBaYsl0vmIQ&callback=initialize&libraries=places&v=weekly"
-    defer
-    ></script> <!---->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <!--  -->
-
 
     <script src="{% static 'Landing/js/go.js' %}"></script>
+
+    <script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBzd999zA1_gyh7uB6KpUh-hBaYsl0vmIQ&callback=initialize&libraries=places&v=weekly"></script> <!---->
+  
+    <script src="{% static 'Landing/js/webSockets.js' %}"></script>
+
+
 </body>
 
 </html>

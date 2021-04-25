@@ -4,7 +4,7 @@ from django import forms
 from django.contrib.auth import authenticate, login, logout
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from .models import User, AccountManager
-from .models import waitData, capacityData, waitTimes, Capacity, validate_user, validate_pwd
+from .models import waitData, capacityData, waitTimes, Capacity, validate_user, validate_pwd, Business, Temp_Business
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 import json
@@ -98,14 +98,38 @@ def business_view(request, ID):
     return render(request, "Landing/go.html") #temp link
 
 
+def nearby_location_search(request):
+    xcor = request.GET.get('xcor')
+    ycor = request.GET.get('ycor')
+    radius = request.GET.get('radius')
+    if (xcor and ycor and radius > 0):
+        pass #search
+
 def go(request):
     print(request.method)
     if ( request.method == "POST"):
         # print(request.raw_post_data) // broken
         json_data = request.read()
         data = json.loads(json_data)
-        if (data and data.length > 0):
-            print(data) #get py array
+        # method_list = [method for method in dir(data) if method.startswith('_') is False]
+        # print(method_list)
+        # print(type(data))
+        for i in data:
+            # print(i) 
+            if (i['placeID'] and not Business.objects.filter(placeID=i['placeID']).exists()):
+                targetQuery = Temp_Business.objects.filter(placeID=i['placeID'])
+                if targetQuery.exists():#temp busness if exist then update time
+                    print('exists already')
+                    tempBiz = targetQuery.get()
+                    tempBiz.updateTime()
+                else: # other wise create temp
+                    print('creating tempBiz')
+                    tempBiz = Temp_Business(xcor = i['coords']['lat'], ycor = i['coords']['lng'], placeID = i['placeID']) 
+                    tempBiz.save()
+                    pass
+
+            else:
+                continue #query busness => if exist exit        
 
         return HttpResponse("recieved")
 

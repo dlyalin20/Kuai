@@ -225,8 +225,22 @@ function nearbySearch(){ //plots the nearby locations
     const locations = service.nearbySearch(request, (result, status)=>{
         if (status == google.maps.places.PlacesServiceStatus.OK){
             placeResultsToMarkers(result);
-            createTemps(result);
-            lastsend = result;
+            //only take xy coords and place id
+            var myResults = [];
+
+            result && result.map(v => {
+                let coords = v.geometry.location;     
+                let placeID = v.place_id;           
+                myResults.push({ coords, placeID });
+            })
+            // for ({location: geometry, myPlace: place_id} in result){
+            //     let coords = i.geometry.location;
+            //     let placeID = i.place_id;
+            //     myResults.append({ coords, placeID });
+            // }
+
+            createTemps(myResults);
+            lastsend = myResults;
         }
     });
 }

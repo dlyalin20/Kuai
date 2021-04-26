@@ -10,6 +10,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     # async def disconnect(self):
     #     pass
+    # @database_sync_to_async
+    @sync_to_async
+    def nearbySearch(self, lat, lon, radius):
+        Temp_Business = apps.get_model('Landing', 'Temp_Business')
+        return Temp_Business.objects.search(lat, lon, radius)
 
     async def receive(self, text_data):
         text_data_json = json.loads(text_data) #get sent json
@@ -18,17 +23,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
         radius = text_data_json['radius']
         print("recieved lat: " + str(lat) + ' lon: ' + str(lon) + " radius: "+ str(radius))
         # qs = await database_sync_to_async(self.nearbySearch(lat, lon, radius))() #query dbs
-        qs = self.nearbySearch(lat, lon, radius)
-        print(qs)
+        qs = await self.nearbySearch(lat, lon, radius)
+        print('qs: ' + str(qs))
 
         await self.send(text_data=json.dumps({
-            'message': 'test'
+            'message': qs
         }))
 
-    # @database_sync_to_async
-    @sync_to_async
-    def nearbySearch(self, lat, lon, radius):
-        Temp_Business = apps.get_model('Landing', 'Temp_Business')
-        return Temp_Business.objects.search(lat, lon, radius)
 
 

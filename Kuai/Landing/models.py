@@ -9,6 +9,7 @@ from django.db.models.signals import post_save
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import User, PermissionsMixin, AbstractBaseUser, BaseUserManager
+from django.db.models.expressions import RawSQL
 import django.utils
 from django.contrib import admin
 import PIL
@@ -272,10 +273,76 @@ class Staff_Profile(models.Model):
         return self.user.username
 
 class Temp_Business_Manager(models.Manager):
-    def search(self, latitude, longitude, radius):
-        # find point around :
-        query= "SELECT ID, NOM, LAT, LON, 3956 * 2 * ASIN(SQRT(POWER(SIN((%s - LAT) * 0.0174532925 / 2), 2) + COS(%s * 0.0174532925) * COS(LAT * 0.0174532925) * POWER(SIN((%s - LON) * 0.0174532925 / 2), 2) )) as distance from POI  having distance < 50 ORDER BY distance ASC " % ( latitude, latitude, longitude)
-        return('test')
+    def isFloatNum(self, targetString):
+        try : 
+            float(targetString)
+            return(True)
+        except :
+            print("Not a float")
+            return(False)
+
+    def search(self, latitude, longitude, radius): # radius in kms
+        if (self.isFloatNum(latitude) and self.isFloatNum(longitude) and self.isFloatNum(radius)):
+
+            #first attempt using raw sql
+            # # convert all to string for query
+            # latitude = str(latitude)
+            # longitude = str(longitude)
+            # radius = str(radius)
+            # # find locations with location radius km away from the target location:
+            # query= (
+            #     "SELECT PLACEID, "
+            #     "3956 * 2 * ASIN(SQRT(POWER(SIN((%s - LAT) * 0.0174532925 / 2), 2) + COS(%s * 0.0174532925) * COS(LAT * 0.0174532925) * POWER(SIN((%s - LON) * 0.0174532925 / 2), 2) )) as distance "
+            #     "having distance < %s ORDER BY distance ASC "
+            # ) % (latitude, latitude, longitude, radius)
+            # qs = self.raw(query)
+
+            #second attempt => 
+            # Great circle distance formula
+            gcd_formula = "6371 * acos(min(max(\
+            cos(radians(%s)) * cos(radians(lat)) \
+            * cos(radians(lon) - radians(%s)) + \
+            sin(radians(%s)) * sin(radians(lat)) \
+            , -1), 1))"
+            distance_raw_sql = RawSQL(
+                gcd_formula,
+                (latitude, longitude, latitude)
+            )
+            qs = self.get_queryset()
+            qs = qs.annotate(distance=distance_raw_sql)
+            qs = qs.filter(distance__lt=radius).order_by('distance')
+            # return qs
+            # 
+            # django filter get rect => annotate distance => loop through taking out w. distance < radius
+            
+
+
+            # 
+            # Potential using geodjango
+            # from django.contrib.gis.geos import Point
+            # from django.contrib.gis.measure import D
+
+            # distance = 2000 
+            # ref_location = Point(1.232433, 1.2323232)
+            # qs = self.get_queryset()
+            # res = qs.filter(
+            #     location__distance_lte=(
+            #         ref_location,
+            #         D(m=distance)
+            #     )
+            # ).distance(
+            #     ref_location
+            # ).order_by(
+            #     'distance'
+            # )
+
+            # 
+            # using filtering then looping
+
+            print(qs)
+        return('test') #escape out
+
+
 
 
 class Temp_Business(models.Model):

@@ -271,7 +271,7 @@ class Staff_Profile(models.Model):
     
     def __str__(self):
         return self.user.username
-
+from django.core.serializers import serialize
 class Temp_Business_Manager(models.Manager):
     def isFloatNum(self, targetString):
         try : 
@@ -282,22 +282,7 @@ class Temp_Business_Manager(models.Manager):
             return(False)
 
     def search(self, latitude, longitude, radius): # radius in kms
-        if (self.isFloatNum(latitude) and self.isFloatNum(longitude) and self.isFloatNum(radius)):
-
-            #first attempt using raw sql
-            # # convert all to string for query
-            # latitude = str(latitude)
-            # longitude = str(longitude)
-            # radius = str(radius)
-            # # find locations with location radius km away from the target location:
-            # query= (
-            #     "SELECT PLACEID, "
-            #     "3956 * 2 * ASIN(SQRT(POWER(SIN((%s - LAT) * 0.0174532925 / 2), 2) + COS(%s * 0.0174532925) * COS(LAT * 0.0174532925) * POWER(SIN((%s - LON) * 0.0174532925 / 2), 2) )) as distance "
-            #     "having distance < %s ORDER BY distance ASC "
-            # ) % (latitude, latitude, longitude, radius)
-            # qs = self.raw(query)
-
-            #second attempt => 
+        if (self.isFloatNum(latitude) and self.isFloatNum(longitude) and self.isFloatNum(radius)): 
             # Great circle distance formula
             gcd_formula = "6371 * acos(min(max(\
             cos(radians(%s)) * cos(radians(lat)) \
@@ -311,36 +296,13 @@ class Temp_Business_Manager(models.Manager):
             qs = self.get_queryset()
             qs = qs.annotate(distance=distance_raw_sql)
             qs = qs.filter(distance__lt=radius).order_by('distance')
-            # return qs
-            # 
-            # django filter get rect => annotate distance => loop through taking out w. distance < radius
-            
-
-
-            # 
-            # Potential using geodjango
-            # from django.contrib.gis.geos import Point
-            # from django.contrib.gis.measure import D
-
-            # distance = 2000 
-            # ref_location = Point(1.232433, 1.2323232)
-            # qs = self.get_queryset()
-            # res = qs.filter(
-            #     location__distance_lte=(
-            #         ref_location,
-            #         D(m=distance)
-            #     )
-            # ).distance(
-            #     ref_location
-            # ).order_by(
-            #     'distance'
-            # )
-
-            # 
-            # using filtering then looping
-
-            print(qs)
-        return('test') #escape out
+            listOfPlaceIDs = []
+            for place in qs.iterator():
+                listOfPlaceIDs.append(dict(id=place.placeID, lat = place.lat, lon=place.lon))
+            # data = serialize("json", qs)
+            print('qs: ' + str(listOfPlaceIDs))
+            return listOfPlaceIDs
+        return('bad inputs') #escape out
 
 
 

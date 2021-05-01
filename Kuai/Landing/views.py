@@ -1,29 +1,29 @@
-from django.shortcuts import get_object_or_404, render, redirect
-from django.http import HttpResponse, HttpResponseRedirect
-from django import forms
-from django.contrib.auth import authenticate, login, logout
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from .models import User, AccountManager
-from .models import waitData, capacityData, waitTimes, Capacity, validate_user, validate_pwd, Business, Temp_Business
-from django.urls import reverse
-from django.contrib.auth.decorators import login_required
-import json
 import re
+import json
+import pytz
 import time
 import datetime
-import pytz
+from django import forms
+from django.urls import reverse
+from .models import User, AccountManager
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse, HttpResponseRedirect
+from django.contrib.auth import authenticate, login, logout
+from django.shortcuts import get_object_or_404, render, redirect
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from .models import waitData, capacityData, waitTimes, Capacity, validate_user, validate_pwd, Business
 
 
 # format to handle requests and check for integers
 # also filter data
 def addWaitTime(request, ID, time):
     user = request.user
-    try:
+    """  try:
         if int((pytz.utc.localize(datetime.datetime.now()) - user.profile.last_time_update.timestamp).total_seconds() / 60) < float(time) and user.profile.last_time_update.business == ID:
             print("Too Soon")
             return
     except AttributeError:
-        pass
+        pass """
     entry = waitData(business = ID, wait_time = time, author = request.user.username)
     entry.save()
     try:
@@ -37,18 +37,19 @@ def addWaitTime(request, ID, time):
         times = waitTimes(business = ID, numReviews = 1, average = time)
         times.save()
     user.profile.last_time_update = entry
+    user.profile.all_time_updates.add(entry)
     user.save()
 
 # format to handle requests and check for integers
 # also filter data
 def addCapacity(request, ID, capacity):
     user = request.user
-    try:
+    """ try:
         if int((pytz.utc.localize(datetime.datetime.now()) - user.profile.last_capacity_update.timestamp).total_seconds() / 60) and user.profile.last_capacity_update.business == ID:
             print("Too Soon")
             return
     except AttributeError:
-        pass
+        pass """
     entry = capacityData(business = ID, capacity = capacity, author = request.user.username)
     entry.save()
     try:
@@ -62,7 +63,9 @@ def addCapacity(request, ID, capacity):
         capacities = Capacity(business = ID, numReviews = 1, average = capacity)
         capacities.save()
     user.profile.last_capacity_update = entry
+    user.profile.all_capacity_updates.add(entry)
     user.save()
+
 
 # login form
 class UserLoginForm(forms.Form):
@@ -82,13 +85,6 @@ def index(request):
     # if request.user.is_authenticated:
     #     return HttpResponse("Hello authenticated!")
     # simple search handler
-    profile = request.user.profile
-    print(f"Search history: {profile.search_history}")
-    profile.search_history.append("x")
-    profile.save()
-    print(f"Search history: {profile.search_history}")
-    
-    
     return render(request, "Landing/landing.html")
 
 # def search(request): 
@@ -219,8 +215,24 @@ def test(request, id):
         "id":id
     })
 
-def popup(request):
-    return render(request, "Landing/popup.html")
+# test view for testing out html elements
+def test(request, placeID):
+    business = Business.objects.filter(placeID = placeID)[0]
+    wait_time = business.wait_time
+    capacity = business.capacity
+    return render(request, "Landing/business_page.html", {
+        "business" : business,
+        'wait_time' : wait_time,
+        'capacity' : capacity
+    })
+
+def popup(request, placeID):
+    business = Business.objects.filter(placeID = placeID)[0]
+    wait_time = business.wait_time
+    return render(request, "Landing/popup.html", {
+        'business' : business,
+        'wait_time' : wait_time
+    })
 
 def userAccount(request):
     times = {0:"night", 1:"night",2:"night",3:"night",4:"night",5:"night",6:"morning",7:"morning",8:"morning",9:"morning",10:"morning",11:"morning",12:"day",13:"day",14:"day",15:"day",16:"day",17:"afternoon",18:"afternoon",19:"afternoon", 20:"afternoon", 21:"night", 22:"ngiht",23:"night",24:"night"}
@@ -236,5 +248,37 @@ def quickWaitTime(request):
         form = request.POST
         id = form["business"]
         time = form["time"]
+        business = Business.objects.filter(placeID = id)[0]
         addWaitTime(request, id, time)
-    return HttpResponseRedirect("/popup")
+    return HttpResponseRedirect(f"/popup/{business.placeID}")
+
+def longWaitTime(request):
+    if request.method == 'POST':
+        form = request.POST
+        id = form['business']
+        time = form['time']
+        business = Business.objects.filter(placeID = id)[0]
+        addWaitTime(request, id, time)
+    return HttpResponseRedirect(f'/business_view/{business.placeID}')
+
+def longCapacity(request):
+    if request.method == 'POST':
+        form = request.POST
+        id = form['business']
+        cap = form['cap']
+        business = Business.objects.filter(placeID = id)[0]
+        addCapacity(request, id, cap)
+    return HttpResponseRedirect(f'/business_view/{business.placeID}')
+
+#def a(request):
+
+
+""" def skip(request):
+    if request.user.profile.subscription_type == 'BASIC':
+       # surge pricing
+       message = "It appears you're not currently a Premium user. Would you like to make a one time payment or subscribe to our line-skipping, digital queue service?" 
+    else:
+        if (request.user.profile.skip_count > 0): """
+
+
+#def verification_collection()

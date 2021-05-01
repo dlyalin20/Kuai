@@ -1,17 +1,18 @@
 import re
+import PIL
 import datetime
 import collections
+from typing import Iterable
 from django.db import models
 from jsonfield import JSONField
+from django.contrib import admin
 from django.dispatch import receiver
 from django.db.models.deletion import CASCADE
+from django_mysql.models import ListTextField
 from django.db.models.signals import post_save
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import User, PermissionsMixin, AbstractBaseUser, BaseUserManager
-import django.utils
-from django.contrib import admin
-import PIL
 
 # validators
 def validate_user(user):
@@ -30,6 +31,52 @@ def validate_pwd(pwd):
         raise ValidationError("Password cannot contain whitespace characters.")
     if len(re.findall("[a-zA-Z]", pwd)) == 0:
         raise ValidationError("Password must contain at least one alphabetic character.")
+
+# Custom List Field Test
+class ListField(models.TextField):
+    """
+    A custom Django field to represent lists as comma separated strings
+    """
+
+    def __init__(self, *args, **kwargs):
+        self.token = kwargs.pop('token', ',')
+        super().__init__(*args, **kwargs)
+
+    def deconstruct(self):
+        name, path, args, kwargs = super().deconstruct()
+        kwargs['token'] = self.token
+        return name, path, args, kwargs
+
+    def to_python(self, value):
+
+        class SubList(list):
+            def __init__(self, token, *args):
+                self.token = token
+                super().__init__(*args)
+
+            def __str__(self):
+                return self.token.join(self)
+
+        if isinstance(value, list):
+            return value
+        if value is None:
+            return SubList(self.token)
+        return SubList(self.token, value.split(self.token))
+
+    def from_db_value(self, value, expression, connection):
+        return self.to_python(value)
+
+    def get_prep_value(self, value):
+        if not value:
+            return
+        assert(isinstance(value, Iterable))
+        return self.token.join(value)
+
+    def value_to_string(self, obj):
+        value = self.value_from_object(obj)
+        return self.get_prep_value(value)
+
+
 
 # Custom User
 
@@ -138,6 +185,16 @@ class capacityData(models.Model):
     def __str__(self):
         return self.business
 
+class Subscriber(models.Model):
+    skips = models.IntegerField(default = 15, null = False, blank = False, validators = [
+        MinValueValidator(0),
+        MaxValueValidator(15)
+    ])
+    skip_history = ListField(null = True, blank = True)
+    last_pay_date = models.DateField(null = False, blank = False)
+
+
+
 # Custom User Profile
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=CASCADE, unique = True)
@@ -151,10 +208,24 @@ class Profile(models.Model):
     ])
     birth_date = models.DateField(null = True, blank = True)
     profile_pic = models.ImageField(blank = True, null = True, upload_to='Landing/pfps')
-    favorite_businesses = JSONField(null = True, blank = True) # Map each business to Name, Category (food, event, etc.), distance from user home point
-    search_history = JSONField(null = True, blank = True) #store business name mapped with date/time searched
+    favorite_businesses = ListField(null = True, blank = True)
+    search_history = ListField(null = True, blank = True)
+    all_time_updates = models.ManyToManyField(waitData, blank=True, related_name='all_time_up')
+    all_capacity_updates = models.ManyToManyField(capacityData, blank=True, related_name='all_cap_up')
     last_time_update = models.OneToOneField(waitData, null = True, blank = True, on_delete = models.SET_NULL)
     last_capacity_update = models.OneToOneField(capacityData, null = True, blank = True, on_delete = models.SET_NULL)
+
+    is_subscribed = models.BooleanField(default = False)
+    subscription = models.OneToOneField(Subscriber, on_delete = CASCADE, null = True, blank = True)
+    
+    def create_subscriber(self):
+        if self.is_subscribed:
+            subscriber = Subscriber(last_pay_date = django.utils.timezone.utcnow())
+            subscriber.save()
+            subscription = subscriber
+            self.save()
+        else: print("Not a subscriber")
+
 
     @receiver(post_save, sender=User)
     def create_user_profile(sender, instance, created, **kwargs):
@@ -205,6 +276,12 @@ class Capacity(models.Model):
     def __str__(self):
         return self.business
 
+class Queues(models.Model):
+    free_queue = ListField(null = True, blank = True)
+    skip_queue = ListField(null = True, blank = True)
+
+
+
 class Business(models.Model):
     name = models.CharField(max_length = 40, null = False, blank = False, unique = True)
     xcor = models.FloatField(null = False, blank = False)
@@ -213,6 +290,7 @@ class Business(models.Model):
     wait_time = models.OneToOneField(waitTimes, null = True, blank = True, on_delete = models.SET_NULL, related_name = 'time')
     capacity = models.OneToOneField(Capacity, null = True, blank = True, on_delete = models.SET_NULL, related_name='cap')
     placeID = models.TextField(null = False, blank=False, unique = True, default = False)
+    queue = models.OneToOneField(Queues, blank = True, null = True, on_delete = CASCADE)
     REQUIRED_FIELDS = ['name', 'xcor', 'ycor', 'verified']
 
     def get_short_name(self):

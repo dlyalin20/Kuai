@@ -1,6 +1,7 @@
+from . import views
 from django.urls import path, include
 from django.views.generic.base import RedirectView
-from . import views
+
 app_name = 'Landing'
 urlpatterns = [
     path('', views.index, name='index'),
@@ -13,9 +14,11 @@ urlpatterns = [
     path("profile", views.profile, name="profile"),
     #     # new code
     # path('accounts/', include('allauth.urls')),
-    path('popup', views.popup, name="test"),
-    path('business_view/<int:id>', views.test, name="business_view"),
-    path('quickWaitTime', views.quickWaitTime, name="quickWaitTime")
+    path('popup/<str:placeID>', views.popup, name="test"),
+    path('business_view/<str:placeID>', views.test, name="business_view"),
+    path('quickWaitTime', views.quickWaitTime, name="quickWaitTime"),
+    path('longWaitTime', views.longWaitTime, name="longWaitTime"),
+    path('longCapacity', views.longCapacity, name="longCapacity")
     # archive
     # path('autocomplete', views.autocomplete_view, name="autocomplete"),
 ]

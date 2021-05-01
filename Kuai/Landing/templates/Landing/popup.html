@@ -12,7 +12,7 @@
         <center>
             <div class="tile is-ancestor is-2" style="height: 160px; width: 410px;">
                 <div class="tile is-parent">
-                    <article class="tile is-child notification is-white">
+                    <article class="tile is-child notification">
                         <div class="content">
                                 <div class="columns">
                                     <div class = "column" style="padding: 0; margin: 0;">
@@ -32,15 +32,15 @@
                                                 {% if wait_time.average %} 
                                                     {% if wait_time.average >= 0 and wait_time.average < 30 %}
                                                     <span style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: lime;">
-                                                        {{ wait_time.average }}
+                                                        {{ wait_time.average|floatformat }}<button class="button is-info is-small" style="white-space: nowrap; padding: 0; margin: 0; height: 30px;">Skip Line</button>
                                                     </span>
                                                     {% elif wait_time.average >= 30 and wait_time.average < 60 %}
                                                     <span style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: orange;">
-                                                        {{ wait_time.average }}
+                                                        {{ wait_time.average|floatformat }}
                                                     </span>
                                                     {% else %}
                                                     <span style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: red;">
-                                                        {{ wait_time.average }}
+                                                        {{ wait_time.average|floatformat }}
                                                     </span>
                                                     {% endif %}
                                                 {% else %} 

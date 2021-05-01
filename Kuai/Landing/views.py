@@ -1,17 +1,20 @@
-from django.shortcuts import get_object_or_404, render, redirect
-from django.http import HttpResponse, HttpResponseRedirect
-from django import forms
-from django.contrib.auth import authenticate, login, logout
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from .models import User, AccountManager
-from .models import waitData, capacityData, waitTimes, Capacity, validate_user, validate_pwd, Business
-from django.urls import reverse
-from django.contrib.auth.decorators import login_required
-import json
 import re
+import json
+import pytz
 import time
 import datetime
-import pytz
+from django import forms
+from django.urls import reverse
+from .models import User, AccountManager
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse, HttpResponseRedirect
+from django.contrib.auth import authenticate, login, logout
+from django.shortcuts import get_object_or_404, render, redirect
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from .models import waitData, capacityData, waitTimes, Capacity, validate_user, validate_pwd, Business
+
+
+
 
 # format to handle requests and check for integers
 # also filter data
@@ -76,6 +79,9 @@ class RegisterForm(forms.Form):
     email = forms.CharField(label="Email: ", required=True, widget=forms.EmailInput)
     username = forms.CharField(label="Username: ", required=True, max_length=20, validators=[validate_user])
     password = forms.CharField(label="Password: ", widget=forms.PasswordInput, max_length=20, required=True, validators=[validate_pwd])
+
+#class VerificationUploadForm(forms.Form):
+ #   return
 
 # Create your views here.
 def index(request):
@@ -217,7 +223,6 @@ def longWaitTime(request):
         form = request.POST
         id = form['business']
         time = form['time']
-        print(id)
         business = Business.objects.filter(placeID = id)[0]
         addWaitTime(request, id, time)
     return HttpResponseRedirect(f'/business_view/{business.placeID}')
@@ -230,6 +235,17 @@ def longCapacity(request):
         business = Business.objects.filter(placeID = id)[0]
         addCapacity(request, id, cap)
     return HttpResponseRedirect(f'/business_view/{business.placeID}')
+
+#def a(request):
+
+
+""" def skip(request):
+    if request.user.profile.subscription_type == 'BASIC':
+       # surge pricing
+       message = "It appears you're not currently a Premium user. Would you like to make a one time payment or subscribe to our line-skipping, digital queue service?" 
+    else:
+        if (request.user.profile.skip_count > 0): """
+
 
 #def verification_collection()
 

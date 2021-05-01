@@ -82,7 +82,11 @@ def index(request):
     # if request.user.is_authenticated:
     #     return HttpResponse("Hello authenticated!")
     # simple search handler
-    print('indexRequest')
+    profile = request.user.profile
+    print(f"Search history: {profile.search_history}")
+    profile.search_history.append("x")
+    profile.save()
+    print(f"Search history: {profile.search_history}")
     
     
     return render(request, "Landing/landing.html")

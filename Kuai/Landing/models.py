@@ -1,7 +1,9 @@
 import re
 import PIL
+import pytz
 import datetime
 import collections
+import django.utils
 from typing import Iterable
 from django.db import models
 from jsonfield import JSONField
@@ -156,6 +158,9 @@ class waitData(models.Model):
 
     REQUIRED_FIELDS = ['business', 'wait_time', 'author', 'timestamp']
 
+    def is_old(self):
+        return (datetime.datetime.now() - self.timestamp).minutes + ((datetime.datetime.now() - self.timestamp).hours * 60) >= self.wait_time
+
     def get_short_name(self):
         return self.business
 
@@ -175,6 +180,9 @@ class capacityData(models.Model):
     timestamp = models.DateTimeField(auto_now = True, null = False, blank = False)
 
     REQUIRED_FIELDS = ['business', 'capacity', 'author', 'timestamp']
+
+    def two_hours(self):
+        return (datetime.datetime.now() - self.timestamp).hours >= 2
 
     def get_short_name(self):
         return self.business
@@ -225,6 +233,22 @@ class Profile(models.Model):
             subscription = subscriber
             self.save()
         else: print("Not a subscriber")
+
+    def wait_too_soon(self, ID):
+        try:
+            if float((pytz.utc.localize(datetime.datetime.now()) - self.last_time_update.timestamp).total_seconds() / 60) < 15 and self.profile.last_time_update.business == ID:
+                return True
+            else: return False
+        except AttributeError:
+            return False
+
+    def capacity_too_soon(self, ID):
+        try:
+            if float((pytz.utc.localize(datetime.datetime.now()) - self.last_capacity_update.timestamp).total_seconds() / 60) < 15 and self.profile.last_time_update.business == ID:
+                return True
+            else: return False
+        except AttributeError:
+            return False
 
 
     @receiver(post_save, sender=User)
@@ -279,8 +303,6 @@ class Capacity(models.Model):
 class Queues(models.Model):
     free_queue = ListField(null = True, blank = True)
     skip_queue = ListField(null = True, blank = True)
-
-
 
 class Business(models.Model):
     name = models.CharField(max_length = 40, null = False, blank = False, unique = True)
@@ -357,8 +379,8 @@ class Temp_Business_Manager(models.Manager):
 
 
 class Temp_Business(models.Model):
-    lat = models.FloatField(blank = False, null = False)
-    lon = models.FloatField(blank = False, null = False)
+    lat = models.FloatField(blank = False, null = True)
+    lon = models.FloatField(blank = False, null = True)
     verified = models.BooleanField(null = False, blank = False, default = False)
     cached_time = models.DateTimeField(auto_now = True, null = False, blank = False)
     wait_time = models.OneToOneField(waitTimes, null = True, blank = True, on_delete = CASCADE)

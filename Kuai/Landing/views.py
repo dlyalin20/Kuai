@@ -5,7 +5,7 @@ import time
 import datetime
 from django import forms
 from django.urls import reverse
-from .models import User, AccountManager
+from .models import Temp_Business, User, AccountManager
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
@@ -18,12 +18,9 @@ from .models import waitData, capacityData, waitTimes, Capacity, validate_user, 
 # also filter data
 def addWaitTime(request, ID, time):
     user = request.user
-    """  try:
-        if int((pytz.utc.localize(datetime.datetime.now()) - user.profile.last_time_update.timestamp).total_seconds() / 60) < float(time) and user.profile.last_time_update.business == ID:
-            print("Too Soon")
-            return
-    except AttributeError:
-        pass """
+    if user.profile.wait_too_soon(ID): 
+        print("Too Soon")
+        return
     entry = waitData(business = ID, wait_time = time, author = request.user.username)
     entry.save()
     try:
@@ -36,6 +33,21 @@ def addWaitTime(request, ID, time):
     except ObjectDoesNotExist:
         times = waitTimes(business = ID, numReviews = 1, average = time)
         times.save()
+    try:
+        business = Business.objects.get(placeID = ID)
+        if business.wait_time is None:
+            business.wait_time = times
+            business.save()
+    except ObjectDoesNotExist:
+        try:
+            business = Temp_Business.objects.get(placeID = ID)
+            if business.wait_time is None:
+                business.wait_time = times
+                business.save()
+        except ObjectDoesNotExist:
+            business = Temp_Business(placeID = ID)
+            business.wait_time = times
+            business.save()
     user.profile.last_time_update = entry
     user.profile.all_time_updates.add(entry)
     user.save()
@@ -44,12 +56,9 @@ def addWaitTime(request, ID, time):
 # also filter data
 def addCapacity(request, ID, capacity):
     user = request.user
-    """ try:
-        if int((pytz.utc.localize(datetime.datetime.now()) - user.profile.last_capacity_update.timestamp).total_seconds() / 60) and user.profile.last_capacity_update.business == ID:
-            print("Too Soon")
-            return
-    except AttributeError:
-        pass """
+    if user.profile.capacity_too_soon(ID): 
+        print("Too Soon")
+        return
     entry = capacityData(business = ID, capacity = capacity, author = request.user.username)
     entry.save()
     try:
@@ -62,6 +71,21 @@ def addCapacity(request, ID, capacity):
     except ObjectDoesNotExist:
         capacities = Capacity(business = ID, numReviews = 1, average = capacity)
         capacities.save()
+    try:
+        business = Business.objects.get(placeID = ID)
+        if business.capacity is None:
+            business.capacity = capacities
+            business.save()
+    except ObjectDoesNotExist:
+        try:
+            business = Temp_Business.objects.get(placeID = ID)
+            if business.capacity is None:
+                business.capacity = capacities
+                business.save()
+        except ObjectDoesNotExist:
+            business = Temp_Business(placeID = ID)
+            business.capacity = capacities
+            business.save()
     user.profile.last_capacity_update = entry
     user.profile.all_capacity_updates.add(entry)
     user.save()

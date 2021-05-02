@@ -32,15 +32,15 @@
                                                 {% if wait_time.average %} 
                                                     {% if wait_time.average >= 0 and wait_time.average < 30 %}
                                                     <span style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: lime;">
-                                                        {{ wait_time.average|floatformat:"0" }}
+                                                        {{ wait_time.average|floatformat:"0" }} {% if business.queue is not None %}<button class="button is-info is-small" style="white-space: nowrap; padding: 0; margin: 0; height: 30px;">Skip Line</button> {% endif %}
                                                     </span>
                                                     {% elif wait_time.average >= 30 and wait_time.average < 60 %}
                                                     <span style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: orange;">
-                                                        {{ wait_time.average|floatformat:"0" }}
+                                                        {{ wait_time.average|floatformat:"0" }} {% if business.queue is not None %}<button class="button is-info is-small" style="white-space: nowrap; padding: 0; margin: 0; height: 30px;">Skip Line</button> {% endif %}
                                                     </span>
                                                     {% else %}
                                                     <span style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: red;">
-                                                        {{ wait_time.average|floatformat:"0" }}
+                                                        {{ wait_time.average|floatformat:"0" }} {% if business.queue is not None %}<button class="button is-info is-small" style="white-space: nowrap; padding: 0; margin: 0; height: 30px;">Skip Line</button> {% endif %}
                                                     </span>
                                                     {% endif %}
                                                 {% else %} 

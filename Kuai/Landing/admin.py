@@ -1,4 +1,4 @@
-from .models import User, Profile, waitData, waitTimes, capacityData, Capacity, Business, Temp_Business
+from .models import *
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
@@ -14,4 +14,6 @@ admin.site.register(capacityData)
 admin.site.register(Capacity)
 admin.site.register(Business)
 admin.site.register(Temp_Business, TempBizAdmin)
+admin.site.register(Subscriber)
+admin.site.register(Queues)
 #AUTH_USER_MODEL = 'models.CustomUser'

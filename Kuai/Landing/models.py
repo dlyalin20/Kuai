@@ -268,6 +268,7 @@ class waitTimes(models.Model):
     average = models.FloatField(validators = [
         MinValueValidator(0)
     ], default = 0, null = False, blank = False)
+    last_update = models.OneToOneField(waitData, null = True, blank = True, on_delete = CASCADE, related_name= "timeup")
     REQUIRED_FIELDS = ['business', 'numReviews', 'average']
 
     def get_short_name(self):
@@ -288,6 +289,7 @@ class Capacity(models.Model):
         MinValueValidator(0),
         MaxValueValidator(100)
     ], default = 0, null = False, blank = False)
+    last_update = models.OneToOneField(capacityData, null = True, blank = True, on_delete = CASCADE, related_name="capup")
     
     REQUIRED_FIELDS = ['business', 'numReviews', 'average']
 
@@ -303,6 +305,7 @@ class Capacity(models.Model):
 class Queues(models.Model):
     free_queue = ListField(null = True, blank = True)
     skip_queue = ListField(null = True, blank = True)
+    premium = models.FloatField(null = False, blank = False, default = 0)
 
 class Business(models.Model):
     name = models.CharField(max_length = 40, null = False, blank = False, unique = True)

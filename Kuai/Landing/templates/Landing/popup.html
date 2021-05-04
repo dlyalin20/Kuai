@@ -32,15 +32,33 @@
                                                 {% if wait_time.average %} 
                                                     {% if wait_time.average >= 0 and wait_time.average < 30 %}
                                                     <span style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: lime;">
-                                                        {{ wait_time.average|floatformat:"0" }} {% if business.queue is not None %}<button class="button is-info is-small" style="white-space: nowrap; padding: 0; margin: 0; height: 30px;">Skip Line</button> {% endif %}
+                                                        {{ wait_time.average|floatformat:"0" }} {% if business.queue is not None %}
+                                                        <form style="white-space: nowrap; padding: 0; margin: 0; height: 30px;" action="/skipOptions" method="post">
+                                                            {% csrf_token %}
+                                                            <input type="hidden" value="{{ business.name }}">
+                                                            <input type="submit" class="button is-info is-small" value="Skip Line">
+                                                        </form>
+                                                        {% endif %}
                                                     </span>
                                                     {% elif wait_time.average >= 30 and wait_time.average < 60 %}
                                                     <span style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: orange;">
-                                                        {{ wait_time.average|floatformat:"0" }} {% if business.queue is not None %}<button class="button is-info is-small" style="white-space: nowrap; padding: 0; margin: 0; height: 30px;">Skip Line</button> {% endif %}
+                                                        {{ wait_time.average|floatformat:"0" }} {% if business.queue is not None %}
+                                                        <form style="white-space: nowrap; padding: 0; margin: 0; height: 30px;" action="/skipOptions" method="post">
+                                                            {% csrf_token %}
+                                                            <input type="hidden" value="{{ business.name }}">
+                                                            <input type="submit" class="button is-info is-small" value="Skip Line">
+                                                        </form>
+                                                        {% endif %}
                                                     </span>
                                                     {% else %}
                                                     <span style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: red;">
-                                                        {{ wait_time.average|floatformat:"0" }} {% if business.queue is not None %}<button class="button is-info is-small" style="white-space: nowrap; padding: 0; margin: 0; height: 30px;">Skip Line</button> {% endif %}
+                                                        {{ wait_time.average|floatformat:"0" }} {% if business.queue is not None %}
+                                                        <form style="white-space: nowrap; padding: 0; margin: 0; height: 30px;" action="/skipOptions" method="post">
+                                                            {% csrf_token %}
+                                                            <input type="hidden" value="{{ business.name }}">
+                                                            <input type="submit" class="button is-info is-small" value="Skip Line">
+                                                        </form>
+                                                        {% endif %}
                                                     </span>
                                                     {% endif %}
                                                 {% else %} 
@@ -133,6 +151,29 @@
                 </div>
             </div>
         </center>
-        
+        </body>
+        <script type="text/javascript"> // implement line counter for queue
+            const isSubscribed = ("{{ user.profile.is_subscribed|js }}" === "True");
+            const price = parseFloat("{{ price|js }}");
+            console.log(isSubscribed);
+            console.log(price)
+            function skipOptions() {
+                if (isSubscribed) {
+                    const remainingSkips = parseInt("{{ user.profile.subscription.skips|js }}");
+                    if (remainingSkips > 0) {
+                        var message = `You have ${remainingSkips} skips remaining. Would you like to use one?`;
+                        // implement popup and form: form processing in python
+                    }
+                    else {
+                        var message = `You have no skips remaining. The buying price for a skip is currently ${price}. Would you like to buy a skip?`
+                    }
+                }
+                else {
+                    var message = `The buying price for a skip is currently ${price}. Would you like to pay and skip the line?`;
+                }
+                console.log(message);
+            }
+        </script>
+</html>        
 
        

@@ -5,6 +5,7 @@ import time
 import datetime
 from django import forms
 from django.urls import reverse
+from  django.utils import timezone
 from .models import Temp_Business, User, AccountManager
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
@@ -29,6 +30,7 @@ def addWaitTime(request, ID, time):
         product += int(time)
         times.numReviews += 1
         times.average = product / times.numReviews
+        times.last_update = timezone.utcnow()
         times.save()
     except ObjectDoesNotExist:
         times = waitTimes(business = ID, numReviews = 1, average = time)
@@ -67,6 +69,7 @@ def addCapacity(request, ID, capacity):
         product += int(capacity)
         capacities.numReviews += 1
         capacities.average = product / capacities.numReviews
+        capacities.last_update = timezone.utcnow()
         capacities.save()
     except ObjectDoesNotExist:
         capacities = Capacity(business = ID, numReviews = 1, average = capacity)
@@ -90,6 +93,39 @@ def addCapacity(request, ID, capacity):
     user.profile.all_capacity_updates.add(entry)
     user.save()
 
+# Queue Controls
+'''def pricing(ID): # implement ML algo
+    business = Business.objects.get(placeID = ID)
+    wait_time = business.wait_time
+    capacity = business.capacity # implement checks later; implement collection mechanism for old data
+    queue = business.queue
+
+    price = 1.0 + queue.premium
+
+    time_percent = (wait_time.average / 180) # neg dif checks
+    time_dif = float((pytz.utc.localize(datetime.datetime.now()) - wait_time.last_update.timestamp).total_seconds() / 60)
+    time_dif_percent = (time_dif / 180) 
+    time_weighted = abs(time_percent - time_dif_percent)
+
+    capacity_dif = float((pytz.utc.localize(datetime.datetime.now()) - capacity.last_update.timestamp).total_seconds() / 60)
+    capacity_dif_percent = (capacity_dif / 180) 
+    capacity_weighted = abs(capacity.average - capacity_dif_percent)
+
+    average = (time_weighted + capacity_weighted) / 2
+    return price * (1 + average)'''
+def pricing(ID):
+    business = Business.objects.get(placeID = ID)
+    wait_time = business.wait_time
+    capacity = business.capacity
+    queue = business.queue
+
+    last_time = float((pytz.utc.localize(datetime.datetime.now()) - wait_time.last_update.timestamp).total_seconds() / 60)
+    price = queue.premium + (.25 * (abs(wait_time.average - last_time))) # negatives have to be counted for
+
+    last_cap = ((float((pytz.utc.localize(datetime.datetime.now()) - capacity.last_update.timestamp).total_seconds() / 60)) / 180)
+    if (float(capacity.average / 100) - last_cap > .5): price *= (1 + float(capacity.average / 100) - last_cap)
+
+    return price
 
 # login form
 class UserLoginForm(forms.Form):
@@ -250,12 +286,16 @@ def test(request, placeID):
         'capacity' : capacity
     })
 
+
 def popup(request, placeID):
     business = Business.objects.filter(placeID = placeID)[0]
+    price = pricing(placeID)            
     wait_time = business.wait_time
     return render(request, "Landing/popup.html", {
         'business' : business,
-        'wait_time' : wait_time
+        'wait_time' : wait_time,
+        'user' : request.user,
+        'price' : price
     })
 
 def userAccount(request):
@@ -293,6 +333,9 @@ def longCapacity(request):
         business = Business.objects.filter(placeID = id)[0]
         addCapacity(request, id, cap)
     return HttpResponseRedirect(f'/business_view/{business.placeID}')
+
+
+
 
 #def a(request):
 

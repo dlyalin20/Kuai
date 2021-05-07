@@ -2,14 +2,13 @@
 var UserPos;
 const Google_Places_API_KEY = "jAIzaSyBzd999zA1_gyh7uB6KpUh-hBaYsl0vmIQ";
 var map;
-var service;
 // we are targeting a location, bring out the busness popup
 var targetingLocation = false;
 // $( document ).ready(
 var sessionToken;
 var autocomplete;
 var previousSearch = q;
-var markers = new Array();
+var markers = new Array(); // type: custom class busness
 const choices = $("#choices");
 var levelOfDepth = 0; 
 const options = {
@@ -387,13 +386,15 @@ function queryService(targetID, callback, index = false){
                 place.geometry.location
             ){
                 // good
-                console.log(place);
+                // console.log(place);
                 if (Number.isInteger(index)){
                     callback(place, index);
                 }
                 else{
                     callback(place);
                 }
+            }else{
+                console.log(status);
             }
         })
     }
@@ -495,22 +496,35 @@ async function plotListMarkers(results) {
     // turn this in to plant markers function
     for (let i = 0; i < results.length; i++) {
         await new Promise(function(accept, reject){
-            queryService(results[i].place_id, function (thisMarkerLocation){
-                if (thisMarkerLocation){
-                    console.log(thisMarkerLocation);
-                    createMarker(thisMarkerLocation);
-                    newChoice = $(`<div class='option-items' location = `+thisMarkerLocation.geometry.location+`>
-                        ` + (i + 1) + '. ' + thisMarkerLocation.name + '|' + thisMarkerLocation.geometry.location +
-                        `</div>`).on("click", function(){
-                            map.setCenter(thisMarkerLocation.geometry.location)
-                        });  
-                    accept(choices.append(newChoice));
+            markers = new Array()
+            var choicesArray= new Array(data.length);
+            for (let i = 0; i < data.length; i++){
+                choices.html("");
+                let temp = new Business(results[i].place_id, null, null, function(){
+                    this.pushDivDescription(i);                
+    
+                });
+                // console.log(placeLocation);
+                // createMarker(placeLocation);
+                // queryService(data[i], placeResult, i)
+                markers.push(temp);
+            }
+            // queryService(results[i].place_id, function (thisMarkerLocation){
+            //     if (thisMarkerLocation){
+            //         console.log(thisMarkerLocation);
+            //         createMarker(thisMarkerLocation);
+            //         newChoice = $(`<div class='option-items' location = `+thisMarkerLocation.geometry.location+`>
+            //             ` + (i + 1) + '. ' + thisMarkerLocation.name + '|' + thisMarkerLocation.geometry.location +
+            //             `</div>`).on("click", function(){
+            //                 map.setCenter(thisMarkerLocation.geometry.location)
+            //             });  
+            //         accept(choices.append(newChoice));
                     
-                }else{
-                    accept();
-                }
+            //     }else{
+            //         accept();
+            //     }
             
-            });
+            // });
             })
         
     }
@@ -524,14 +538,11 @@ function createMarker(place) {
     });
     markers.push(marker);
     infowindow = new google.maps.InfoWindow;
-    google.maps.event.addListener(marker, "click", () => {
-        infowindow.setContent(place.name || "");
-        infowindow.open(map);
-    });
+    
 }
 function clearMarkers(){
     for(var i=0; i<markers.length; i++){
-        markers[i].setMap(null);
+        markers[i].hideMarker();
         
     }
     markers = new Array();

@@ -15,18 +15,25 @@ chatSocket.onmessage = function(e) {
     }else{
         // array found: display the markers on the map
         // data[i].place_id ; data[i].lat, data[i].lon
-        choices.html("");
-
+        // choices.html("");
+        markers = new Array()
+        var choicesArray= new Array(data.length);
         for (let i = 0; i < data.length; i++){
-            placeLocation = {
-                "geometry": {
-                    "location": {"lat" : parseFloat(data[i].lat), "lng": parseFloat(data[i].lon)}
-                }
-            }
+            choices.html("");
+            let temp = new Business(data[i], null, null, function(){
+                this.pushDivDescription(i);                
+
+            });
             // console.log(placeLocation);
-            createMarker(placeLocation);
-            queryService(data[i].id, placeResult, i)
+            // createMarker(placeLocation);
+            // queryService(data[i], placeResult, i)
+            markers.push(temp);
         }
+ 
+
+        
+
+        
     }
 };
 

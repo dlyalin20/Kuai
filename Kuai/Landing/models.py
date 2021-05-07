@@ -295,11 +295,11 @@ class Temp_Business_Manager(models.Manager):
             )
             qs = self.get_queryset()
             qs = qs.annotate(distance=distance_raw_sql)
-            qs = qs.filter(distance__lt=radius).order_by('distance')
+            qs = qs.filter(distance__lt=radius).order_by('distance').values_list("placeID", flat=True)
             listOfPlaceIDs = []
             for place in qs.iterator():
-                listOfPlaceIDs.append(dict(id=place.placeID, lat = place.lat, lon=place.lon))
-            # data = serialize("json", qs)
+                listOfPlaceIDs.append(place)
+            # data = serialize("json", [ qs, ])
             print('qs: ' + str(listOfPlaceIDs))
             return listOfPlaceIDs
         return('bad inputs') #escape out

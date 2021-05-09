@@ -2,15 +2,15 @@
 var UserPos;
 const Google_Places_API_KEY = "jAIzaSyBzd999zA1_gyh7uB6KpUh-hBaYsl0vmIQ";
 var map;
-var service;
 // we are targeting a location, bring out the busness popup
 var targetingLocation = false;
 // $( document ).ready(
 var sessionToken;
 var autocomplete;
 var previousSearch = q;
-var markers = new Array();
+var markers = new Array(); // type: custom class busness
 const choices = $("#choices");
+var levelOfDepth = 0; 
 const options = {
     enableHighAccuracy: true,
     // timeout: 5000, // => default infinity // take as much time as you need
@@ -191,58 +191,73 @@ Input in a array of elements
         -location
     - name
 */
-function createTemps(result = lastsend){    
-    var data = JSON.stringify(result);
-    console.log(data);
-    $.ajax({
-        headers: { "X-CSRFToken": csrftoken },
-        type: "POST",
-        url: window.location.pathname,
-        // The key needs to match your method's input parameter (case-sensitive).
-        data: data,
-        contentType: "application/json; charset=utf-8",
-        dataType: "json",
-        success: function(data){
-            alert(data);
-        },
-        error: function(errMsg) {
-            alert(errMsg);
-        }
-    });
+function createTemps(result = lastsend){ 
+    if (result != lastsend){
+        var data = JSON.stringify(result);
+        console.log(data);
+    
+        $.ajax({
+            headers: { "X-CSRFToken": csrftoken },
+            type: "POST",
+            url: window.location.pathname,
+            // The key needs to match your method's input parameter (case-sensitive).
+            data: data,
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function(data){
+                alert(data);
+            },
+            error: function(errMsg) {
+                alert(errMsg);
+            }
+        });
+    }   
 }
 
-
 function nearbySearch(){ //plots the nearby locations
-    let request = {
-        location: map.getCenter(),
-        // add ranked by changed by options
-        rankBy: google.maps.places.RankBy.DISTANCE,
-        // edit the type by options
-        type: "restaurant",
-    }
+    if (service){
+        switch (levelOfDepth){
+            case 0:
+                console.log("query from local db");
+                let center = map.center;
+                
+                queryDB(center.lat(), center.lng()); // default radius of 10
+                levelOfDepth ++;
+                // change text
 
-    service = new google.maps.places.PlacesService(map);
-    const locations = service.nearbySearch(request, (result, status)=>{
-        if (status == google.maps.places.PlacesServiceStatus.OK){
-            placeResultsToMarkers(result);
-            //only take xy coords and place id
-            var myResults = [];
-
-            result && result.map(v => {
-                let coords = v.geometry.location;     
-                let placeID = v.place_id;           
-                myResults.push({ coords, placeID });
-            })
-            // for ({location: geometry, myPlace: place_id} in result){
-            //     let coords = i.geometry.location;
-            //     let placeID = i.place_id;
-            //     myResults.append({ coords, placeID });
-            // }
-
-            createTemps(myResults);
-            lastsend = myResults;
+                // create temp
+                break
+            case 1:
+                console.log("query from nearby search");
+                let request = {
+                    location: map.getCenter(),
+                    // add ranked by changed by options
+                    rankBy: google.maps.places.RankBy.DISTANCE,
+                    // edit the type by options
+                    type: "restaurant",
+                }
+                const locations = service.nearbySearch(request, (result, status)=>{
+                    if (status == google.maps.places.PlacesServiceStatus.OK){
+                        placeResultsToMarkers(result);
+                        //only take xy coords and place id
+                        var myResults = [];
+            
+                        result && result.map(v => {
+                            let coords = v.geometry.location;     
+                            let placeID = v.place_id;           
+                            myResults.push({ coords, placeID });
+                        })
+            
+            
+                        createTemps(myResults);
+                        lastsend = myResults;
+                    }
+                });
+                break;
         }
-    });
+
+
+    }
 }
 
 // take array of objects
@@ -252,22 +267,28 @@ function nearbySearch(){ //plots the nearby locations
     - name
 */
 
-function placeResultsToMarkers(results){
+function placeResultsToMarkers(results, ){
     choices.html("");
     clearMarkers();
     for (let index = 0; index < results.length; index++) {
         const element = results[index];
-        createMarker(element)
-        newChoice = $(`<div class='option-items' location = `+element.geometry.location+`>
-        ` + (index + 1) + '. ' + element.name + '|' + element.geometry.location +
-        `</div>`).on("click", function(){
-            map.setCenter(element.geometry.location)
-        });
-        choices.append(newChoice);
+        createMarker(element);
+        placeResult(element, index);
   
 
     }
 }
+
+function placeResult(element, index){
+    newChoice = $(`<div class='option-items' location = `+element.geometry.location+`>
+    ` + (index + 1) + '. ' + element.name + '|' + element.geometry.location +
+    `</div>`).on("click", function(){
+        map.setCenter(element.geometry.location)
+    });
+    choices.append(newChoice);
+
+}
+
 
 // return [firstpos, listofMarkers ]
 function search(callback) {
@@ -330,6 +351,7 @@ function updatePosition(position){
     console.log("after: " + UserPos);  
 }
 var geocoder;
+// input placeid
 // returns a results object that you can send a callback into to manipulate
 function queryGeocoder(targetID, callback){
     if (targetID ){ //!= ""
@@ -350,7 +372,7 @@ function queryGeocoder(targetID, callback){
         callback(false);
     }
 }
-function queryService(targetID, callback){
+function queryService(targetID, callback, index = false){
     if (targetID ){ //!= ""
         const request = {
             placeId: targetID,
@@ -364,8 +386,15 @@ function queryService(targetID, callback){
                 place.geometry.location
             ){
                 // good
-                console.log(place);
-                callback(place);
+                // console.log(place);
+                if (Number.isInteger(index)){
+                    callback(place, index);
+                }
+                else{
+                    callback(place);
+                }
+            }else{
+                console.log(status);
             }
         })
     }
@@ -397,7 +426,9 @@ function initMap(result) {
     zoom: 18,
     center: result.target,
     });
-
+    map.addListener("center_changed", () => {
+        levelOfDepth = 0;
+      });
     //marker for current location
     var marker = new google.maps.Marker({position: result.target, map: map});
 
@@ -458,28 +489,42 @@ function toggleSidePanel(params) {
 
 //input: list of place results
 //post-condition: plotted markers and result divs
+// results.place_id
 async function plotListMarkers(results) {
     choices.html("");
     clearMarkers()
     // turn this in to plant markers function
     for (let i = 0; i < results.length; i++) {
         await new Promise(function(accept, reject){
-            queryService(results[i].place_id, function (thisMarkerLocation){
-                if (thisMarkerLocation){
-                    console.log(thisMarkerLocation);
-                    createMarker(thisMarkerLocation);
-                    newChoice = $(`<div class='option-items' location = `+thisMarkerLocation.geometry.location+`>
-                        ` + (i + 1) + '. ' + thisMarkerLocation.name + '|' + thisMarkerLocation.geometry.location +
-                        `</div>`).on("click", function(){
-                            map.setCenter(thisMarkerLocation.geometry.location)
-                        });  
-                    accept(choices.append(newChoice));
+            markers = new Array()
+            var choicesArray= new Array(data.length);
+            for (let i = 0; i < data.length; i++){
+                choices.html("");
+                let temp = new Business(results[i].place_id, null, null, function(){
+                    this.pushDivDescription(i);                
+    
+                });
+                // console.log(placeLocation);
+                // createMarker(placeLocation);
+                // queryService(data[i], placeResult, i)
+                markers.push(temp);
+            }
+            // queryService(results[i].place_id, function (thisMarkerLocation){
+            //     if (thisMarkerLocation){
+            //         console.log(thisMarkerLocation);
+            //         createMarker(thisMarkerLocation);
+            //         newChoice = $(`<div class='option-items' location = `+thisMarkerLocation.geometry.location+`>
+            //             ` + (i + 1) + '. ' + thisMarkerLocation.name + '|' + thisMarkerLocation.geometry.location +
+            //             `</div>`).on("click", function(){
+            //                 map.setCenter(thisMarkerLocation.geometry.location)
+            //             });  
+            //         accept(choices.append(newChoice));
                     
-                }else{
-                    accept();
-                }
+            //     }else{
+            //         accept();
+            //     }
             
-            });
+            // });
             })
         
     }
@@ -493,14 +538,11 @@ function createMarker(place) {
     });
     markers.push(marker);
     infowindow = new google.maps.InfoWindow;
-    google.maps.event.addListener(marker, "click", () => {
-        infowindow.setContent(place.name || "");
-        infowindow.open(map);
-    });
+    
 }
 function clearMarkers(){
     for(var i=0; i<markers.length; i++){
-        markers[i].setMap(null);
+        markers[i].hideMarker();
         
     }
     markers = new Array();

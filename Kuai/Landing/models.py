@@ -15,6 +15,10 @@ from django.db.models.signals import post_save
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import User, PermissionsMixin, AbstractBaseUser, BaseUserManager
+from django.db.models.expressions import RawSQL
+import django.utils
+from django.contrib import admin
+import PIL
 
 # validators
 def validate_user(user):
@@ -260,24 +264,42 @@ class Profile(models.Model):
     def save_user_profile(sender, instance, **kwargs):
         instance.profile.save()
 
-class waitTimes(models.Model):
-    business = models.CharField(max_length = 40, null = False, blank = False, unique = True)
-    numReviews = models.IntegerField(validators = [
+class WaitTimeReview(models.Model):
+    author = models.OneToOneField(User, CASCADE)
+    timeToOrder = models.IntegerField(validators = [
         MinValueValidator(0)
     ], default = 0, null = False, blank = False)
-    average = models.FloatField(validators = [
+    timeTillFood = models.IntegerField(validators = [
         MinValueValidator(0)
     ], default = 0, null = False, blank = False)
-    REQUIRED_FIELDS = ['business', 'numReviews', 'average']
-
     def get_short_name(self):
-        return self.business
+        return str(self.pk)
 
     def natural_key(self):
-        return self.business
+        return str(self.pk)
 
     def __str__(self):
-        return self.business
+        return str(self.pk)
+    
+class waitTimes(models.Model):
+    parentTemp = models.BooleanField(default=False) #parent will either be tempbiz for true or biz for false
+    reviews = models.ManyToManyField(WaitTimeReview, related_name="bizWait", verbose_name="list of revews")
+    average = models.FloatField(validators = [MinValueValidator(0)], default = 0, null = False, blank = False)
+    REQUIRED_FIELDS = ['reviews', 'average', 'parentTemp']
+
+    def getParent(self):
+        if self.parentTemp:
+            return self.tempbiz
+        else:
+            return self.biz
+    def get_short_name(self):
+        return str(self.pk)
+
+    def natural_key(self):
+        return str(self.pk)
+
+    def __str__(self):
+        return str(self.pk)
 
 class Capacity(models.Model):
     business = models.CharField(max_length = 40, null = False, blank = False, unique = True)
@@ -309,7 +331,7 @@ class Business(models.Model):
     xcor = models.FloatField(null = False, blank = False)
     ycor = models.FloatField(null = False, blank = False)
     verified = models.BooleanField(default = False)
-    wait_time = models.OneToOneField(waitTimes, null = True, blank = True, on_delete = models.SET_NULL, related_name = 'time')
+    wait_time = models.OneToOneField(waitTimes, null = True, blank = True, on_delete = models.SET_NULL, related_name = 'biz')
     capacity = models.OneToOneField(Capacity, null = True, blank = True, on_delete = models.SET_NULL, related_name='cap')
     placeID = models.TextField(null = False, blank=False, unique = True, default = False)
     queue = models.OneToOneField(Queues, blank = True, null = True, on_delete = CASCADE)
@@ -370,12 +392,40 @@ class Staff_Profile(models.Model):
     
     def __str__(self):
         return self.user.username
-
+from django.core.serializers import serialize
 class Temp_Business_Manager(models.Manager):
-    def search(self, latitude, longitude, radius):
-        # find point around :
-        query= "SELECT ID, NOM, LAT, LON, 3956 * 2 * ASIN(SQRT(POWER(SIN((%s - LAT) * 0.0174532925 / 2), 2) + COS(%s * 0.0174532925) * COS(LAT * 0.0174532925) * POWER(SIN((%s - LON) * 0.0174532925 / 2), 2) )) as distance from POI  having distance < 50 ORDER BY distance ASC " % ( latitude, latitude, longitude)
-        return('test')
+    def isFloatNum(self, targetString):
+        try : 
+            float(targetString)
+            return(True)
+        except :
+            print("Not a float")
+            return(False)
+
+    def search(self, latitude, longitude, radius): # radius in kms
+        if (self.isFloatNum(latitude) and self.isFloatNum(longitude) and self.isFloatNum(radius)): 
+            # Great circle distance formula
+            gcd_formula = "6371 * acos(min(max(\
+            cos(radians(%s)) * cos(radians(lat)) \
+            * cos(radians(lon) - radians(%s)) + \
+            sin(radians(%s)) * sin(radians(lat)) \
+            , -1), 1))"
+            distance_raw_sql = RawSQL(
+                gcd_formula,
+                (latitude, longitude, latitude)
+            )
+            qs = self.get_queryset()
+            qs = qs.annotate(distance=distance_raw_sql)
+            qs = qs.filter(distance__lt=radius).order_by('distance').values_list("placeID", flat=True)
+            listOfPlaceIDs = []
+            for place in qs.iterator():
+                listOfPlaceIDs.append(place)
+            # data = serialize("json", [ qs, ])
+            print('qs: ' + str(listOfPlaceIDs))
+            return listOfPlaceIDs
+        return('bad inputs') #escape out
+
+
 
 
 class Temp_Business(models.Model):
@@ -383,7 +433,7 @@ class Temp_Business(models.Model):
     lon = models.FloatField(blank = False, null = True)
     verified = models.BooleanField(null = False, blank = False, default = False)
     cached_time = models.DateTimeField(auto_now = True, null = False, blank = False)
-    wait_time = models.OneToOneField(waitTimes, null = True, blank = True, on_delete = CASCADE)
+    wait_time = models.OneToOneField(waitTimes, null = True, blank = True, on_delete = models.SET_NULL, related_name = 'tempbiz')
     capacity = models.OneToOneField(Capacity, null = True, blank = True, on_delete = CASCADE)
     placeID = models.TextField(null = False, blank=False, unique = True, default = False)
     REQUIRED_FIELDS = ['xcor', 'ycor', 'verified', 'placeID', "cached_time"]

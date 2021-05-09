@@ -166,24 +166,42 @@ class Profile(models.Model):
     def save_user_profile(sender, instance, **kwargs):
         instance.profile.save()
 
-class waitTimes(models.Model):
-    business = models.CharField(max_length = 40, null = False, blank = False, unique = True)
-    numReviews = models.IntegerField(validators = [
+class WaitTimeReview(models.Model):
+    author = models.OneToOneField(User, CASCADE)
+    timeToOrder = models.IntegerField(validators = [
         MinValueValidator(0)
     ], default = 0, null = False, blank = False)
-    average = models.FloatField(validators = [
+    timeTillFood = models.IntegerField(validators = [
         MinValueValidator(0)
     ], default = 0, null = False, blank = False)
-    REQUIRED_FIELDS = ['business', 'numReviews', 'average']
-
     def get_short_name(self):
-        return self.business
+        return str(self.pk)
 
     def natural_key(self):
-        return self.business
+        return str(self.pk)
 
     def __str__(self):
-        return self.business
+        return str(self.pk)
+    
+class waitTimes(models.Model):
+    parentTemp = models.BooleanField(default=False) #parent will either be tempbiz for true or biz for false
+    reviews = models.ManyToManyField(WaitTimeReview, related_name="bizWait", verbose_name="list of revews")
+    average = models.FloatField(validators = [MinValueValidator(0)], default = 0, null = False, blank = False)
+    REQUIRED_FIELDS = ['reviews', 'average', 'parentTemp']
+
+    def getParent(self):
+        if self.parentTemp:
+            return self.tempbiz
+        else:
+            return self.biz
+    def get_short_name(self):
+        return str(self.pk)
+
+    def natural_key(self):
+        return str(self.pk)
+
+    def __str__(self):
+        return str(self.pk)
 
 class Capacity(models.Model):
     business = models.CharField(max_length = 40, null = False, blank = False, unique = True)
@@ -211,7 +229,7 @@ class Business(models.Model):
     xcor = models.FloatField(null = False, blank = False)
     ycor = models.FloatField(null = False, blank = False)
     verified = models.BooleanField(default = False)
-    wait_time = models.OneToOneField(waitTimes, null = True, blank = True, on_delete = models.SET_NULL, related_name = 'time')
+    wait_time = models.OneToOneField(waitTimes, null = True, blank = True, on_delete = models.SET_NULL, related_name = 'biz')
     capacity = models.OneToOneField(Capacity, null = True, blank = True, on_delete = models.SET_NULL, related_name='cap')
     placeID = models.TextField(null = False, blank=False, unique = True, default = False)
     REQUIRED_FIELDS = ['name', 'xcor', 'ycor', 'verified']
@@ -312,7 +330,7 @@ class Temp_Business(models.Model):
     lon = models.FloatField(blank = False, null = False)
     verified = models.BooleanField(null = False, blank = False, default = False)
     cached_time = models.DateTimeField(auto_now = True, null = False, blank = False)
-    wait_time = models.OneToOneField(waitTimes, null = True, blank = True, on_delete = CASCADE)
+    wait_time = models.OneToOneField(waitTimes, null = True, blank = True, on_delete = models.SET_NULL, related_name = 'tempbiz')
     capacity = models.OneToOneField(Capacity, null = True, blank = True, on_delete = CASCADE)
     placeID = models.TextField(null = False, blank=False, unique = True, default = False)
     REQUIRED_FIELDS = ['xcor', 'ycor', 'verified', 'placeID', "cached_time"]

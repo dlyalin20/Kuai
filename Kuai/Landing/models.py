@@ -9,12 +9,13 @@ from django.db import models
 from jsonfield import JSONField
 from django.contrib import admin
 from django.dispatch import receiver
-from django.db.models.deletion import CASCADE
 from django_mysql.models import ListTextField
 from django.db.models.signals import post_save
 from django.core.exceptions import ValidationError
+from django.db.models.deletion import CASCADE, SET_NULL
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import User, PermissionsMixin, AbstractBaseUser, BaseUserManager
+# speed test the querying, add a second models file, add new businesses to popup
 
 # validators
 def validate_user(user):
@@ -148,13 +149,13 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.username
 
 class waitData(models.Model):
-    business = models.CharField(max_length = 40, null = False, blank = False, unique = False)
+    business = models.ForeignKey('Business', null = True, blank = False, unique = False, on_delete = CASCADE)
     wait_time = models.FloatField(validators = [
         MinValueValidator(0),
         MaxValueValidator(180)
     ], null = False, blank = False)
-    author = models.CharField(max_length = 20, null = False, blank = False)
-    timestamp = models.DateTimeField(default = django.utils.timezone.now, null = False, blank = False,)
+    author = models.ForeignKey('User', null = True, blank = False, on_delete = CASCADE)
+    timestamp = models.DateTimeField(default = django.utils.timezone.now, null = False, blank = False)
 
     REQUIRED_FIELDS = ['business', 'wait_time', 'author', 'timestamp']
 
@@ -168,15 +169,15 @@ class waitData(models.Model):
         return self.business
     
     def __str__(self):
-        return self.business
+        return self.business.placeID
 
 class capacityData(models.Model):
-    business = models.CharField(max_length = 40, null = False, blank = False, unique = False)
+    business = models.ForeignKey('Business', null = True, blank = False, unique = False, on_delete = CASCADE)
     capacity = models.FloatField(validators = [
         MinValueValidator(0),
         MaxValueValidator(100)
     ], null = False, blank = False)
-    author = models.CharField(max_length = 20, null = False, blank = False)
+    author = models.ForeignKey('User', max_length = 20, null = True, blank = False, on_delete = CASCADE)
     timestamp = models.DateTimeField(auto_now = True, null = False, blank = False)
 
     REQUIRED_FIELDS = ['business', 'capacity', 'author', 'timestamp']
@@ -191,9 +192,10 @@ class capacityData(models.Model):
         return self.business
     
     def __str__(self):
-        return self.business
+        return self.business.placeID
 
 class Subscriber(models.Model):
+    account = models.ForeignKey('Profile', null = True, on_delete = CASCADE, )
     skips = models.IntegerField(default = 15, null = False, blank = False, validators = [
         MinValueValidator(0),
         MaxValueValidator(15)
@@ -201,7 +203,8 @@ class Subscriber(models.Model):
     skip_history = ListField(null = True, blank = True)
     last_pay_date = models.DateField(null = False, blank = False)
 
-
+    def __str__(self):
+        return self.account.user.username
 
 # Custom User Profile
 class Profile(models.Model):
@@ -216,15 +219,15 @@ class Profile(models.Model):
     ])
     birth_date = models.DateField(null = True, blank = True)
     profile_pic = models.ImageField(blank = True, null = True, upload_to='Landing/pfps')
-    favorite_businesses = ListField(null = True, blank = True)
+    favorite_businesses = models.ManyToManyField('Business', blank = True)
     search_history = ListField(null = True, blank = True)
     all_time_updates = models.ManyToManyField(waitData, blank=True, related_name='all_time_up')
     all_capacity_updates = models.ManyToManyField(capacityData, blank=True, related_name='all_cap_up')
-    last_time_update = models.OneToOneField(waitData, null = True, blank = True, on_delete = models.SET_NULL)
-    last_capacity_update = models.OneToOneField(capacityData, null = True, blank = True, on_delete = models.SET_NULL)
+    last_time_update = models.OneToOneField(waitData, null = True, blank = True, on_delete = SET_NULL)
+    last_capacity_update = models.OneToOneField(capacityData, null = True, blank = True, on_delete = SET_NULL)
 
     is_subscribed = models.BooleanField(default = False)
-    subscription = models.OneToOneField(Subscriber, on_delete = CASCADE, null = True, blank = True)
+    subscription = models.OneToOneField(Subscriber, on_delete = SET_NULL, null = True, blank = True)
     
     def create_subscriber(self):
         if self.is_subscribed:
@@ -250,7 +253,6 @@ class Profile(models.Model):
         except AttributeError:
             return False
 
-
     @receiver(post_save, sender=User)
     def create_user_profile(sender, instance, created, **kwargs):
         if created and not instance.is_business and not instance.is_staff:
@@ -260,8 +262,11 @@ class Profile(models.Model):
     def save_user_profile(sender, instance, **kwargs):
         instance.profile.save()
 
+    def __str__(self):
+        return self.user.username
+
 class waitTimes(models.Model):
-    business = models.CharField(max_length = 40, null = False, blank = False, unique = True)
+    business = models.OneToOneField('Business', null = False, blank = False, unique = True, on_delete = CASCADE)
     numReviews = models.IntegerField(validators = [
         MinValueValidator(0)
     ], default = 0, null = False, blank = False)
@@ -277,10 +282,10 @@ class waitTimes(models.Model):
         return self.business
 
     def __str__(self):
-        return self.business
+        return self.business.placeID
 
 class Capacity(models.Model):
-    business = models.CharField(max_length = 40, null = False, blank = False, unique = True)
+    business = models.OneToOneField('Business', null = False, blank = False, unique = True, on_delete = CASCADE, related_name = "biz")
     numReviews = models.IntegerField(validators = [
         MinValueValidator(0)
     ], default = 0, null = False, blank = False)
@@ -298,19 +303,23 @@ class Capacity(models.Model):
         return self.business
 
     def __str__(self):
-        return self.business
+        return self.business.placeID
 
 class Queues(models.Model):
+    affiliatedBusiness = models.ForeignKey('Business', on_delete = CASCADE)
     free_queue = ListField(null = True, blank = True)
     skip_queue = ListField(null = True, blank = True)
+
+    def __str__(self):
+        return self.affiliatedBusiness
 
 class Business(models.Model):
     name = models.CharField(max_length = 40, null = False, blank = False, unique = True)
     xcor = models.FloatField(null = False, blank = False)
     ycor = models.FloatField(null = False, blank = False)
     verified = models.BooleanField(default = False)
-    wait_time = models.OneToOneField(waitTimes, null = True, blank = True, on_delete = models.SET_NULL, related_name = 'time')
-    capacity = models.OneToOneField(Capacity, null = True, blank = True, on_delete = models.SET_NULL, related_name='cap')
+    wait_time = models.OneToOneField(waitTimes, null = True, blank = True, on_delete = SET_NULL, related_name = 'time')
+    capacity = models.OneToOneField(Capacity, null = True, blank = True, on_delete = SET_NULL, related_name='cap')
     placeID = models.TextField(null = False, blank=False, unique = True, default = False)
     queue = models.OneToOneField(Queues, blank = True, null = True, on_delete = CASCADE)
     REQUIRED_FIELDS = ['name', 'xcor', 'ycor', 'verified']
@@ -325,7 +334,7 @@ class Business(models.Model):
         return self.name
 
 class Business_Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=CASCADE, unique = True)
+    user = models.OneToOneField(User, on_delete = CASCADE, unique = True)
     businesses = models.ManyToManyField(Business, blank = True)
 
     REQUIRED_FIELDS = ['user']
@@ -350,7 +359,7 @@ class Business_Profile(models.Model):
 
 
 class Staff_Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=CASCADE, unique = True)
+    user = models.OneToOneField(User, on_delete = CASCADE, unique = True)
     staffof = models.OneToOneField(Business, null = False, blank = False, unique = False, on_delete = CASCADE)
 
     @receiver(post_save, sender=User)

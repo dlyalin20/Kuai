@@ -148,12 +148,12 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.username
 
 class waitData(models.Model):
-    business = models.CharField(max_length = 40, null = False, blank = False, unique = False)
+    business = models.ForeignKey('Business', null = False, blank = False, unique = False, on_delete = CASCADE)
     wait_time = models.FloatField(validators = [
         MinValueValidator(0),
         MaxValueValidator(180)
     ], null = False, blank = False)
-    author = models.CharField(max_length = 20, null = False, blank = False)
+    author = models.ForeignKey('Profile', null = False, blank = False, on_delete = CASCADE)
     timestamp = models.DateTimeField(default = django.utils.timezone.now, null = False, blank = False,)
 
     REQUIRED_FIELDS = ['business', 'wait_time', 'author', 'timestamp']
@@ -168,15 +168,15 @@ class waitData(models.Model):
         return self.business
     
     def __str__(self):
-        return self.business
+        return self.business.name
 
 class capacityData(models.Model):
-    business = models.CharField(max_length = 40, null = False, blank = False, unique = False)
+    business = models.ForeignKey('Business', null = False, blank = False, unique = False, on_delete = CASCADE)
     capacity = models.FloatField(validators = [
         MinValueValidator(0),
         MaxValueValidator(100)
     ], null = False, blank = False)
-    author = models.CharField(max_length = 20, null = False, blank = False)
+    author = models.ForeignKey('Profile', null = False, blank = False, on_delete = CASCADE)
     timestamp = models.DateTimeField(auto_now = True, null = False, blank = False)
 
     REQUIRED_FIELDS = ['business', 'capacity', 'author', 'timestamp']
@@ -191,15 +191,19 @@ class capacityData(models.Model):
         return self.business
     
     def __str__(self):
-        return self.business
+        return self.business.name
 
 class Subscriber(models.Model):
+    account = models.OneToOneField('Profile', null = True, blank = False, on_delete = CASCADE)
     skips = models.IntegerField(default = 15, null = False, blank = False, validators = [
         MinValueValidator(0),
         MaxValueValidator(15)
     ])
     skip_history = ListField(null = True, blank = True)
     last_pay_date = models.DateField(null = False, blank = False)
+
+    def __str__(self):
+        return self.account.user.username
 
 
 
@@ -259,9 +263,12 @@ class Profile(models.Model):
     @receiver(post_save, sender=User)
     def save_user_profile(sender, instance, **kwargs):
         instance.profile.save()
+        
+    def __str__(self):
+        return self.user.username
 
 class waitTimes(models.Model):
-    business = models.CharField(max_length = 40, null = False, blank = False, unique = True)
+    business = models.OneToOneField('Business', null = False, blank = False, unique = True, on_delete = CASCADE)
     numReviews = models.IntegerField(validators = [
         MinValueValidator(0)
     ], default = 0, null = False, blank = False)
@@ -278,10 +285,10 @@ class waitTimes(models.Model):
         return self.business
 
     def __str__(self):
-        return self.business
+        return self.business.name
 
 class Capacity(models.Model):
-    business = models.CharField(max_length = 40, null = False, blank = False, unique = True)
+    business = models.OneToOneField('Business', null = False, blank = False, unique = True, on_delete = CASCADE, related_name='biz')
     numReviews = models.IntegerField(validators = [
         MinValueValidator(0)
     ], default = 0, null = False, blank = False)
@@ -300,9 +307,10 @@ class Capacity(models.Model):
         return self.business
 
     def __str__(self):
-        return self.business
+        return self.business.name
 
 class Queues(models.Model):
+    connectedTo = models.OneToOneField('Business', blank = False, null = True, on_delete = CASCADE)
     free_queue = ListField(null = True, blank = True)
     skip_queue = ListField(null = True, blank = True)
     premium = models.FloatField(null = False, blank = False, default = 0)
@@ -315,7 +323,7 @@ class Business(models.Model):
     wait_time = models.OneToOneField(waitTimes, null = True, blank = True, on_delete = models.SET_NULL, related_name = 'time')
     capacity = models.OneToOneField(Capacity, null = True, blank = True, on_delete = models.SET_NULL, related_name='cap')
     placeID = models.TextField(null = False, blank=False, unique = True, default = False)
-    queue = models.OneToOneField(Queues, blank = True, null = True, on_delete = CASCADE)
+    queue = models.OneToOneField(Queues, blank = True, null = True, on_delete = models.SET_NULL)
     REQUIRED_FIELDS = ['name', 'xcor', 'ycor', 'verified']
 
     def get_short_name(self):

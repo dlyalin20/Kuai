@@ -14,12 +14,47 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from .models import waitData, capacityData, waitTimes, Capacity, validate_user, validate_pwd, Business
 
+def check_business(ID):
+    try:
+        business = Business.objects.get(placeID = ID)
+        return business
+    except ObjectDoesNotExist:
+        try:
+            business = Temp_Business.objects.get(placeID = ID)
+            return business
+        except ObjectDoesNotExist:
+            business = Temp_Business(placeID = ID)
+            business.save()
+            return business
+
 
 # format to handle requests and check for integers
 # also filter data
 def addWaitTime(request, ID, time):
     user = request.user
-    if user.profile.wait_too_soon(ID): 
+    '''if user.profile.wait_too_soon(ID): 
+        print("Too Soon")
+        return'''
+    business = check_business(ID)
+    entry = waitData(business = business, wait_time = time, author = request.user)
+    entry.save()
+    try:
+        times = waitTimes.objects.get(business = business)
+        product = times.numReviews * times.average
+        product += int(time)
+        times.numReviews += 1
+        times.average = product / times.numReviews
+        times.last_update = timezone.utcnow()
+        times.save()
+    except ObjectDoesNotExist:
+        times = waitTimes(business = business, numReviews = 1, average = time)
+        times.save()
+    business.wait_time = times
+    business.save()
+    user.profile.last_time_update = entry
+    user.profile.all_time_updates.add(entry)
+    user.save()
+    """ if user.profile.wait_too_soon(ID): 
         print("Too Soon")
         return
     entry = waitData(business = ID, wait_time = time, author = request.user.username)
@@ -52,8 +87,9 @@ def addWaitTime(request, ID, time):
             business.save()
     user.profile.last_time_update = entry
     user.profile.all_time_updates.add(entry)
-    user.save()
+    user.save() """
 
+# update to convert to modern standards
 # format to handle requests and check for integers
 # also filter data
 def addCapacity(request, ID, capacity):

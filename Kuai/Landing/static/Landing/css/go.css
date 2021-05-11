@@ -30,6 +30,11 @@
   position: relative;
     text-align: center;
 }
+#choices{
+  flex-direction: column;
+  display: flex;
+  overflow: scroll;
+}
 #arrow{
   width: 0;
   height: 0;

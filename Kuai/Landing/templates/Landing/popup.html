@@ -1,15 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <title>Landing</title>
+
+<!-- When show js adds the content to these tags -->
+<!-- 
+    Properties
+    - bis_name
+    - bis_time_average
+ -->
         {% load static %}
         {% load Landing_extras %}
-        <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" type="text/css" href="{% static 'Landing/css/popup.css' %}">
-    </head>
-    {% include 'Landing/navbar.html' %}
-    <body>
         <center>
+            <span id="close_popup">X</span>
             <div class="tile is-ancestor is-2" style="height: 160px; width: 410px;">
                 <div class="tile is-parent">
                     <article class="tile is-child notification is-white">
@@ -22,13 +22,14 @@
                                     </div>
                                     <div class="column" style="padding: 0; margin: 0;">
                                         <h1 class="title is-5" style="padding: 0; margin-bottom: 0; color: navy;"><b>
-                                            <a href="">
-                                            {% if business.name %} {{ business.name }} {% else %} Business Name {% endif %}
+                                            <a href="" id="bis_name">
+                                            
+
                                             </a>
                                             </b><br></h1>
                                         <p style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;" class="content">
                                             Wait time:
-                                            <span style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;">
+                                            <span id="bis_time_average"style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;">
                                                 {% if wait_time.average %} 
                                                     {% if wait_time.average >= 0 and wait_time.average < 30 %}
                                                     <span style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: lime;">

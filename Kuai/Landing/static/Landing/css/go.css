@@ -8,12 +8,13 @@
     }
       
       
-      /* Optional: Makes the sample page fill the window. */
+      /* Optional: Makes the page fill the window. */
       html,
       body {
         height: 100%;
         margin: 0;
         padding: 0;
+        overflow: hidden;
       }
 
 /* search + options */
@@ -34,6 +35,7 @@
   flex-direction: column;
   display: flex;
   overflow: scroll;
+  height: calc(100% - 5em);
 }
 #arrow{
   width: 0;

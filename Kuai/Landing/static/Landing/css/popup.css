@@ -52,3 +52,17 @@
     line-height: 73px;
     text-align: center;
 }
+
+#popup{
+    position: relative;
+    top: 1.5em;
+    left: calc(50% - 1em);
+    z-index: 2;
+}
+
+#close_popup{
+    position: relative;
+    top: 1.5em;
+    left: calc(100% - 1em);
+    z-index: 2;
+}

@@ -268,25 +268,23 @@ function nearbySearch(){ //plots the nearby locations
 */
 
 function placeResultsToMarkers(results, ){
-    choices.html("");
-    clearMarkers();
-    for (let index = 0; index < results.length; index++) {
+    // choices.html("");
+    // clearMarkers();
+    const start = markers.length;
+    for (let index = 0; index < 0 + results.length; index++) {
         const element = results[index];
-        createMarker(element);
-        placeResult(element, index);
-  
+        // createMarker(element);
+        // placeResult(element, index);
+        
+        new Business(element.place_id, element.geometry.location, element.name, async function(){
+            let x = await this.testHash();
+            if (!x){
+                this.pushDivDescription();
+                markers.push(this);
+            }
+        }, start + index);
 
     }
-}
-
-function placeResult(element, index){
-    newChoice = $(`<div class='option-items' location = `+element.geometry.location+`>
-    ` + (index + 1) + '. ' + element.name + '|' + element.geometry.location +
-    `</div>`).on("click", function(){
-        map.setCenter(element.geometry.location)
-    });
-    choices.append(newChoice);
-
 }
 
 
@@ -487,27 +485,28 @@ function toggleSidePanel(params) {
     }
 }
 
-//input: list of place results
+//input: list of place results taken in from initial search query
 //post-condition: plotted markers and result divs
 // results.place_id
 async function plotListMarkers(results) {
-    choices.html("");
-    clearMarkers()
+    // choices.html("");
+
     // turn this in to plant markers function
     for (let i = 0; i < results.length; i++) {
         await new Promise(function(accept, reject){
-            markers = new Array()
-            var choicesArray= new Array(data.length);
+            const start = markers.length;
             for (let i = 0; i < data.length; i++){
-                choices.html("");
-                let temp = new Business(results[i].place_id, null, null, function(){
-                    this.pushDivDescription(i);                
-    
-                });
+                // choices.html("");
+                new Business(results[i].place_id, null, null, async function(){
+                    if (!await this.testHash()){
+                        this.pushDivDescription();
+                        markers.push(temp);
+                    }
+                }, start + i);
                 // console.log(placeLocation);
                 // createMarker(placeLocation);
                 // queryService(data[i], placeResult, i)
-                markers.push(temp);
+                // markers.push(temp);
             }
             // queryService(results[i].place_id, function (thisMarkerLocation){
             //     if (thisMarkerLocation){
@@ -536,7 +535,6 @@ function createMarker(place) {
         map,
         position: place.geometry.location,
     });
-    markers.push(marker);
     infowindow = new google.maps.InfoWindow;
     
 }
@@ -546,4 +544,5 @@ function clearMarkers(){
         
     }
     markers = new Array();
+    bizHash = new hashtable();
 }

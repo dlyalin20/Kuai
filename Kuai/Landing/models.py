@@ -417,6 +417,7 @@ class Temp_Business_Manager(models.Manager):
             qs = self.get_queryset()
             qs = qs.annotate(distance=distance_raw_sql)
             qs = qs.filter(distance__lt=radius).order_by('distance').values_list("placeID", flat=True)
+            qs = qs[:10] # take only the first 10
             listOfPlaceIDs = []
             for place in qs.iterator():
                 listOfPlaceIDs.append(place)

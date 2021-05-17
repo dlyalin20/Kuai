@@ -4,6 +4,8 @@ const chatSocket = new WebSocket(
     + '/ws/go/SearchNearby'
 ); 
 var data;
+var bizHash = new hashtable();
+
 chatSocket.onmessage = function(e) {
     console.log(chatSocket);
 
@@ -13,27 +15,22 @@ chatSocket.onmessage = function(e) {
     }else if(data == null || data.length == 0){
         alert("No results found")
     }else{
+        bizHash = new hashtable();
         // array found: display the markers on the map
         // data[i].place_id ; data[i].lat, data[i].lon
-        // choices.html("");
-        markers = new Array()
-        var choicesArray= new Array(data.length);
+        choices.html("");
+        clearMarkers();
         for (let i = 0; i < data.length; i++){
-            choices.html("");
+            // choices.html("");
             let temp = new Business(data[i], null, null, function(){
-                this.pushDivDescription(i);                
-
-            });
+                this.addHash(); //eventually adds hash
+                this.pushDivDescription();             
+            }, markers.length);
             // console.log(placeLocation);
             // createMarker(placeLocation);
             // queryService(data[i], placeResult, i)
             markers.push(temp);
         }
- 
-
-        
-
-        
     }
 };
 

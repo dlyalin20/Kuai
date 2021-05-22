@@ -18,7 +18,8 @@ urlpatterns = [
     path('business_view/<str:placeID>', views.test, name="business_view"),
     path('quickWaitTime', views.quickWaitTime, name="quickWaitTime"),
     path('longWaitTime', views.longWaitTime, name="longWaitTime"),
-    path('longCapacity', views.longCapacity, name="longCapacity")
+    path('longCapacity', views.longCapacity, name="longCapacity"),
+    path('QRTest', views.QRGenerator, name = 'QRTest')
     # archive
     # path('autocomplete', views.autocomplete_view, name="autocomplete"),
 ]

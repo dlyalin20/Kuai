@@ -15,5 +15,6 @@ admin.site.register(Capacity)
 admin.site.register(Business)
 admin.site.register(Temp_Business, TempBizAdmin)
 admin.site.register(Subscriber)
-admin.site.register(Queues)
+#admin.site.register(Queues)
+admin.site.register(Skips)
 #AUTH_USER_MODEL = 'models.CustomUser'

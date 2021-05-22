@@ -309,11 +309,16 @@ class Capacity(models.Model):
     def __str__(self):
         return self.business.name
 
-class Queues(models.Model):
+class Skips(models.Model):
+    business = models.ForeignKey('Business', on_delete = CASCADE, null = True)
+    user = models.ForeignKey('Profile', null = False, blank = False, on_delete = CASCADE)
+    hash = models.CharField(max_length = 64, null = False, blank = False, unique = True)
+
+'''class Queues(models.Model):
     connectedTo = models.OneToOneField('Business', blank = False, null = True, on_delete = CASCADE)
     free_queue = ListField(null = True, blank = True)
     skip_queue = ListField(null = True, blank = True)
-    premium = models.FloatField(null = False, blank = False, default = 0)
+    premium = models.FloatField(null = False, blank = False, default = 0)'''
 
 class Business(models.Model):
     name = models.CharField(max_length = 40, null = False, blank = False, unique = True)
@@ -323,7 +328,7 @@ class Business(models.Model):
     wait_time = models.OneToOneField(waitTimes, null = True, blank = True, on_delete = models.SET_NULL, related_name = 'time')
     capacity = models.OneToOneField(Capacity, null = True, blank = True, on_delete = models.SET_NULL, related_name='cap')
     placeID = models.TextField(null = False, blank=False, unique = True, default = False)
-    queue = models.OneToOneField(Queues, blank = True, null = True, on_delete = models.SET_NULL)
+    #queue = models.OneToOneField(Queues, blank = True, null = True, on_delete = models.SET_NULL)
     REQUIRED_FIELDS = ['name', 'xcor', 'ycor', 'verified']
 
     def get_short_name(self):

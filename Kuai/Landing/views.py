@@ -1,18 +1,30 @@
+import os
 import re
+import png
+import PIL
 import json
 import pytz
 import time
+import string
+import secrets
+import hashlib
+import pyqrcode
 import datetime
+from PIL import Image
+from .models import *
 from django import forms
+from pyqrcode import QRCode
 from django.urls import reverse
 from  django.utils import timezone
+from .templatetags import html_utils
+from django.template import RequestContext
+from django.templatetags.static import static
 from .models import Temp_Business, User, AccountManager
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import get_object_or_404, render, redirect
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from .models import waitData, capacityData, waitTimes, Capacity, validate_user, validate_pwd, Business
 
 def check_business(ID):
     try:
@@ -369,6 +381,20 @@ def longCapacity(request):
         business = Business.objects.filter(placeID = id)[0]
         addCapacity(request, id, cap)
     return HttpResponseRedirect(f'/business_view/{business.placeID}')
+
+
+def QRGenerator(request):
+    result_characters = string.ascii_letters + string.digits + string.punctuation
+    result = ''.join((secrets.choice(result_characters) for x in range(32)))
+    result += ' ' + request.user.username
+    qr = pyqrcode.create(result.encode('utf-8'))
+    qr.png('Landing/static/Landing/imgs/Tmp_' + request.user.username, scale=6) # write to a specific directory and include event name
+    business = Business.objects.get(placeID = 'Tmp')
+    skip = Skips(business = business, user = request.user.profile, hash = hashlib.sha256(result.encode('utf-8')).hexdigest())
+    skip.save()
+    return render(request, 'Landing/QRRender.html')
+
+#def QRDeleter(request): qr deletion 
 
 
 

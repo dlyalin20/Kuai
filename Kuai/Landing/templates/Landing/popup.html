@@ -9,7 +9,7 @@
         {% load Landing_extras %}
         <link rel="stylesheet" type="text/css" href="{% static 'Landing/css/popup.css' %}">
         <center>
-            <span id="close_popup">X</span>
+
             <div class="tile is-ancestor is-2" style="height: 160px; width: 410px;">
                 <div class="tile is-parent">
                     <article class="tile is-child notification is-white">
@@ -27,33 +27,24 @@
 
                                             </a>
                                             </b><br></h1>
-                                        <p style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;" class="content">
+                                        
+                                        <p id="popup_wait_time" style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;" class="content">
                                             Wait time:
-                                            <span id="bis_time_average"style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;">
-                                                {% if wait_time.average %} 
-                                                    {% if wait_time.average >= 0 and wait_time.average < 30 %}
-                                                    <span style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: lime;">
-                                                        {{ wait_time.average|floatformat:"0" }}
-                                                    </span>
-                                                    {% elif wait_time.average >= 30 and wait_time.average < 60 %}
-                                                    <span style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: orange;">
-                                                        {{ wait_time.average|floatformat:"0" }}
-                                                    </span>
-                                                    {% else %}
-                                                    <span style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: red;">
-                                                        {{ wait_time.average|floatformat:"0" }}
-                                                    </span>
-                                                    {% endif %}
-                                                {% else %} 
-                                                <span style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;">
-                                                    No Time
-                                                </span>
-                                                {% endif %}
-                                            </span>
-                                            <p style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;" class="content">Add Wait Time: </p>
-                                            <form action="/quickWaitTime"  method="post" style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;">
-                                                {% csrf_token %}
-                                                <input type="hidden" value="{{ business.placeID }}" name="business" />
+                                            
+                                        </p>
+                                        <div id="popup-description"></div>
+                                        <div id="popup-input">
+                                            <label class="people_in_front"> How many people in front of you </label>
+                                            <input class="people_in_front" type="number" id="number_of_people" name="quantity" min="1" max="20">
+                                            
+                                            <label> More than 20: </label>
+                                            <input type="checkbox" id="overflow_people" name="morthan20">
+                                        </div>
+
+                                        <!-- <p style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;" id="waitTimeForm" class="content">Add Wait Time: </p> -->
+                                            <!-- <form action="/quickWaitTime"  method="post" style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;"> -->
+                                                <!-- {% csrf_token %} -->
+                                                <!-- <input type="hidden" id="placeID" value="{{ business.placeID }}" name="business" />
                                                 <div class="field" style="width: 75px; white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;">
                                                     <input style="width: 75px; white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;" type="number" list="times" name="time"/>
                                                     <datalist id="times">
@@ -64,13 +55,16 @@
                                                             <option> 50 </option>
                                                             <option> 60 </option>
                                                     </datalist>
-                                                </div>
+                                                </div> -->
                                                 <div class="field">
                                                     <div class="control">
-                                                        <button class="button is-info is-small" type="submit">Submit</button>
+                                                        <button id="popupnext" class="button is-info is-small">
+                                                            <!-- next / submit -->
+                                                        </button>
                                                     </div>
                                                 </div>
-                                            </form>
+                                            <!-- </form> -->
+                                        </p>
                                            <!-- <p style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;" class="content"> Add Wait Times: </p>
                                             <span style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;">
                                                 <div class="table-container" style="width: 100px; white-space: nowrap; padding: 0; margin: 0; font-size: 13px; color: darkblue;">
@@ -131,6 +125,7 @@
                                 </p>-->
                         </div>
                       </article>
+                      <span id="close_popup">X</span>
                 </div>
             </div>
         </center>

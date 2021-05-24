@@ -15,6 +15,8 @@ class hashtable {
     }
 }
 
+var targetBiz; 
+
 class Business{
     // location new google.maps.LatLng(location);
     //Call back is run after contructor is done
@@ -90,7 +92,7 @@ class Business{
         }        
     }
 
-    async pushDivDescription(){
+    async pushDivDescription(){ // what happends when u click on the marker
         var i = this.array_index_plus1;
         if (!(this.position && this.marker)){
             await this.position;
@@ -104,8 +106,15 @@ class Business{
         const parent = this;
         let myDiv = $(baseObject)
             .on("click", function(){
-                map.panTo(parent.position)
-                map.setZoom(18);
+                if (targetBiz == this){
+                    closePopUp();
+                    targetBiz = null;
+                }else{
+                    targetBiz = parent;
+                    map.panTo(parent.position)
+                    map.setZoom(18);
+                    openPopUp(parent.name, parent.placeID, 123)
+                }
             })
             .css("order", i)
             .appendTo(choices)

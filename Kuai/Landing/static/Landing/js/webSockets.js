@@ -25,7 +25,7 @@ chatSocket.onmessage = function(e) {
             let temp = new Business(data[i], null, null, function(){
                 this.addHash(); //eventually adds hash
                 this.pushDivDescription();             
-            }, markers.length);
+            }, i);
             // console.log(placeLocation);
             // createMarker(placeLocation);
             // queryService(data[i], placeResult, i)
@@ -50,4 +50,16 @@ function queryDB( lat = 40.6237542, lon = -73.913696, radius = 10){
         )
         
     }    
+}
+
+function waitTimeAvgData(OverallTime, NumOfPeople, placeID){
+    if (chatSocket && chatSocket.readyState == 1){
+        chatSocket.send(JSON.stringify({
+            'finalData': true,
+            'waittimeperperson': OverallTime / NumOfPeople, 
+            'placeID': placeID,
+            })
+        )
+        
+    } 
 }

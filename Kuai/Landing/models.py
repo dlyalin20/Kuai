@@ -151,16 +151,47 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.username
 
+class waitTimes(models.Model):
+    parentTemp = models.BooleanField(default=False) #parent will either be tempbiz for true or biz for false
+    # reviews = models.ManyToManyField(waitData, related_name="bizWait", verbose_name="list of revews")
+    average = models.FloatField(validators = [MinValueValidator(0)], default = 0, null = False, blank = False)
+    # 'reviews', 
+    REQUIRED_FIELDS = ['average', 'parentTemp']
+
+    def getParent(self):
+        if self.parentTemp:
+            return self.tempbiz
+        else:
+            return self.biz
+
+    def addReview(self, waittimeperperson, user):
+        # review = self.
+        # r = waitData(wait_time=waittimeperperson, author=user)
+        # r.save()
+        # self.reviews.add(r)
+        # r.
+        pass
+    def get_short_name(self):
+        return str(self.pk)
+
+    def natural_key(self):
+        return str(self.pk)
+
+    def __str__(self):
+        return str(self.pk)
+
+
 class waitData(models.Model):
-    business = models.CharField(max_length = 40, null = False, blank = False, unique = False)
+    # business = models.CharField(max_length = 40, null = False, blank = False, unique = False)
     wait_time = models.FloatField(validators = [
         MinValueValidator(0),
         MaxValueValidator(180)
     ], null = False, blank = False)
-    author = models.CharField(max_length = 20, null = False, blank = False)
+    author = models.OneToOneField(User, max_length = 20, null = False, blank = False, on_delete=models.CASCADE)
+    waitTimes = models.ForeignKey(waitTimes, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(default = django.utils.timezone.now, null = False, blank = False,)
-
-    REQUIRED_FIELDS = ['business', 'wait_time', 'author', 'timestamp']
+# 'business', 
+    REQUIRED_FIELDS = ['wait_time', 'author', 'waitTimes', 'timestamp']
 
     def is_old(self):
         return (datetime.datetime.now() - self.timestamp).minutes + ((datetime.datetime.now() - self.timestamp).hours * 60) >= self.wait_time
@@ -196,7 +227,6 @@ class capacityData(models.Model):
     
     def __str__(self):
         return self.business
-
 class Subscriber(models.Model):
     skips = models.IntegerField(default = 15, null = False, blank = False, validators = [
         MinValueValidator(0),
@@ -204,9 +234,6 @@ class Subscriber(models.Model):
     ])
     skip_history = ListField(null = True, blank = True)
     last_pay_date = models.DateField(null = False, blank = False)
-
-
-
 # Custom User Profile
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=CASCADE, unique = True)
@@ -264,43 +291,8 @@ class Profile(models.Model):
     def save_user_profile(sender, instance, **kwargs):
         instance.profile.save()
 
-class WaitTimeReview(models.Model):
-    author = models.OneToOneField(User, CASCADE)
-    timeToOrder = models.IntegerField(validators = [
-        MinValueValidator(0)
-    ], default = 0, null = False, blank = False)
-    timeTillFood = models.IntegerField(validators = [
-        MinValueValidator(0)
-    ], default = 0, null = False, blank = False)
-    def get_short_name(self):
-        return str(self.pk)
 
-    def natural_key(self):
-        return str(self.pk)
-
-    def __str__(self):
-        return str(self.pk)
-    
-class waitTimes(models.Model):
-    parentTemp = models.BooleanField(default=False) #parent will either be tempbiz for true or biz for false
-    reviews = models.ManyToManyField(WaitTimeReview, related_name="bizWait", verbose_name="list of revews")
-    average = models.FloatField(validators = [MinValueValidator(0)], default = 0, null = False, blank = False)
-    REQUIRED_FIELDS = ['reviews', 'average', 'parentTemp']
-
-    def getParent(self):
-        if self.parentTemp:
-            return self.tempbiz
-        else:
-            return self.biz
-    def get_short_name(self):
-        return str(self.pk)
-
-    def natural_key(self):
-        return str(self.pk)
-
-    def __str__(self):
-        return str(self.pk)
-
+        return str(instance.pk) 
 class Capacity(models.Model):
     business = models.CharField(max_length = 40, null = False, blank = False, unique = True)
     numReviews = models.IntegerField(validators = [
@@ -328,14 +320,14 @@ class Queues(models.Model):
 
 class Business(models.Model):
     name = models.CharField(max_length = 40, null = False, blank = False, unique = True)
-    xcor = models.FloatField(null = False, blank = False)
-    ycor = models.FloatField(null = False, blank = False)
+    lat = models.FloatField(null = False, blank = False)
+    lon = models.FloatField(null = False, blank = False)
     verified = models.BooleanField(default = False)
     wait_time = models.OneToOneField(waitTimes, null = True, blank = True, on_delete = models.SET_NULL, related_name = 'biz')
     capacity = models.OneToOneField(Capacity, null = True, blank = True, on_delete = models.SET_NULL, related_name='cap')
     placeID = models.TextField(null = False, blank=False, unique = True, default = False)
     queue = models.OneToOneField(Queues, blank = True, null = True, on_delete = CASCADE)
-    REQUIRED_FIELDS = ['name', 'xcor', 'ycor', 'verified']
+    REQUIRED_FIELDS = ['name', 'lat', 'lon', 'verified']
 
     def get_short_name(self):
         return self.name
@@ -426,6 +418,12 @@ class Temp_Business_Manager(models.Manager):
             return listOfPlaceIDs
         return('bad inputs') #escape out
 
+    def addWaitTime(self, placeID, waittimeperperson):
+        if (self.isFloatNum(waittimeperperson)):
+            # find the venue
+            TarBiz = self.get(placeID=placeID)
+            TarBiz.wait_time
+            pass
 
 
 
@@ -437,7 +435,7 @@ class Temp_Business(models.Model):
     wait_time = models.OneToOneField(waitTimes, null = True, blank = True, on_delete = models.SET_NULL, related_name = 'tempbiz')
     capacity = models.OneToOneField(Capacity, null = True, blank = True, on_delete = CASCADE)
     placeID = models.TextField(null = False, blank=False, unique = True, default = False)
-    REQUIRED_FIELDS = ['xcor', 'ycor', 'verified', 'placeID', "cached_time"]
+    REQUIRED_FIELDS = ['lat', 'lon', 'verified', 'placeID', "cached_time"]
 
     def twenty_days(self):
         return (datetime.datetime.now() - self.cached_time).days >= 20

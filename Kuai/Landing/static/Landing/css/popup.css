@@ -53,16 +53,29 @@
     text-align: center;
 }
 
-#popup{
+#popup {
+    display: block;
+    position: fixed;
+    left: 30%;
+    width: 70%;
+    top: 58%;
+    z-index: 2;
+    text-align: center;
+  }
+
+#close_popup{
+    height: fit-content;
     position: relative;
-    top: 1.5em;
-    left: calc(50% - 1em);
+    display: inherit;
+    float: right;
+    right: 1em;
     z-index: 2;
 }
 
-#close_popup{
-    position: relative;
-    top: 1.5em;
-    left: calc(100% - 1em);
-    z-index: 2;
+#bis_name::before{
+    content: attr(data-name);
+}
+
+#popup_wait_time::after{
+    content: attr(data-val);
 }

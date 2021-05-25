@@ -20,7 +20,9 @@ var targetBiz;
 class Business{
     // location new google.maps.LatLng(location);
     //Call back is run after contructor is done
-    constructor(placeID, location=null, name=null, callback=null, array_index){
+    constructor(placeID, location=null, name=null, callback=null, array_index, perperson = null, person = null){
+        this.perperson = perperson;
+        this.person = person;
         this.placeID = placeID;
         this.infowindow = new google.maps.InfoWindow;
         this.callback = callback;
@@ -113,7 +115,12 @@ class Business{
                     targetBiz = parent;
                     map.panTo(parent.position)
                     map.setZoom(18);
-                    openPopUp(parent.name, parent.placeID, 123)
+                    if (parent.perperson && parent.person){
+                        openPopUp(parent.name, parent.placeID, parent.perperson * parent.person, parent.perperson);
+                    }
+                    else{
+                        openPopUp(parent.name, parent.placeID);
+                    }
                 }
             })
             .css("order", i)

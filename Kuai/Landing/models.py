@@ -1,3 +1,4 @@
+from asyncio.tasks import wait
 import re
 import PIL
 import pytz
@@ -155,8 +156,9 @@ class waitTimes(models.Model):
     parentTemp = models.BooleanField(default=False) #parent will either be tempbiz for true or biz for false
     # reviews = models.ManyToManyField(waitData, related_name="bizWait", verbose_name="list of revews")
     average = models.FloatField(validators = [MinValueValidator(0)], default = 0, null = False, blank = False)
+    averagePeople = models.FloatField(validators = [MinValueValidator(0)], default = 0, null = False, blank = False)
     # 'reviews', 
-    REQUIRED_FIELDS = ['average', 'parentTemp']
+    REQUIRED_FIELDS = ['average', "averagePeople", 'parentTemp']
 
     def getParent(self):
         if self.parentTemp:
@@ -164,13 +166,24 @@ class waitTimes(models.Model):
         else:
             return self.biz
 
-    def addReview(self, waittimeperperson, user):
-        # review = self.
-        # r = waitData(wait_time=waittimeperperson, author=user)
-        # r.save()
-        # self.reviews.add(r)
-        # r.
-        pass
+    def addReview(self, waittimeperperson, numofpeople, user):
+        print(str(waittimeperperson) + " " + str(numofpeople)) 
+        if (self.average == -1):
+            # this is the first average
+            self.average = waittimeperperson
+            self.averagePeople = numofpeople
+        else:
+            # average accounting for other times
+            currentcount = self.review.count()
+            self.average = (((self.average * currentcount) + waittimeperperson) / (currentcount + 1))
+            self.averagePeople = (((self.averagePeople * currentcount) + float(numofpeople)) / (currentcount + 1))
+        self.save()
+        review = self.review.create(wait_time=waittimeperperson, numofpeople=numofpeople, author=user.profile)
+        review.save()
+        return review
+
+    
+
     def get_short_name(self):
         return str(self.pk)
 
@@ -180,30 +193,30 @@ class waitTimes(models.Model):
     def __str__(self):
         return str(self.pk)
 
-
 class waitData(models.Model):
     # business = models.CharField(max_length = 40, null = False, blank = False, unique = False)
-    wait_time = models.FloatField(validators = [
-        MinValueValidator(0),
-        MaxValueValidator(180)
-    ], null = False, blank = False)
-    author = models.OneToOneField(User, max_length = 20, null = False, blank = False, on_delete=models.CASCADE)
-    waitTimes = models.ForeignKey(waitTimes, on_delete=models.CASCADE)
+    wait_time = models.FloatField(validators = [MinValueValidator(0)], null = False, blank = False)
+    numofpeople = models.FloatField(validators = [MinValueValidator(0)], null = False, blank = False)
+
+    # author = models.OneToOneField(User, max_length = 20, null = False, blank = False, on_delete=models.CASCADE)
+    waitTimes = models.ForeignKey(waitTimes, on_delete=models.CASCADE, related_name="review", null=True, blank=True)
     timestamp = models.DateTimeField(default = django.utils.timezone.now, null = False, blank = False,)
+    author = models.ForeignKey("Profile", related_name='all_time_updates', on_delete=CASCADE)
+
 # 'business', 
-    REQUIRED_FIELDS = ['wait_time', 'author', 'waitTimes', 'timestamp']
+    REQUIRED_FIELDS = ['wait_time', "numofpeople", 'author', 'waitTimes', 'timestamp']
 
     def is_old(self):
         return (datetime.datetime.now() - self.timestamp).minutes + ((datetime.datetime.now() - self.timestamp).hours * 60) >= self.wait_time
 
     def get_short_name(self):
-        return self.business
+        return str(self.wait_time)
 
     def natural_key(self):
-        return self.business
+        return str(self.wait_time)
     
     def __str__(self):
-        return self.business
+        return str(self.wait_time)
 
 class capacityData(models.Model):
     business = models.CharField(max_length = 40, null = False, blank = False, unique = False)
@@ -234,9 +247,10 @@ class Subscriber(models.Model):
     ])
     skip_history = ListField(null = True, blank = True)
     last_pay_date = models.DateField(null = False, blank = False)
+
 # Custom User Profile
 class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=CASCADE, unique = True)
+    user = models.OneToOneField(User, on_delete=CASCADE, unique = True, related_name="profile")
     latitude = models.IntegerField(null = True, blank = True, validators= [
         MinValueValidator(-90),
         MaxValueValidator(90)
@@ -249,8 +263,7 @@ class Profile(models.Model):
     profile_pic = models.ImageField(blank = True, null = True, upload_to='Landing/pfps')
     favorite_businesses = ListField(null = True, blank = True)
     search_history = ListField(null = True, blank = True)
-    all_time_updates = models.ManyToManyField(waitData, blank=True, related_name='all_time_up')
-    all_capacity_updates = models.ManyToManyField(capacityData, blank=True, related_name='all_cap_up')
+    all_capacity_updates = models.ForeignKey(capacityData, null=True, blank=True, related_name='all_cap_up', on_delete=CASCADE)
     last_time_update = models.OneToOneField(waitData, null = True, blank = True, on_delete = models.SET_NULL)
     last_capacity_update = models.OneToOneField(capacityData, null = True, blank = True, on_delete = models.SET_NULL)
 
@@ -293,6 +306,7 @@ class Profile(models.Model):
 
 
         return str(instance.pk) 
+
 class Capacity(models.Model):
     business = models.CharField(max_length = 40, null = False, blank = False, unique = True)
     numReviews = models.IntegerField(validators = [
@@ -387,6 +401,7 @@ class Staff_Profile(models.Model):
 from django.core.serializers import serialize
 class Temp_Business_Manager(models.Manager):
     def isFloatNum(self, targetString):
+        print(targetString)
         try : 
             float(targetString)
             return(True)
@@ -408,7 +423,7 @@ class Temp_Business_Manager(models.Manager):
             )
             qs = self.get_queryset()
             qs = qs.annotate(distance=distance_raw_sql)
-            qs = qs.filter(distance__lt=radius).order_by('distance').values_list("placeID", flat=True)
+            qs = qs.filter(distance__lt=radius).order_by('distance').values_list("placeID", "wait_time__average", "wait_time__averagePeople")
             qs = qs[:10] # take only the first 10
             listOfPlaceIDs = []
             for place in qs.iterator():
@@ -418,14 +433,23 @@ class Temp_Business_Manager(models.Manager):
             return listOfPlaceIDs
         return('bad inputs') #escape out
 
-    def addWaitTime(self, placeID, waittimeperperson):
-        if (self.isFloatNum(waittimeperperson)):
-            # find the venue
+    def addWaitTime(self, waittimeperperson, numofpeople, placeID, user):
+        if (self.isFloatNum(waittimeperperson) and self.isFloatNum(numofpeople)):
+            # find the venue and add a review
             TarBiz = self.get(placeID=placeID)
-            TarBiz.wait_time
-            pass
+            print(TarBiz)
+            thisWaitTimes = TarBiz.wait_time
+            if (not thisWaitTimes):
+                thisWaitTimes = waitTimes(parentTemp=True)
+                thisWaitTimes.save()
+                TarBiz.wait_time = thisWaitTimes
+                TarBiz.save()
+            print(thisWaitTimes)
+            return thisWaitTimes.addReview(waittimeperperson, numofpeople, user)
+            
 
-
+        else:
+            return False    
 
 class Temp_Business(models.Model):
     lat = models.FloatField(blank = False, null = True)

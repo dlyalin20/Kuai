@@ -263,10 +263,10 @@ class Profile(models.Model):
     profile_pic = models.ImageField(blank = True, null = True, upload_to='Landing/pfps')
     favorite_businesses = ListField(null = True, blank = True)
     search_history = ListField(null = True, blank = True)
-    all_capacity_updates = models.ForeignKey(capacityData, null=True, blank=True, related_name='all_cap_up', on_delete=CASCADE)
+    # all_capacity_updates = models.ForeignKey(capacityData, null=True, blank=True, related_name='all_cap_up', on_delete=CASCADE)
     last_time_update = models.OneToOneField(waitData, null = True, blank = True, on_delete = models.SET_NULL)
-    last_capacity_update = models.OneToOneField(capacityData, null = True, blank = True, on_delete = models.SET_NULL)
-
+    # last_capacity_update = models.OneToOneField(capacityData, null = True, blank = True, on_delete = models.SET_NULL)
+    
     is_subscribed = models.BooleanField(default = False)
     subscription = models.OneToOneField(Subscriber, on_delete = CASCADE, null = True, blank = True)
     

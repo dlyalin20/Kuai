@@ -100,7 +100,6 @@ function closePopUp(){
 
 
 function popUpNext(event, setto=null){
-    // 
     if (setto){
         popup_step = setto
     }
@@ -110,7 +109,7 @@ function popUpNext(event, setto=null){
     switch (popup_step){
         case 1: 
             popup.find("#popup-input").show();
-            popup.find('#popupnext').html("Out Of Line!"); 
+            popup.find('#popupnext').html("Submit"); 
             break;
         default:
             //last step // leave

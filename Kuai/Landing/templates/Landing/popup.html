@@ -12,7 +12,7 @@
 
             <div class="tile is-ancestor is-2" style="height: 160px; width: 410px;">
                 <div class="tile is-parent">
-                    <article class="tile is-child notification is-white">
+                    <article class="tile is-child notification is-white" style="height: fit-content;">
                         <div class="content">
                                 <div class="columns">
                                     <div class = "column" style="padding: 0; margin: 0;">
@@ -34,11 +34,33 @@
                                         </p>
                                         <div id="popup-description"></div>
                                         <div id="popup-input">
-                                            <label class="people_in_front"> How many people in front of you </label>
+                                            <label class="wait_time_input">How long was the wait?</label>
+                                            <!-- <ul>
+                                                <li> -->
+                                                    <button value="5">5 mins</button>
+                                                <!-- </li>
+                                                <li> -->
+                                                    <button value="10">10 mins</button>
+                                                <!-- </li>
+                                                <li> -->
+                                                    <button value="15">15 mins</button>
+                                                <!-- </li>
+                                                <li> -->
+                                                    <button value="20">20 mins</button>
+
+                                                    <input type="number" placeholder="Custom-Time" style="width: 7em;"/>
+                                                    
+">
+                                                <!-- </li>
+                                            </ul> -->
+
+                                            
+                                            
+                                            <!-- <label class="people_in_front"> How many people in front of you </label>
                                             <input class="people_in_front" type="number" id="number_of_people" name="quantity" min="1" max="20">
                                             
                                             <label> More than 20: </label>
-                                            <input type="checkbox" id="overflow_people" name="morthan20">
+                                            <input type="checkbox" id="overflow_people" name="morthan20"> -->
                                         </div>
 
                                         <!-- <p style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;" id="waitTimeForm" class="content">Add Wait Time: </p> -->
@@ -64,7 +86,6 @@
                                                     </div>
                                                 </div>
                                             <!-- </form> -->
-                                        </p>
                                            <!-- <p style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;" class="content"> Add Wait Times: </p>
                                             <span style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;">
                                                 <div class="table-container" style="width: 100px; white-space: nowrap; padding: 0; margin: 0; font-size: 13px; color: darkblue;">
@@ -80,7 +101,6 @@
                                                     </table>
                                                 </div>
                                                 </span>-->
-                                            <br /></p>
                                         <!--<p style="padding: 0; margin: 0; font-size: 15px; color: darkblue;" class="content">
                                             Capacity: 
                                             {% if capacity %}  

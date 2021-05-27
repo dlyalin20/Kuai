@@ -18,10 +18,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
         Temp_Business = apps.get_model('Landing', 'Temp_Business')
         return Temp_Business.objects.search(lat, lon, radius)
     @sync_to_async
-    def addToWait(self, waittimeperperson, numofpeople, placeID, user):
+    def addToWait(self, waitTime, placeID, user):
         Temp_Business = apps.get_model('Landing', 'Temp_Business')
         # add wait time to Biz and return the wait data object
-        review = Temp_Business.objects.addWaitTime(waittimeperperson, numofpeople, placeID, user)
+        review = Temp_Business.objects.addWaitTime(waitTime, placeID, user)
         if (review):
         #     # link object to user profile
             print(user)
@@ -52,13 +52,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.user = self.scope["user"]
             placeID = text_data_json['placeID']
             # run wait time query
-            waittimeperperson = text_data_json['waittimeperperson']
-            numofpeople = text_data_json['numofpeople']
+            waitTime = text_data_json['OverallTime']
             placeID = text_data_json['placeID']
-            if (waittimeperperson and placeID and self.user):
-                print("recieved waittimeperperson: " + str(waittimeperperson) + " placeID: "+ str(placeID))
+            if (waitTime and placeID and self.user):
+                print("recieved waitTime: " + str(waitTime) + " placeID: "+ str(placeID))
                 # add to db
-                qs = await self.addToWait(waittimeperperson, numofpeople, placeID, self.user)
+                qs = await self.addToWait(waitTime, placeID, self.user)
                 await self.send(text_data=json.dumps(qs))
             await self.send("bad input")
 

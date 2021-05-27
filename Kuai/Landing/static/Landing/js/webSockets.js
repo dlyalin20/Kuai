@@ -20,6 +20,7 @@ chatSocket.onmessage = function(e) {
         if(data == null || data.length == 0){
             alert("No results found")
         }else{
+            console.log(data);
             bizHash = new hashtable();
             // array found: display the markers on the map
             // data[i].place_id ; data[i].lat, data[i].lon
@@ -30,7 +31,7 @@ chatSocket.onmessage = function(e) {
                 let temp = new Business(data[i][0], null, null, function(){
                     this.addHash(); //eventually adds hash
                     this.pushDivDescription();             
-                }, i, data[i][1], data[i][2]);
+                }, i, data[i][1]);
                 // console.log(placeLocation);
                 // createMarker(placeLocation);
                 // queryService(data[i], placeResult, i)
@@ -58,11 +59,10 @@ function queryDB( lat = 40.6237542, lon = -73.913696, radius = 10){
     }    
 }
 
-function waitTimeAvgData(OverallTime, NumOfPeople, placeID){
+async function waitTimeAvgData(OverallTime, placeID){
     data =  JSON.stringify({
         'finalData': true,
-        'waittimeperperson': OverallTime*1.0 / NumOfPeople, 
-        'numofpeople': NumOfPeople,
+        'OverallTime': OverallTime,
         'placeID': placeID,
         })
     console.log(data);

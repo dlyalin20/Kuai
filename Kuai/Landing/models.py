@@ -156,7 +156,6 @@ class waitTimes(models.Model):
     parentTemp = models.BooleanField(default=False) #parent will either be tempbiz for true or biz for false
     # reviews = models.ManyToManyField(waitData, related_name="bizWait", verbose_name="list of revews")
     average = models.FloatField(validators = [MinValueValidator(0)], default = 0, null = False, blank = False)
-    averagePeople = models.FloatField(validators = [MinValueValidator(0)], default = 0, null = False, blank = False)
     # 'reviews', 
     REQUIRED_FIELDS = ['average', "averagePeople", 'parentTemp']
 
@@ -166,19 +165,17 @@ class waitTimes(models.Model):
         else:
             return self.biz
 
-    def addReview(self, waittimeperperson, numofpeople, user):
-        print(str(waittimeperperson) + " " + str(numofpeople)) 
+    def addReview(self, waitTime, user):
+        print(str(waitTime) + " ") 
         if (self.average == -1):
             # this is the first average
-            self.average = waittimeperperson
-            self.averagePeople = numofpeople
+            self.average = waitTime
         else:
             # average accounting for other times
             currentcount = self.review.count()
-            self.average = (((self.average * currentcount) + waittimeperperson) / (currentcount + 1))
-            self.averagePeople = (((self.averagePeople * currentcount) + float(numofpeople)) / (currentcount + 1))
+            self.average = (((self.average * currentcount) + float(waitTime)) / (currentcount + 1))
         self.save()
-        review = self.review.create(wait_time=waittimeperperson, numofpeople=numofpeople, author=user.profile)
+        review = self.review.create(wait_time=waitTime, author=user.profile)
         review.save()
         return review
 
@@ -196,8 +193,6 @@ class waitTimes(models.Model):
 class waitData(models.Model):
     # business = models.CharField(max_length = 40, null = False, blank = False, unique = False)
     wait_time = models.FloatField(validators = [MinValueValidator(0)], null = False, blank = False)
-    numofpeople = models.FloatField(validators = [MinValueValidator(0)], null = False, blank = False)
-
     # author = models.OneToOneField(User, max_length = 20, null = False, blank = False, on_delete=models.CASCADE)
     waitTimes = models.ForeignKey(waitTimes, on_delete=models.CASCADE, related_name="review", null=True, blank=True)
     timestamp = models.DateTimeField(default = django.utils.timezone.now, null = False, blank = False,)
@@ -423,7 +418,7 @@ class Temp_Business_Manager(models.Manager):
             )
             qs = self.get_queryset()
             qs = qs.annotate(distance=distance_raw_sql)
-            qs = qs.filter(distance__lt=radius).order_by('distance').values_list("placeID", "wait_time__average", "wait_time__averagePeople")
+            qs = qs.filter(distance__lt=radius).order_by('distance').values_list("placeID", "wait_time__average")
             qs = qs[:10] # take only the first 10
             listOfPlaceIDs = []
             for place in qs.iterator():
@@ -433,19 +428,19 @@ class Temp_Business_Manager(models.Manager):
             return listOfPlaceIDs
         return('bad inputs') #escape out
 
-    def addWaitTime(self, waittimeperperson, numofpeople, placeID, user):
-        if (self.isFloatNum(waittimeperperson) and self.isFloatNum(numofpeople)):
+    def addWaitTime(self, waitTime, placeID, user):
+        if (self.isFloatNum(waitTime)):
             # find the venue and add a review
             TarBiz = self.get(placeID=placeID)
             print(TarBiz)
             thisWaitTimes = TarBiz.wait_time
-            if (not thisWaitTimes):
+            if (not thisWaitTimes): #if related wait time row doesnt exist, make row
                 thisWaitTimes = waitTimes(parentTemp=True)
                 thisWaitTimes.save()
                 TarBiz.wait_time = thisWaitTimes
                 TarBiz.save()
             print(thisWaitTimes)
-            return thisWaitTimes.addReview(waittimeperperson, numofpeople, user)
+            return thisWaitTimes.addReview(waitTime, user)
             
 
         else:

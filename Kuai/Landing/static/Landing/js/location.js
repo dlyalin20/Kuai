@@ -1,11 +1,32 @@
+class hashtable {
+    constructor(){
+        this.list = [];
+    }
+    async doesExistorAdd(placeID, array_index_plus1) {
+        var x = await getHash(placeID)
+        var dv = new DataView(x);
+        var hash = dv.getInt32();
+        if (this.list[hash]){
+            return true;
+        }else{
+            this.list[hash] = array_index_plus1;
+            return false;
+        }
+    }
+}
+
+var targetBiz; 
+
 class Business{
     // location new google.maps.LatLng(location);
     //Call back is run after contructor is done
-    constructor(placeID, location=null, name=null, callback=null){
+    constructor(placeID, location=null, name=null, callback=null, array_index, waitTime = null){
+        this.waitTime = waitTime;
         this.placeID = placeID;
         this.infowindow = new google.maps.InfoWindow;
         this.callback = callback;
-        if (!(location && name)){
+        this.array_index_plus1 = array_index + 1; // plus one to avoid the number coming back as false
+        if (!(location && name)){ 
             // run Places Details request to get lat lng and name
             const hold = this;
             let y = queryService(placeID, function(x){
@@ -26,8 +47,12 @@ class Business{
                 this.callback();
             }
         }
-    }
+    
 
+        
+        
+    }
+    
     fillLocals( results){
         let pos = results.geometry.location
         // temp = new Promise(accept, reject){
@@ -53,14 +78,23 @@ class Business{
         }
         this.marker.setMap(map);
     }
+    addHash(){
+        bizHash.doesExistorAdd(this.placeID, this.array_index_plus1);
+    }
 
+    async testHash(){
+        //if place_id hash already exists returns true
+        //else returns false
+        return await bizHash.doesExistorAdd(this.placeID, this.array_index_plus1);
+    }
     hideMarker(){
         if (this.marker){
             this.marker.setMap(null);
         }        
     }
 
-    async pushDivDescription(i){
+    async pushDivDescription(){ // what happends when u click on the marker
+        var i = this.array_index_plus1;
         if (!(this.position && this.marker)){
             await this.position;
             this.marker = new google.maps.Marker({
@@ -68,18 +102,25 @@ class Business{
             });
         }
         this.showMarker();
-        // jQuery('<div/>', {
-        //     "class": '<div class="option-items>"',
-        //     'css': 'now this div has a title!',
-        //     'style': "order:" + i,
-        // }).on("click", function(){
-        //     map.setCenter(this.position)
-        // }).appendTo('choices');
-        console.log(`<div class='option-items'>` + (i + 1) + '. ' + this.name + '|' + this.position + `</div>`);
+        let baseObject = `<div class='option-items'>` + i + '. ' + this.name + '|' + this.position + `</div>`;
+        console.log(baseObject);
         const parent = this;
-        let myDiv = $(`<div class='option-items'>` + (i + 1) + '. ' + this.name + '|' + this.position + `</div>`)
+        let myDiv = $(baseObject)
             .on("click", function(){
-                map.setCenter(parent.position)
+                if (targetBiz == this){
+                    closePopUp();
+                    targetBiz = null;
+                }else{
+                    targetBiz = parent;
+                    map.panTo(parent.position)
+                    map.setZoom(18);
+                    if (parent.waitTime){
+                        openPopUp(parent.name, parent.placeID, parent.waitTime);
+                    }
+                    else{
+                        openPopUp(parent.name, parent.placeID);
+                    }
+                }
             })
             .css("order", i)
             .appendTo(choices)
@@ -89,22 +130,14 @@ class Business{
 
 
     }
-
-    // toHash(){
-    //     temp = "";
-    //     for (var i = 0; i < this.placeID.length; i++){
-    //         let charater = this.placeID.charAt(i);
-    //         if (!isNaN(charater)){
-    //             // if its a number
-    //             temp += charater;
-    //         }else{
-    //             // convert to ascii
-                
-    //         }
-    //     }
-    //     return 
-    // }
 }
+// Run SHA-256 on data
+async function getHash(string){
+    const encoder = new TextEncoder();
+    const data = encoder.encode(string);
+    const hash = await crypto.subtle.digest('SHA-256', data);
+    return hash;
+} 
 
 async function settleCoords(lat, lng){
     let templat = await lat();

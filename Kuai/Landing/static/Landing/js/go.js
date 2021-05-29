@@ -260,6 +260,30 @@ function nearbySearch(){ //plots the nearby locations
     }
 }
 
+async function placeResultsToMarkers(results, ){
+    // choices.html("");
+    // clearMarkers();
+    var pointer = 0;
+    for (let index = 0; index < results.length; index++) {
+        const element = results[index];
+        // createMarker(element);
+        // placeResult(element, index);
+        if (!(await bizHash.doesExistorAdd(element.place_id, markers.length))){
+            x = new Business(element.place_id, element.geometry.location, element.name, async function(){
+                this.pushDivDescription();
+            }, markers.length);
+            markers.push(x);   
+        }
+        
+        
+
+    }
+}
+
+
+
+
+
 // take array of objects
 /*element
     - geometry
@@ -267,27 +291,6 @@ function nearbySearch(){ //plots the nearby locations
     - name
 */
 
-function placeResultsToMarkers(results, ){
-    choices.html("");
-    clearMarkers();
-    for (let index = 0; index < results.length; index++) {
-        const element = results[index];
-        createMarker(element);
-        placeResult(element, index);
-  
-
-    }
-}
-
-function placeResult(element, index){
-    newChoice = $(`<div class='option-items' location = `+element.geometry.location+`>
-    ` + (index + 1) + '. ' + element.name + '|' + element.geometry.location +
-    `</div>`).on("click", function(){
-        map.setCenter(element.geometry.location)
-    });
-    choices.append(newChoice);
-
-}
 
 
 // return [firstpos, listofMarkers ]
@@ -487,27 +490,31 @@ function toggleSidePanel(params) {
     }
 }
 
-//input: list of place results
+
+// redo later
+//input: list of place results taken in from initial search query
 //post-condition: plotted markers and result divs
 // results.place_id
 async function plotListMarkers(results) {
-    choices.html("");
-    clearMarkers()
+    // choices.html("");
     // turn this in to plant markers function
     for (let i = 0; i < results.length; i++) {
         await new Promise(function(accept, reject){
-            markers = new Array()
-            var choicesArray= new Array(data.length);
+            const start = markers.length -1;
+            var pointer = 0;
             for (let i = 0; i < data.length; i++){
-                choices.html("");
-                let temp = new Business(results[i].place_id, null, null, function(){
-                    this.pushDivDescription(i);                
-    
-                });
+                // choices.html("");
+                new Business(results[i].place_id, null, null, async function(){
+                    if (!await this.testHash()){
+                        this.pushDivDescription();
+                        markers.push(temp);
+                        pointer ++;
+                    }
+                }, start + pointer);
                 // console.log(placeLocation);
                 // createMarker(placeLocation);
                 // queryService(data[i], placeResult, i)
-                markers.push(temp);
+                // markers.push(temp);
             }
             // queryService(results[i].place_id, function (thisMarkerLocation){
             //     if (thisMarkerLocation){
@@ -526,7 +533,6 @@ async function plotListMarkers(results) {
             
             // });
             })
-        
     }
 }
 
@@ -536,7 +542,6 @@ function createMarker(place) {
         map,
         position: place.geometry.location,
     });
-    markers.push(marker);
     infowindow = new google.maps.InfoWindow;
     
 }
@@ -546,4 +551,5 @@ function clearMarkers(){
         
     }
     markers = new Array();
+    bizHash = new hashtable();
 }

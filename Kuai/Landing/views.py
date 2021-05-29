@@ -179,7 +179,7 @@ def go(request):
                     tempBiz.updateTime()
                 else: # other wise create temp
                     print('creating tempBiz')
-                    tempBiz = Temp_Business(xcor = i['coords']['lat'], ycor = i['coords']['lng'], placeID = i['placeID']) 
+                    tempBiz = Temp_Business(lat = i['coords']['lat'], lon = i['coords']['lng'], placeID = i['placeID']) 
                     tempBiz.save()
                     pass
 
@@ -327,7 +327,10 @@ def longCapacity(request):
 
 #def a(request):
 
+def testing(request):
+    return render(request, "Landing/popup.html", {
 
+    })
 """ def skip(request):
     if request.user.profile.subscription_type == 'BASIC':
        # surge pricing

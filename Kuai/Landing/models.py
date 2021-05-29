@@ -191,7 +191,7 @@ class waitTimes(models.Model):
 class waitData(models.Model):
     # business = models.CharField(max_length = 40, null = False, blank = False, unique = False)
     wait_time = models.FloatField(validators = [MinValueValidator(0)], null = False, blank = False)
-    # author = models.OneToOneField(User, max_length = 20, null = False, blank = False, on_delete=models.CASCADE)
+   # # author = models.OneToOneField(User, max_length = 20, null = False, blank = False, on_delete=models.CASCADE)
     waitTimes = models.ForeignKey(waitTimes, on_delete=models.CASCADE, related_name="review", null=True, blank=True)
     timestamp = models.DateTimeField(default = django.utils.timezone.now, null = False, blank = False,)
     author = models.ForeignKey("Profile", related_name='all_time_updates', on_delete=CASCADE)
@@ -257,9 +257,9 @@ class Profile(models.Model):
     profile_pic = models.ImageField(blank = True, null = True, upload_to='Landing/pfps')
     favorite_businesses = models.ManyToManyField('Business', blank = True)
     search_history = ListField(null = True, blank = True)
-    all_time_updates = models.ManyToManyField(waitData, blank=True, related_name='all_time_up')
+    alltime = models.ManyToManyField(waitData, blank=True)
     all_capacity_updates = models.ManyToManyField(capacityData, blank=True, related_name='all_cap_up')
-    last_time_update = models.OneToOneField(waitData, null = True, blank = True, on_delete = SET_NULL)
+    last_time_update = models.OneToOneField(waitData, null = True, blank = True, on_delete = SET_NULL, related_name = 'lastime')
     last_capacity_update = models.OneToOneField(capacityData, null = True, blank = True, on_delete = SET_NULL)
 
     is_subscribed = models.BooleanField(default = False)

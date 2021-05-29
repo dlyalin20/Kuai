@@ -50,7 +50,7 @@ def addWaitTime(request, ID, time):
     business.wait_time = times
     business.save()
     user.profile.last_time_update = entry
-    user.profile.all_time_updates.add(entry)
+    user.profile.alltime.add(entry)
     user.save()
     """ entry = waitData(business = ID, wait_time = time, author = request.user)
     entry.save()

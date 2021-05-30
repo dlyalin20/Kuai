@@ -49,10 +49,11 @@
 .option-items{
   font-size: 1.5vw;
   margin: 5%;
-  background-color: red;
+  background-color: white;
   border-radius: 30px;
+  border-color: black;
   padding: 5%;
-  color: white;
+  color: black;
   text-align: center;
 }
       #description {

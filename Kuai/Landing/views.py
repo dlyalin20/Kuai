@@ -265,7 +265,7 @@ def login_view(request):
     #     if user is not None:
     #         login(request, user)
     #         return HttpResponseRedirect('/')
-    return render(request, "Landing/login.html", {
+    return render(request, "account/login.html", {
         "form":UserLoginForm()
     })
 @login_required(login_url='/accounts/login/')

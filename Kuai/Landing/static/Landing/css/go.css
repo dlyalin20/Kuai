@@ -58,10 +58,10 @@
 .option-items{
   font-size: 1.5vw;
   margin: 5%;
-  background-color: red;
+  background-color: rgb(255, 255, 255);
   border-radius: 30px;
   padding: 5%;
-  color: white;
+  color: purple;
   text-align: center;
 }
       #description {

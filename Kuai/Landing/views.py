@@ -5,13 +5,13 @@ import time
 import datetime
 from django import forms
 from django.urls import reverse
-from .models import Temp_Business, User, AccountManager
+from .models import Business, User, AccountManager
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import get_object_or_404, render, redirect
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from .models import waitData, capacityData, waitTimes, Capacity, validate_user, validate_pwd, Business
+from .models import waitData, validate_user, validate_pwd, Business
 
 def business_exists(ID):
     try:
@@ -19,107 +19,107 @@ def business_exists(ID):
         return business
     except ObjectDoesNotExist:
         try:
-            business = Temp_Business.objects.get(placeID = ID)
+            business = Business.objects.get(placeID = ID)
             return business
         except ObjectDoesNotExist:
-            business = Temp_Business(placeID = ID)
+            business = Business(placeID = ID)
             business.save()
             return business
 
 
-# format to handle requests and check for integers
-# also filter data
-def addWaitTime(request, ID, time):
-    user = request.user
-    """ if user.profile.wait_too_soon(ID): 
-        print("Too Soon")
-        return """
-    business = business_exists(ID)
-    entry = waitData(business = business, wait_time = time, author = request.user)
-    entry.save()
-    try:
-        times = waitTimes.objects.get(business = business)
-        product = times.numReviews * times.average
-        product += int(time)
-        times.numReviews += 1
-        times.average = product / times.numReviews
-        times.save()
-    except ObjectDoesNotExist:
-            times = waitTimes(business = business, numReviews = 1, average = time)
-            times.save()
-    business.wait_time = times
-    business.save()
-    user.profile.last_time_update = entry
-    user.profile.alltime.add(entry)
-    user.save()
-    """ entry = waitData(business = ID, wait_time = time, author = request.user)
-    entry.save()
-    try:
-        times = waitTimes.objects.get(business = ID)
-        product = times.numReviews * times.average
-        product += int(time)
-        times.numReviews += 1
-        times.average = product / times.numReviews
-        times.save()
-    except ObjectDoesNotExist:
-        times = waitTimes(business = ID, numReviews = 1, average = time)
-        times.save()
-    try:
-        business = Business.objects.get(placeID = ID)
-        if business.wait_time is None:
-            business.wait_time = times
-            business.save()
-    except ObjectDoesNotExist:
-        try:
-            business = Temp_Business.objects.get(placeID = ID)
-            if business.wait_time is None:
-                business.wait_time = times
-                business.save()
-        except ObjectDoesNotExist:
-            business = Temp_Business(placeID = ID)
-            business.wait_time = times
-            business.save()
-    user.profile.last_time_update = entry
-    user.profile.all_time_updates.add(entry)
-    user.save() """
+# # format to handle requests and check for integers
+# # also filter data
+# def addWaitTime(request, ID, time):
+#     user = request.user
+#     """ if user.profile.wait_too_soon(ID): 
+#         print("Too Soon")
+#         return """
+#     business = business_exists(ID)
+#     entry = waitData(business = business, wait_time = time, author = request.user)
+#     entry.save()
+#     try:
+#         times = waitTimes.objects.get(business = business)
+#         product = times.numReviews * times.average
+#         product += int(time)
+#         times.numReviews += 1
+#         times.average = product / times.numReviews
+#         times.save()
+#     except ObjectDoesNotExist:
+#             times = waitTimes(business = business, numReviews = 1, average = time)
+#             times.save()
+#     business.wait_time = times
+#     business.save()
+#     user.profile.last_time_update = entry
+#     user.profile.alltime.add(entry)
+#     user.save()
+#     """ entry = waitData(business = ID, wait_time = time, author = request.user)
+#     entry.save()
+#     try:
+#         times = waitTimes.objects.get(business = ID)
+#         product = times.numReviews * times.average
+#         product += int(time)
+#         times.numReviews += 1
+#         times.average = product / times.numReviews
+#         times.save()
+#     except ObjectDoesNotExist:
+#         times = waitTimes(business = ID, numReviews = 1, average = time)
+#         times.save()
+#     try:
+#         business = Business.objects.get(placeID = ID)
+#         if business.wait_time is None:
+#             business.wait_time = times
+#             business.save()
+#     except ObjectDoesNotExist:
+#         try:
+#             business = Business.objects.get(placeID = ID)
+#             if business.wait_time is None:
+#                 business.wait_time = times
+#                 business.save()
+#         except ObjectDoesNotExist:
+#             business = Business(placeID = ID)
+#             business.wait_time = times
+#             business.save()
+#     user.profile.last_time_update = entry
+#     user.profile.all_time_updates.add(entry)
+#     user.save() """
 
-# format to handle requests and check for integers
-# also filter data
-def addCapacity(request, ID, capacity):
-    user = request.user
-    if user.profile.capacity_too_soon(ID): 
-        print("Too Soon")
-        return
-    entry = capacityData(business = ID, capacity = capacity, author = request.user.username)
-    entry.save()
-    try:
-        capacities = Capacity.objects.get(business = ID)
-        product = capacities.numReviews * capacities.average
-        product += int(capacity)
-        capacities.numReviews += 1
-        capacities.average = product / capacities.numReviews
-        capacities.save()
-    except ObjectDoesNotExist:
-        capacities = Capacity(business = ID, numReviews = 1, average = capacity)
-        capacities.save()
-    try:
-        business = Business.objects.get(placeID = ID)
-        if business.capacity is None:
-            business.capacity = capacities
-            business.save()
-    except ObjectDoesNotExist:
-        try:
-            business = Temp_Business.objects.get(placeID = ID)
-            if business.capacity is None:
-                business.capacity = capacities
-                business.save()
-        except ObjectDoesNotExist:
-            business = Temp_Business(placeID = ID)
-            business.capacity = capacities
-            business.save()
-    user.profile.last_capacity_update = entry
-    user.profile.all_capacity_updates.add(entry)
-    user.save()
+# # format to handle requests and check for integers
+# # also filter data
+# def addCapacity(request, ID, capacity):
+#     user = request.user
+#     if user.profile.capacity_too_soon(ID): 
+#         print("Too Soon")
+#         return
+#     entry = capacityData(business = ID, capacity = capacity, author = request.user.username)
+#     entry.save()
+#     try:
+#         capacities = Capacity.objects.get(business = ID)
+#         product = capacities.numReviews * capacities.average
+#         product += int(capacity)
+#         capacities.numReviews += 1
+#         capacities.average = product / capacities.numReviews
+#         capacities.save()
+#     except ObjectDoesNotExist:
+#         capacities = Capacity(business = ID, numReviews = 1, average = capacity)
+#         capacities.save()
+#     try:
+#         business = Business.objects.get(placeID = ID)
+#         if business.capacity is None:
+#             business.capacity = capacities
+#             business.save()
+#     except ObjectDoesNotExist:
+#         try:
+#             business = Business.objects.get(placeID = ID)
+#             if business.capacity is None:
+#                 business.capacity = capacities
+#                 business.save()
+#         except ObjectDoesNotExist:
+#             business = Business(placeID = ID)
+#             business.capacity = capacities
+#             business.save()
+#     user.profile.last_capacity_update = entry
+#     user.profile.all_capacity_updates.add(entry)
+#     user.save()
 
 
 # login form
@@ -172,15 +172,15 @@ def go(request):
         for i in data:
             # print(i) 
             if (i['placeID'] and not Business.objects.filter(placeID=i['placeID']).exists()):
-                targetQuery = Temp_Business.objects.filter(placeID=i['placeID'])
+                targetQuery = Business.objects.filter(placeID=i['placeID'])
                 if targetQuery.exists():#temp busness if exist then update time
                     print('exists already')
-                    tempBiz = targetQuery.get()
-                    tempBiz.updateTime()
+                    Biz = targetQuery.get()
+                    Biz.updateTime()
                 else: # other wise create temp
-                    print('creating tempBiz')
-                    tempBiz = Temp_Business(lat = i['coords']['lat'], lon = i['coords']['lng'], placeID = i['placeID']) 
-                    tempBiz.save()
+                    print('creating Biz')
+                    Biz = Business(lat = i['coords']['lat'], lon = i['coords']['lng'], placeID = i['placeID']) 
+                    Biz.save()
                     pass
 
             else:

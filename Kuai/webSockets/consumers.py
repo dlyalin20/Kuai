@@ -15,13 +15,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
     # @database_sync_to_async
     @sync_to_async
     def nearbySearch(self, lat, lon, radius):
-        Temp_Business = apps.get_model('Landing', 'Temp_Business')
-        return Temp_Business.objects.search(lat, lon, radius)
+        Business = apps.get_model('Landing', 'Business')
+        return Business.objects.search(lat, lon, radius)
     @sync_to_async
     def addToWait(self, waitTime, placeID, user):
-        Temp_Business = apps.get_model('Landing', 'Temp_Business')
+        Business = apps.get_model('Landing', 'Business')
         # add wait time to Biz and return the wait data object
-        review = Temp_Business.objects.addWaitTime(waitTime, placeID, user)
+        review = Business.objects.addWaitTime(waitTime, placeID, user)
         if (review):
         #     # link object to user profile
             print(user)

@@ -17,6 +17,8 @@ from django.core.exceptions import ValidationError
 from django.db.models.deletion import CASCADE, SET_NULL
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import User, PermissionsMixin, AbstractBaseUser, BaseUserManager
+from django.db.models.functions import Now
+
 # speed test the querying, add a second models file, add new businesses to popup
 
 # validators
@@ -150,54 +152,19 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.username
 
-class waitTimes(models.Model):
-    parentTemp = models.BooleanField(default=False) #parent will either be tempbiz for true or biz for false
-    # reviews = models.ManyToManyField(waitData, related_name="bizWait", verbose_name="list of revews")
-    average = models.FloatField(validators = [MinValueValidator(0)], default = 0, null = False, blank = False)
-    # 'reviews', 
-    REQUIRED_FIELDS = ['average', "averagePeople", 'parentTemp']
-
-    def getParent(self):
-        if self.parentTemp:
-            return self.tempbiz
-        else:
-            return self.biz
-
-    def addReview(self, waitTime, user):
-        print(str(waitTime) + " ") 
-        if (self.average == -1):
-            # this is the first average
-            self.average = waitTime
-        else:
-            # average accounting for other times
-            currentcount = self.review.count()
-            self.average = (((self.average * currentcount) + float(waitTime)) / (currentcount + 1))
-        self.save()
-        review = self.review.create(wait_time=waitTime, author=user.profile)
-        review.save()
-        return review
-
-    
-
-    def get_short_name(self):
-        return str(self.pk)
-
-    def natural_key(self):
-        return str(self.pk)
-
-    def __str__(self):
-        return str(self.pk)
+def getExperationTime():
+    return django.utils.timezone.now() + django.utils.timezone.timedelta(minutes=5)
 
 class waitData(models.Model):
     # business = models.CharField(max_length = 40, null = False, blank = False, unique = False)
     wait_time = models.FloatField(validators = [MinValueValidator(0)], null = False, blank = False)
    # # author = models.OneToOneField(User, max_length = 20, null = False, blank = False, on_delete=models.CASCADE)
-    waitTimes = models.ForeignKey(waitTimes, on_delete=models.CASCADE, related_name="review", null=True, blank=True)
-    timestamp = models.DateTimeField(default = django.utils.timezone.now, null = False, blank = False,)
+    business = models.ForeignKey("Business", on_delete=models.CASCADE, related_name="review", null=True, blank=True)
+    expiration_time = models.DateTimeField(default = getExperationTime, null = False, blank = False,)
     author = models.ForeignKey("Profile", related_name='all_time_updates', on_delete=CASCADE)
 
 # 'business', 
-    REQUIRED_FIELDS = ['wait_time', "numofpeople", 'author', 'waitTimes', 'timestamp']
+    REQUIRED_FIELDS = ['wait_time', 'author', 'business', 'expiration_time']
 
     def is_old(self):
         return (datetime.datetime.now() - self.timestamp).minutes + ((datetime.datetime.now() - self.timestamp).hours * 60) >= self.wait_time
@@ -211,28 +178,6 @@ class waitData(models.Model):
     def __str__(self):
         return str(self.wait_time)
 
-class capacityData(models.Model):
-    business = models.ForeignKey('Business', null = True, blank = False, unique = False, on_delete = CASCADE)
-    capacity = models.FloatField(validators = [
-        MinValueValidator(0),
-        MaxValueValidator(100)
-    ], null = False, blank = False)
-    author = models.ForeignKey('User', max_length = 20, null = True, blank = False, on_delete = CASCADE)
-    timestamp = models.DateTimeField(auto_now = True, null = False, blank = False)
-
-    REQUIRED_FIELDS = ['business', 'capacity', 'author', 'timestamp']
-
-    def two_hours(self):
-        return (datetime.datetime.now() - self.timestamp).hours >= 2
-
-    def get_short_name(self):
-        return self.business
-
-    def natural_key(self):
-        return self.business
-    
-    def __str__(self):
-        return self.business
 class Subscriber(models.Model):
     account = models.ForeignKey('Profile', null = True, on_delete = CASCADE, )
     skips = models.IntegerField(default = 15, null = False, blank = False, validators = [
@@ -257,10 +202,7 @@ class Profile(models.Model):
     profile_pic = models.ImageField(blank = True, null = True, upload_to='Landing/pfps')
     favorite_businesses = models.ManyToManyField('Business', blank = True)
     search_history = ListField(null = True, blank = True)
-    alltime = models.ManyToManyField(waitData, blank=True)
-    all_capacity_updates = models.ManyToManyField(capacityData, blank=True, related_name='all_cap_up')
     last_time_update = models.OneToOneField(waitData, null = True, blank = True, on_delete = SET_NULL, related_name = 'lastime')
-    last_capacity_update = models.OneToOneField(capacityData, null = True, blank = True, on_delete = SET_NULL)
 
     is_subscribed = models.BooleanField(default = False)
     subscription = models.OneToOneField(Subscriber, on_delete = SET_NULL, null = True, blank = True)
@@ -297,88 +239,96 @@ class Profile(models.Model):
     @receiver(post_save, sender=User)
     def save_user_profile(sender, instance, **kwargs):
         instance.profile.save()
-
-
         return str(instance.pk) 
 
-class Capacity(models.Model):
-    business = models.OneToOneField('Business', null = False, blank = False, unique = True, on_delete = CASCADE, related_name = "biz")
-    numReviews = models.IntegerField(validators = [
-        MinValueValidator(0)
-    ], default = 0, null = False, blank = False)
-    average = models.FloatField(validators = [
-        MinValueValidator(0),
-        MaxValueValidator(100)
-    ], default = 0, null = False, blank = False)
+
+class Business_Manager(models.Manager):
+    def isFloatNum(self, targetString):
+        print(targetString)
+        try : 
+            float(targetString)
+            return(True)
+        except :
+            print("Not a float")
+            return(False)
     
-    REQUIRED_FIELDS = ['business', 'numReviews', 'average']
+    def search(self, latitude, longitude, radius): # radius in kms
+        if (self.isFloatNum(latitude) and self.isFloatNum(longitude) and self.isFloatNum(radius)): 
+            # Great circle distance formula
+            gcd_formula = "6371 * acos(min(max(\
+            cos(radians(%s)) * cos(radians(lat)) \
+            * cos(radians(lon) - radians(%s)) + \
+            sin(radians(%s)) * sin(radians(lat)) \
+            , -1), 1))"
+            distance_raw_sql = RawSQL(
+                gcd_formula,
+                (latitude, longitude, latitude)
+            )
+            qs = self.get_queryset()
+            qs = qs.annotate(distance=distance_raw_sql)
+            qs = qs.filter(distance__lt=radius).order_by('distance')
+            # .values_list("placeID", flat=True)
+            qs = qs[:10] # take only the first 10
+            listOfPlaceIDs = []
+            for place in qs.iterator():
+                # get wait time average
+                listOfPlaceIDs.append([place.placeID, place.getAverage()])
+            # data = serialize("json", [ qs, ])
+            print('qs: ' + str(listOfPlaceIDs))
+            return listOfPlaceIDs
+        return('bad inputs') #escape out
 
-    def get_short_name(self):
-        return self.business
-
-    def natural_key(self):
-        return self.business
-
-    def __str__(self):
-        return self.business.placeID
-
-class Queues(models.Model):
-    affiliatedBusiness = models.ForeignKey('Business', on_delete = CASCADE)
-    free_queue = ListField(null = True, blank = True)
-    skip_queue = ListField(null = True, blank = True)
-
-    def __str__(self):
-        return self.affiliatedBusiness
+    def addWaitTime(self, waitTime, placeID, user):
+        if (self.isFloatNum(waitTime)):
+            # find the venue and add a review
+            TarBiz = self.get(placeID=placeID)
+            print(TarBiz)
+            review = TarBiz.review.create(wait_time=waitTime, author=user.profile)
+            review.save()
+            return review
+        else:
+            return False    
 
 class Business(models.Model):
-    name = models.CharField(max_length = 40, null = False, blank = False, unique = True)
-    lat = models.FloatField(null = False, blank = False)
-    lon = models.FloatField(null = False, blank = False)
-    verified = models.BooleanField(default = False)
-    wait_time = models.OneToOneField(waitTimes, null = True, blank = True, on_delete = SET_NULL, related_name = 'time')
-    capacity = models.OneToOneField(Capacity, null = True, blank = True, on_delete = SET_NULL, related_name='cap')
+    lat = models.FloatField(blank = False, null = True)
+    lon = models.FloatField(blank = False, null = True)
+    verified = models.BooleanField(null = False, blank = False, default = False)
+    cached_time = models.DateTimeField(auto_now = True, null = False, blank = False)
     placeID = models.TextField(null = False, blank=False, unique = True, default = False)
-    queue = models.OneToOneField(Queues, blank = True, null = True, on_delete = CASCADE)
-    REQUIRED_FIELDS = ['name', 'lat', 'lon', 'verified']
+    REQUIRED_FIELDS = ['lat', 'lon', 'verified', 'placeID', "cached_time"]
+
+    def twenty_days(self):
+        return (datetime.datetime.now() - self.cached_time).days >= 20
+
+    def updateTime(self):
+        self.cached_time = django.utils.timezone.now()
 
     def get_short_name(self):
-        return self.name
+        return self.placeID
 
     def natural_key(self):
-        return self.name
-
+        return self.placeID
+     
     def __str__(self):
-        return self.name
+        return self.placeID
 
-class Business_Profile(models.Model):
-    user = models.OneToOneField(User, on_delete = CASCADE, unique = True)
-    businesses = models.ManyToManyField(Business, blank = True)
+    def getAverage(self):
+    # average accounting for other times
+        qs = self.review.filter(expiration_time__lt=Now()).values_list("wait_time")
+        mySum = 0
+        count = 0
+        for waittime in qs.iterator():
+            mySum += waittime.wait_time
+            count += 1
+        if mySum == 0:
+            return "N/A"
+        return (mySum / count)
 
-    REQUIRED_FIELDS = ['user']
-
-    @receiver(post_save, sender=User)
-    def create_business(sender, instance, created, **kwargs):
-        if created and instance.is_business:
-            Business_Profile.objects.create(user = instance)
-
-    @receiver(post_save, sender=User)
-    def save_business(sender, instance, **kwargs):
-        instance.profile.save()
-
-    def get_short_name(self):
-        return self.user.username
-
-    def natural_key(self):
-        return self.user.username
-
-    def __str__(self):
-        return self.user.username
-
+    objects = Business_Manager()
 
 class Staff_Profile(models.Model):
     user = models.OneToOneField(User, on_delete = CASCADE, unique = True)
     staffof = models.OneToOneField(Business, null = False, blank = False, unique = False, on_delete = CASCADE)
-
     @receiver(post_save, sender=User)
     def create_staff(sender, instance, created, **kwargs):
         if created and instance.is_staff:
@@ -396,80 +346,3 @@ class Staff_Profile(models.Model):
     
     def __str__(self):
         return self.user.username
-from django.core.serializers import serialize
-class Temp_Business_Manager(models.Manager):
-    def isFloatNum(self, targetString):
-        print(targetString)
-        try : 
-            float(targetString)
-            return(True)
-        except :
-            print("Not a float")
-            return(False)
-
-    def search(self, latitude, longitude, radius): # radius in kms
-        if (self.isFloatNum(latitude) and self.isFloatNum(longitude) and self.isFloatNum(radius)): 
-            # Great circle distance formula
-            gcd_formula = "6371 * acos(min(max(\
-            cos(radians(%s)) * cos(radians(lat)) \
-            * cos(radians(lon) - radians(%s)) + \
-            sin(radians(%s)) * sin(radians(lat)) \
-            , -1), 1))"
-            distance_raw_sql = RawSQL(
-                gcd_formula,
-                (latitude, longitude, latitude)
-            )
-            qs = self.get_queryset()
-            qs = qs.annotate(distance=distance_raw_sql)
-            qs = qs.filter(distance__lt=radius).order_by('distance').values_list("placeID", "wait_time__average")
-            qs = qs[:10] # take only the first 10
-            listOfPlaceIDs = []
-            for place in qs.iterator():
-                listOfPlaceIDs.append(place)
-            # data = serialize("json", [ qs, ])
-            print('qs: ' + str(listOfPlaceIDs))
-            return listOfPlaceIDs
-        return('bad inputs') #escape out
-
-    def addWaitTime(self, waitTime, placeID, user):
-        if (self.isFloatNum(waitTime)):
-            # find the venue and add a review
-            TarBiz = self.get(placeID=placeID)
-            print(TarBiz)
-            thisWaitTimes = TarBiz.wait_time
-            if (not thisWaitTimes): #if related wait time row doesnt exist, make row
-                thisWaitTimes = waitTimes(parentTemp=True)
-                thisWaitTimes.save()
-                TarBiz.wait_time = thisWaitTimes
-                TarBiz.save()
-            print(thisWaitTimes)
-            return thisWaitTimes.addReview(waitTime, user)
-            
-
-        else:
-            return False    
-
-class Temp_Business(models.Model):
-    lat = models.FloatField(blank = False, null = True)
-    lon = models.FloatField(blank = False, null = True)
-    verified = models.BooleanField(null = False, blank = False, default = False)
-    cached_time = models.DateTimeField(auto_now = True, null = False, blank = False)
-    wait_time = models.OneToOneField(waitTimes, null = True, blank = True, on_delete = CASCADE)
-    capacity = models.OneToOneField(Capacity, null = True, blank = True, on_delete = CASCADE)
-    placeID = models.TextField(null = False, blank=False, unique = True, default = False)
-    REQUIRED_FIELDS = ['lat', 'lon', 'verified', 'placeID', "cached_time"]
-
-    def twenty_days(self):
-        return (datetime.datetime.now() - self.cached_time).days >= 20
-    def updateTime(self):
-        self.cached_time = django.utils.timezone.now()
-    def get_short_name(self):
-        return self.placeID
-
-    def natural_key(self):
-        return self.placeID
-     
-    def __str__(self):
-        return self.placeID
-
-    objects = Temp_Business_Manager()

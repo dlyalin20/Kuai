@@ -20,7 +20,7 @@
 
 /* search + options */
 #searchAndOptions{
-  width: 40%;
+  width: 25%;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -30,7 +30,8 @@
 #search-container{
   width: 100%;
   position: relative;
-    text-align: center;
+  text-align: center;
+  padding: 2%;
 }
 #choices{
   flex-direction: column;
@@ -44,7 +45,7 @@
   height: 0;
   left:20px;
   border-top: 15px solid transparent;
-  border-right: 20px solid #555;
+  border-right: 20px solid hsl(171, 95%, 48%);
   border-bottom: 15px solid transparent;
 }
 
@@ -56,13 +57,16 @@
 }
 
 .option-items{
-  font-size: 1.5vw;
-  margin: 5%;
-  background-color: red;
-  border-radius: 30px;
-  padding: 5%;
-  color: white;
+  font-size: 2vw;
+  margin: 0;
+  background-color: rgb(255, 255, 255);
+  border-color: black;
+  border-radius: 0;
+  padding: 0%;
+  color: navy;
   text-align: center;
+  font-family: 'Mate SC', serif;
+  font-weight: bold;
 }
       #description {
         font-family: Roboto;
@@ -138,10 +142,20 @@
 
 #search-area-button {
   position: absolute;
-  width: 8em;
+  /*width: 8em;
   font-size: 1.5em;
   height: 1.8em;
-  z-index: 1;
+  z-index: 1;*/
   top: 80%;
 }
 
+#search-input {
+  height: 40px;
+}
+hr {
+  padding: 0%;
+  margin: 0%;
+  border: 0%;
+  color: black;
+  font-weight: bold;
+}

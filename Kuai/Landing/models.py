@@ -314,11 +314,14 @@ class Business(models.Model):
 
     def getAverage(self):
     # average accounting for other times
-        qs = self.review.filter(expiration_time__lt=Now()).values_list("wait_time")
+        qs = self.review.filter(expiration_time__gt=Now()).values_list("wait_time", flat=True)
         mySum = 0
         count = 0
+        # print(qs.all())
         for waittime in qs.iterator():
-            mySum += waittime.wait_time
+            print("waittime: " + str(waittime))
+            # print(waittime)
+            mySum += waittime
             count += 1
         if mySum == 0:
             return "N/A"

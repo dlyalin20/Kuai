@@ -4,6 +4,8 @@
         {% load static %}
         <link rel="stylesheet" type="text/css" href="{% static 'Landing/css/go.css' %}">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="https://fonts.googleapis.com/css2?family=Mate+SC&display=swap" rel="stylesheet">
     </head>
 <body>
     {% include 'Landing/navbar.html' %}
@@ -12,7 +14,7 @@
     <div id="searchAndOptions">
             <span id="search-container">
                 <input id="search-input" type="text"></input>
-                <button type="submit" id= "search-submit">Search</button>
+                <button type="submit" id= "search-submit" class="button is-rounded">Search</button>
                 
             </span>
             
@@ -23,7 +25,7 @@
     <div id="arrow"></div>
     <div id="show"></div>
     <div id="map"></div>
-    <button id="search-area-button">
+    <button id="search-area-button" class='button is-rounded is-ghost'>
         Search This Area
         </button>
     </div>

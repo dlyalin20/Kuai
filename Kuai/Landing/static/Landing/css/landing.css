@@ -143,8 +143,7 @@ Menu Credit: Erik Terwan, 24th of November 2015, MIT License
     font-size: large;
 } 
 
-#search-submit {
-    z-index: 1;
+#search-submit { 
     border-radius: 7px;
     border: 1px solid;
 }

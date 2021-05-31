@@ -102,7 +102,7 @@ class Business{
             });
         }
         this.showMarker();
-        let baseObject = `<div class='option-items'>` + i + '. ' + this.name + `</div>`;
+        let baseObject = `<div class='option-items'>` + i + '. ' + this.name + `<hr></div>`;
         console.log(baseObject);
         const parent = this;
         let myDiv = $(baseObject)

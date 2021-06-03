@@ -63,7 +63,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 print("recieved waitTime: " + str(waitTime) + " placeID: "+ str(placeID))
                 # add to db
                 qs = await self.addToWait(waitTime, placeID, self.user)
-                await self.send(text_data=json.dumps(qs))
+                await self.send(text_data=qs)
             await self.send("bad input")
 
         

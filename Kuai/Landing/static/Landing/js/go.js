@@ -224,10 +224,18 @@ function nearbySearch(){ //plots the nearby locations
         
         var ne = mapbounds.getNorthEast();
         var sw = mapbounds.getSouthWest();
+        // new google.maps.Marker({
+        //     position: ne
+        // }).setMap(map);
+        // new google.maps.Marker({
+        //     position: sw
+        // }).setMap(map);
         var nelat = ne.lat();
         var nelon = ne.lng();
         var swlat = sw.lat();
         var swlon = sw.lng();
+
+        
         console.log("query from local db");
         let center = map.center;
         
@@ -283,19 +291,12 @@ async function placeResultsToMarkers(results, ){
     }
 }
 
-
-
-
-
 // take array of objects
 /*element
     - geometry
         -location
     - name
 */
-
-
-
 // return [firstpos, listofMarkers ]
 function search(callback) {
     sessionToken = new google.maps.places.AutocompleteSessionToken();
@@ -349,7 +350,6 @@ function getLocation(){
     }
     
 }
-
 
 // updates the user's location
 function updatePosition(position){

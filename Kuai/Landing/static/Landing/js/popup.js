@@ -45,13 +45,7 @@ function runAvg(){
     return true;
 
 }
-function closePopUp(){
-    startedsession = false;
-    targetBiz = null;
-    // const popup = $("#popup");
-    popup.hide();
-    popup.find("#popup-input").hide(); 
-}
+
 
 function popUpNext(event, setto=null){
     if (!(is_authenticated)){
@@ -82,6 +76,14 @@ function popUpNext(event, setto=null){
     
 }
 })
+// open to the other files
+function closePopUp(){
+    startedsession = false;
+    targetBiz = null;
+    const popup = $("#popup");
+    popup.hide();
+    popup.find("#popup-input").hide(); 
+}
 function openPopUp(name, place_id, wait_time = null){
     const popup = $("#popup");
     

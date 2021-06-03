@@ -39,10 +39,7 @@ class Business{
             this.marker = new google.maps.Marker({
                 position: this.position
             });
-            google.maps.event.addListener(this.marker, "click", () => {
-                this.infowindow.setContent(this.name || "");
-                this.infowindow.open(map);
-            });
+            setmarkerCallBack(self);
             if (callback){
                 this.callback();
             }
@@ -52,7 +49,7 @@ class Business{
         
         
     }
-    
+
     fillLocals( results){
         let pos = results.geometry.location
         // temp = new Promise(accept, reject){
@@ -71,10 +68,7 @@ class Business{
             this.marker = new google.maps.Marker({
                 position: await this.position
             });
-            google.maps.event.addListener(this.marker, "click", () => {
-                infowindow.setContent(this.name || "");
-                infowindow.open(map);
-            });
+            setmarkerCallBack(self);
         }
         this.marker.setMap(map);
     }
@@ -107,20 +101,7 @@ class Business{
         const parent = this;
         let myDiv = $(baseObject)
             .on("click", function(){
-                if (targetBiz == this){
-                    closePopUp();
-                    targetBiz = null;
-                }else{
-                    targetBiz = parent;
-                    map.panTo(parent.position)
-                    map.setZoom(18);
-                    if (parent.waitTime){
-                        openPopUp(parent.name, parent.placeID, parent.waitTime);
-                    }
-                    else{
-                        openPopUp(parent.name, parent.placeID);
-                    }
-                }
+                parent.ToggleThisPopUp();
             })
             .css("order", i)
             .appendTo(choices)
@@ -130,7 +111,26 @@ class Business{
 
 
     }
+
+    ToggleThisPopUp(){
+        if (targetBiz != null && targetBiz.placeID == this.placeID){
+            closePopUp();
+            targetBiz = null;
+        }else{
+            targetBiz = this;
+            map.panTo(this.position)
+            map.setZoom(18);
+            if (this.waitTime){
+                openPopUp(this.name, this.placeID, this.waitTime);
+            }
+            else{
+                openPopUp(this.name, this.placeID);
+            }
+        }
+    
+    }
 }
+
 // Run SHA-256 on data
 async function getHash(string){
     const encoder = new TextEncoder();
@@ -143,4 +143,11 @@ async function settleCoords(lat, lng){
     let templat = await lat();
     let templng = await lng();
     return new google.maps.LatLng(templat,  templng)
+}
+
+    // set marker callback
+function setmarkerCallBack(thisObj){
+    google.maps.event.addListener(thisObj.marker, "click", () => {
+        thisObj.ToggleThisPopUp();
+    });
 }

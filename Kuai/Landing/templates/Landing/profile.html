@@ -3,16 +3,35 @@
   <head>
     <title>Profile</title>
   </head>
+  <style>
+    #profile{
+      margin-left: 2em;
+    }
+  </style>
+
   {% block content %}
   {% include 'Landing/navbar.html' %}
-
+<div id="profile">
   <h1>Profile</h1>
+
   {% if user.is_authenticated %}
   <p>Welcome, {{ user.username }}!</p>
+
+  <p>Wait times: 
+    <br>
+
+    {% for i in user.profile.all_time_updates.all %} 
+    
+      {{i.business.get_short_name}}:  {{i.wait_time}}
+      <br>
+
+    {% endfor%}</p>
   <p></p>
   {% else %}
   <p>Welcome, friend!</p>
   {% endif %}
 
   {% endblock %}
+
+  </dib>
 </html>

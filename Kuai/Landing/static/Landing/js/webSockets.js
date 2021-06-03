@@ -5,7 +5,10 @@ const chatSocket = new WebSocket(
 ); 
 var data;
 var bizHash = new hashtable();
-
+var timerId;
+chatSocket.onopen = function(){
+    clearInterval(timerId);
+}
 chatSocket.onmessage = function(e) {
     // console.log(chatSocket);
     if (e.data.charAt(0) != "["){
@@ -18,7 +21,7 @@ chatSocket.onmessage = function(e) {
     else{
         data = JSON.parse(e.data);
         if(data == null || data.length == 0){
-            alert("No results found")
+            console.log("No results found");
         }else{
             console.log(data);
             bizHash = new hashtable();
@@ -42,17 +45,24 @@ chatSocket.onmessage = function(e) {
 };
 
 chatSocket.onclose = function(e) {
-    console.error('Chat socket closed unexpectedly');
-};
+    timerId = setInterval(function() {
+      console.log('Socket is closed. Reconnect will be attempted in 1 second.', e.reason);
+      connect();
+    }, 1000);
+  };
 
 // remove default para later
-function queryDB( lat = 40.6237542, lon = -73.913696, radius = 10){
+function queryDB( lat = 40.6237542, lon = -73.913696, nelat, nelon, swlat, swlon){
     console.log(lat, lon);
     if (chatSocket && chatSocket.readyState == 1){
         chatSocket.send(JSON.stringify({
-            'radius': radius, //meters
             'lat': lat,
-            'lon': lon
+            'lon': lon,
+            'nelat': nelat,
+            'nelon': nelon,
+            'swlat': swlat,
+            'swlon': swlon,
+
             })
         )
         

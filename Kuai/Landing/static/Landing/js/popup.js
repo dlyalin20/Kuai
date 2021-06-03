@@ -54,26 +54,32 @@ function closePopUp(){
 }
 
 function popUpNext(event, setto=null){
-    if (setto){
-        popup_step = setto
+    if (!(is_authenticated)){
+        // if not authenticated
+        alert("please login to submit a wait time")
+    }else{
+        if (setto){
+            popup_step = setto
+        }
+        else{
+            popup_step++;
+        }
+        switch (popup_step){
+            case 1: 
+                popup.find("#popup-input").show();
+                popup.find('#popupnext').html("Submit"); 
+                break;
+            default:
+                //last step // leave
+                if (runAvg()){
+                    alert("Thank you, Bye!");
+                    closePopUp();
+                }
+                    
+                break;
+        }
     }
-    else{
-        popup_step++;
-    }
-    switch (popup_step){
-        case 1: 
-            popup.find("#popup-input").show();
-            popup.find('#popupnext').html("Submit"); 
-            break;
-        default:
-            //last step // leave
-            if (runAvg()){
-                alert("Thank you, Bye!");
-                closePopUp();
-            }
-                
-            break;
-    }
+    
 }
 })
 function openPopUp(name, place_id, wait_time = null){

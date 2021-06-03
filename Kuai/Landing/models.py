@@ -252,8 +252,10 @@ class Business_Manager(models.Manager):
             print("Not a float")
             return(False)
     
-    def search(self, latitude, longitude, radius): # radius in kms
-        if (self.isFloatNum(latitude) and self.isFloatNum(longitude) and self.isFloatNum(radius)): 
+    def search(self, latitude, longitude, nelat, nelon, swlat, swlon):
+        x = self.isFloatNum(latitude) and self.isFloatNum(longitude) 
+        x = x and self.isFloatNum(nelat) and self.isFloatNum(nelon) and self.isFloatNum(swlat) and self.isFloatNum(swlon)
+        if (x): 
             # Great circle distance formula
             gcd_formula = "6371 * acos(min(max(\
             cos(radians(%s)) * cos(radians(lat)) \
@@ -265,8 +267,10 @@ class Business_Manager(models.Manager):
                 (latitude, longitude, latitude)
             )
             qs = self.get_queryset()
+            #get biz in the viewable space
+            qs = qs.filter(lat__lt = nelat, lat__gt = swlat, lon__lt = nelon, lon__gt = swlon)
             qs = qs.annotate(distance=distance_raw_sql)
-            qs = qs.filter(distance__lt=radius).order_by('distance')
+            qs = qs.order_by('distance')
             # .values_list("placeID", flat=True)
             qs = qs[:10] # take only the first 10
             listOfPlaceIDs = []
@@ -288,20 +292,18 @@ class Business_Manager(models.Manager):
             return review
         else:
             return False    
-
+def get_biz_expiration():
+    return django.utils.timezone.now() + django.utils.timezone.timedelta(days=20)
 class Business(models.Model):
     lat = models.FloatField(blank = False, null = True)
     lon = models.FloatField(blank = False, null = True)
     verified = models.BooleanField(null = False, blank = False, default = False)
-    cached_time = models.DateTimeField(auto_now = True, null = False, blank = False)
+    expiration_time = models.DateTimeField(default=get_biz_expiration, null = False, blank = False)
     placeID = models.TextField(null = False, blank=False, unique = True, default = False)
-    REQUIRED_FIELDS = ['lat', 'lon', 'verified', 'placeID', "cached_time"]
-
-    def twenty_days(self):
-        return (datetime.datetime.now() - self.cached_time).days >= 20
+    REQUIRED_FIELDS = ['lat', 'lon', 'verified', 'placeID', "expiration_time"]
 
     def updateTime(self):
-        self.cached_time = django.utils.timezone.now()
+        self.expiration_time = get_biz_expiration()
 
     def get_short_name(self):
         return self.placeID

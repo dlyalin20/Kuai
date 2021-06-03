@@ -30,10 +30,13 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
+CRONJOBS = [
+    ('0 * * * 1', 'myapp.cron.my_cron_job')
+]
 # Application definition
 
 INSTALLED_APPS = [
+    'django_crontab',
     'channels',
     'webSockets',
     'Landing',
@@ -153,7 +156,7 @@ AUTHENTICATION_BACKENDS = (
  'allauth.account.auth_backends.AuthenticationBackend',
  )
 
-SITE_ID = '3'
+SITE_ID = '4'
 LOGIN_REDIRECT_URL = '/'
 
 SOCIALACCOUNT_PROVIDERS = {

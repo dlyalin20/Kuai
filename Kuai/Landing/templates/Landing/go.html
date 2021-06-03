@@ -25,13 +25,14 @@
     <div id="arrow"></div>
     <div id="show"></div>
     <div id="map"></div>
-    <button id="search-area-button" class='button is-rounded is-ghost'>
-        Search This Area
-        </button>
+
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
     <script>
+        {% if user.is_authenticated %}
+        var is_authenticated = true;
+        {% endif %}
         var q = "{{q}}"; // get the query
         // console.log(q);
         var targetID = "{{target_id}}";

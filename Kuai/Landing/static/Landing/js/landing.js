@@ -12,7 +12,7 @@ function initialize() {
     $('#search-submit').on('click', function(event){
         event.preventDefault();
         search();
-    })
+    })  
     
     function search() {
         const place = autocomplete.getPlace();

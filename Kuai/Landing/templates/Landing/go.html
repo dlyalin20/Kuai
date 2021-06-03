@@ -27,7 +27,9 @@
         <div id="arrow"></div>
         <div id="show"></div>
         <div id="map"></div>
-
+        <div id="all-directions-panel">
+            all routes
+        </div>
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
@@ -48,12 +50,14 @@
             document.title = "Kuai Go"
         }
     </script>
+
     <script src="{% static 'Landing/js/location.js' %}"></script>
     <script src="{% static 'Landing/js/go.js' %}"></script>
     <script src="{% static 'Landing/js/popup.js' %}"></script>
     <script
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBzd999zA1_gyh7uB6KpUh-hBaYsl0vmIQ&callback=initialize&libraries=places&v=weekly"></script>
     <!---->
+    <script src="{% static 'Landing/js/directions.js' %}"></script>
     <script src="{% static 'Landing/js/webSockets.js' %}" defer></script>
     <div id="popup">
 

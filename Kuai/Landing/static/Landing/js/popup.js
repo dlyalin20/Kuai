@@ -82,11 +82,11 @@ function closePopUp(){
     targetBiz = null;
     const popup = $("#popup");
     popup.hide();
+    $('#all-directions-panel').hide();
     popup.find("#popup-input").hide(); 
 }
 function openPopUp(name, place_id, wait_time = null){
     const popup = $("#popup");
-    
     popup.find(".timeinput").prop("disabled", false);
     popup.find("#customtimeinput").prop("disabled", false);
     last = 20; // record at most 20 people on line
@@ -101,7 +101,7 @@ function openPopUp(name, place_id, wait_time = null){
     popup.find('#bis_name').attr('data-name', name);
     popup.find("#number_of_people").val('');
     popup.find('#placeID').val(place_id);
-    popup.find('#popupnext').html("Enter Line");
+    popup.find('#popupnext').html("Submit WaitTime Review");
     popup.show();
     popup.find("#popup-input").hide(); 
     popup.find(".people_in_front").show();

@@ -76,6 +76,6 @@
     content: attr(data-name);
 }
 
-#popup_wait_time::after{
+.datainput::after{
     content: attr(data-val);
 }

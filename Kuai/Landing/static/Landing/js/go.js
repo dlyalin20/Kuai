@@ -183,10 +183,11 @@ function mainLoop(position) {
             });
         })
         $("#arrow").click(toggleSidePanel); // toggles side panel
-
+        
         $("#search-area-button").click(nearbySearch); // searches the area around the center of the map
+        loadDirections(); // load directions
         return true;
-    });
+    })
 }
 
 /*

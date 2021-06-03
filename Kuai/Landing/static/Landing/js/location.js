@@ -117,6 +117,7 @@ class Business {
             closePopUp();
             targetBiz = null;
         } else {
+            load_route_to_biz(this);
             targetBiz = this;
             map.panTo(this.position)
             map.setZoom(18);

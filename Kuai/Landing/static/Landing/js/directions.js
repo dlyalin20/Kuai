@@ -30,7 +30,7 @@ async function load_route_to_biz(biz) { //figure out the route to the biz
                         // console.log(calculatedRoute.routes[0].legs[i]);
                         totalduration += calculatedRoute.routes[0].legs[i].duration.value;
                     }
-                    finalduration = totalduration / 60;
+                    finalduration = Math.round(totalduration / 60);
                     popup.find('#popup_travel_time').attr('data-val', finalduration);
                     $('#all-directions-panel').show();
                     directionsRenderer.setDirections(response);

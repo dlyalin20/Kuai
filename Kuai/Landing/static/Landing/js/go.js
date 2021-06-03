@@ -53,7 +53,7 @@ function mainLoop(position) {
         console.log("UserPos: " + UserPos.toString());
     }
     // main promise chain
-    new Promise(function (resolve, reject) { // try target id
+    new Promise(function (resolve, reject) { // try target placeid
         console.log("Finding center of map");
         result = {
             target: false,
@@ -153,8 +153,18 @@ function mainLoop(position) {
         console.table(result);
         // plot markers
         if (result.markers && result.markers.length > 0) {
-            // takes array of pos's
-            plotListMarkers(result.markers);
+            choices.html("");
+            clearMarkers();
+            for (let i = 0; i < result.markers.length; i++){
+                // choices.html("");
+                let temp = new Business(result.markers[i], null, null, function(){
+                    this.pushDivDescription();             
+                }, i);
+                // console.log(placeLocation);
+                // createMarker(placeLocation);
+                // queryService(data[i], placeResult, i)
+                markers.push(temp);
+            }
         }
         return true;
     }).then(function (result) { //set up event listeners
@@ -307,7 +317,6 @@ async function placeResultsToMarkers(results,) {
 // return [firstpos, listofMarkers ]
 function search(callback) {
     sessionToken = new google.maps.places.AutocompleteSessionToken();
-
     advQuery = input.value;
     var request = {
         input: advQuery,

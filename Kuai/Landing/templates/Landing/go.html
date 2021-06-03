@@ -1,30 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        {% load static %}
-        <link rel="stylesheet" type="text/css" href="{% static 'Landing/css/go.css' %}">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="preconnect" href="https://fonts.gstatic.com">
-        <link href="https://fonts.googleapis.com/css2?family=Mate+SC&display=swap" rel="stylesheet">
-    </head>
+
+<head>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'Landing/css/go.css' %}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Mate+SC&display=swap" rel="stylesheet">
+</head>
+
 <body>
     {% include 'Landing/navbar.html' %}
     <div id="main">
-    
-    <div id="searchAndOptions">
+
+        <div id="searchAndOptions">
             <span id="search-container">
                 <input id="search-input" type="text"></input>
-                <button type="submit" id= "search-submit" class="button is-rounded">Search</button>
-                
+                <button type="submit" id="search-submit" class="button is-rounded">Search</button>
+
             </span>
-            
-            
-        <div id="paras"></div>
-        <div id="choices"></div>
-    </div>
-    <div id="arrow"></div>
-    <div id="show"></div>
-    <div id="map"></div>
+
+
+            <div id="paras"></div>
+            <div id="choices"></div>
+        </div>
+        <div id="arrow"></div>
+        <div id="show"></div>
+        <div id="map"></div>
 
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -38,25 +40,26 @@
         var q = "{{q}}"; // get the query
         // console.log(q);
         var targetID = "{{target_id}}";
-        
-        if (!(q==="")){
+
+        if (!(q === "")) {
             document.title = q + " - Kuai Location Search";
         }
-        else{
+        else {
             document.title = "Kuai Go"
         }
     </script>
-    <script src="{% static 'Landing/js/location.js' %}" ></script>
+    <script src="{% static 'Landing/js/location.js' %}"></script>
     <script src="{% static 'Landing/js/go.js' %}"></script>
     <script src="{% static 'Landing/js/popup.js' %}"></script>
     <script
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBzd999zA1_gyh7uB6KpUh-hBaYsl0vmIQ&callback=initialize&libraries=places&v=weekly"></script> <!---->
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBzd999zA1_gyh7uB6KpUh-hBaYsl0vmIQ&callback=initialize&libraries=places&v=weekly"></script>
+    <!---->
     <script src="{% static 'Landing/js/webSockets.js' %}" defer></script>
     <div id="popup">
-        
+
         {% include 'Landing/popup.html' %}
     </div>
-    
+
 </body>
 
 </html>

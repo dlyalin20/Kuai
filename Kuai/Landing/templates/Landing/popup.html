@@ -1,5 +1,5 @@
 
-<!-- When show js adds the content to these tags -->
+<!-- js adds the content to these tags -->
 <!-- 
     Properties
     - bis_name
@@ -18,60 +18,20 @@
                                     <div class="column" style="padding: 0; margin: 0;">
                                         <h1 class="title is-5" style="padding: 0; margin-bottom: 0; color: navy;"><b>
                                             <a href="" id="bis_name">
-                                            
-
                                             </a>
                                             </b><br></h1>
-                                        
                                         <p id="popup_wait_time" style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;" class="content">
                                             Wait time:
-                                            
                                         </p>
                                         <div id="popup-description"></div>
                                         <div id="popup-input">
                                             <label class="wait_time_input">How long was the wait?</label> <br>
-                                            <!-- <ul>
-                                                <li> -->
                                                     <button class="timeinput is-small button" value="5">5 mins</button>
-                                                <!-- </li>
-                                                <li> -->
                                                     <button class="timeinput is-small button" value="10">10 mins</button>
-                                                <!-- </li>
-                                                <li> -->
                                                     <button class="timeinput is-small button" value="15">15 mins</button>
-                                                <!-- </li>
-                                                <li> -->
                                                     <button class="timeinput is-small button" value="20">20 mins</button>
-
                                                     <input id="customtimeinput" type="number" placeholder="Custom" style="width: 7em;"/>
-
-                                                <!-- </li>
-                                            </ul> -->
-
-                                            
-                                            
-                                            <!-- <label class="people_in_front"> How many people in front of you </label>
-                                            <input class="people_in_front" type="number" id="number_of_people" name="quantity" min="1" max="20">
-                                            
-                                            <label> More than 20: </label>
-                                            <input type="checkbox" id="overflow_people" name="morthan20"> -->
                                         </div>
-
-                                        <!-- <p style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;" id="waitTimeForm" class="content">Add Wait Time: </p> -->
-                                            <!-- <form action="/quickWaitTime"  method="post" style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;"> -->
-                                                <!-- {% csrf_token %} -->
-                                                <!-- <input type="hidden" id="placeID" value="{{ business.placeID }}" name="business" />
-                                                <div class="field" style="width: 75px; white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;">
-                                                    <input style="width: 75px; white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;" type="number" list="times" name="time"/>
-                                                    <datalist id="times">
-                                                            <option> 10 </option>
-                                                            <option> 20 </option>
-                                                            <option> 30 </option>
-                                                            <option> 40 </option>
-                                                            <option> 50 </option>
-                                                            <option> 60 </option>
-                                                    </datalist>
-                                                </div> -->
                                                 <div class="field">
                                                     <div class="control">
                                                         <button id="popupnext" class="button is-info is-small">
@@ -79,64 +39,9 @@
                                                         </button>
                                                     </div>
                                                 </div>
-                                            <!-- </form> -->
-                                           <!-- <p style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;" class="content"> Add Wait Times: </p>
-                                            <span style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;">
-                                                <div class="table-container" style="width: 100px; white-space: nowrap; padding: 0; margin: 0; font-size: 13px; color: darkblue;">
-                                                    <table class="table is-narrow is-bordered is-striped" style="font-weight: normal; white-space: nowrap; padding: 0; margin: 0; font-size: 14px; color: darkblue;">
-                                                    <tr class="tr">
-                                                        {% for n in range %}
-                                                        <td class="td" style="margin: 0; padding: 0;">
-                                                            {{ n }} Min.
-                                                        </td>
-                                                        {% endfor %}
-                                                        <td class="td">Add Custom</td>
-                                                    </tr>
-                                                    </table>
-                                                </div>
-                                                </span>-->
-                                        <!--<p style="padding: 0; margin: 0; font-size: 15px; color: darkblue;" class="content">
-                                            Capacity: 
-                                            {% if capacity %}  
-                                                {% if capacity >= 0 and capacity < 25 %}
-                                                <span style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: lime;">
-                                                    {{ capacity }}
-                                                </span>
-                                                {% elif capacity >= 25 and capacity < 75 %}
-                                                <span style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: orange;">
-                                                    {{ capacity }}
-                                                </span>
-                                                {% else %}
-                                                <span style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: lime;">
-                                                    {{ capacity }}
-                                                </span>
-                                                {% endif %}
-                                            {% else %} 
-                                            <span style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;">
-                                                No Capacity
-                                            </span>
-                                            {% endif %}<br /><br>
-                                        </p>-->
                                     </b>
                                     </div>
                                 </div>
-                                 <!--<b>Reviews:</b> <br>{% if reviews %}
-                                 <ul>
-                                    {% for review in reviews %}
-                                    <li>{{ review }}</li>
-                                    {% endfor %}
-                                 </ul>
-                                 {% else %} No Reviews <br>
-                                 {% endif %}<br>
-                                 <b>Alternative Recommendations:</b> <br>{% if recs %}
-                                 <ul>
-                                    {% for rec in recs %}
-                                    <li>{{ rec }}</li>
-                                    {% endfor %}
-                                 </ul>
-                                 {% else %} No Recommendations <br>
-                                 {% endif %}
-                                </p>-->
                         </div>
                       </article>
                       <span id="close_popup">X</span>

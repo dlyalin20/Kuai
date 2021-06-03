@@ -1,56 +1,56 @@
 class hashtable {
-    constructor(){
+    constructor() {
         this.list = [];
     }
     async doesExistorAdd(placeID, array_index_plus1) {
         var x = await getHash(placeID)
         var dv = new DataView(x);
         var hash = dv.getInt32();
-        if (this.list[hash]){
+        if (this.list[hash]) {
             return true;
-        }else{
+        } else {
             this.list[hash] = array_index_plus1;
             return false;
         }
     }
 }
 
-var targetBiz; 
+var targetBiz;
 
-class Business{
+class Business {
     // location new google.maps.LatLng(location);
     //Call back is run after contructor is done
-    constructor(placeID, location=null, name=null, callback=null, array_index, waitTime = null){
+    constructor(placeID, location = null, name = null, callback = null, array_index, waitTime = null) {
         this.waitTime = waitTime;
         this.placeID = placeID;
         this.infowindow = new google.maps.InfoWindow;
         this.callback = callback;
         this.array_index_plus1 = array_index + 1; // plus one to avoid the number coming back as false
-        if (!(location && name)){ 
+        if (!(location && name)) {
             // run Places Details request to get lat lng and name
             const hold = this;
-            let y = queryService(placeID, function(x){
+            let y = queryService(placeID, function (x) {
                 hold.fillLocals(x);
                 hold.callback();
             });
-        }else{
+        } else {
             this.name = name;
             this.position = location;
             this.marker = new google.maps.Marker({
                 position: this.position
             });
             setmarkerCallBack(self);
-            if (callback){
+            if (callback) {
                 this.callback();
             }
         }
-    
 
-        
-        
+
+
+
     }
 
-    fillLocals( results){
+    fillLocals(results) {
         let pos = results.geometry.location
         // temp = new Promise(accept, reject){
         // }
@@ -63,8 +63,8 @@ class Business{
         this.name = results.name;
     }
 
-    async showMarker(){
-        if (!(this.position && this.marker)){
+    async showMarker() {
+        if (!(this.position && this.marker)) {
             this.marker = new google.maps.Marker({
                 position: await this.position
             });
@@ -72,24 +72,24 @@ class Business{
         }
         this.marker.setMap(map);
     }
-    addHash(){
+    addHash() {
         bizHash.doesExistorAdd(this.placeID, this.array_index_plus1);
     }
 
-    async testHash(){
+    async testHash() {
         //if place_id hash already exists returns true
         //else returns false
         return await bizHash.doesExistorAdd(this.placeID, this.array_index_plus1);
     }
-    hideMarker(){
-        if (this.marker){
+    hideMarker() {
+        if (this.marker) {
             this.marker.setMap(null);
-        }        
+        }
     }
 
-    async pushDivDescription(){ // what happends when u click on the marker
+    async pushDivDescription() { // what happends when u click on the marker
         var i = this.array_index_plus1;
-        if (!(this.position && this.marker)){
+        if (!(this.position && this.marker)) {
             await this.position;
             this.marker = new google.maps.Marker({
                 position: this.position
@@ -100,7 +100,7 @@ class Business{
         console.log(baseObject);
         const parent = this;
         let myDiv = $(baseObject)
-            .on("click", function(){
+            .on("click", function () {
                 parent.ToggleThisPopUp();
             })
             .css("order", i)
@@ -112,41 +112,41 @@ class Business{
 
     }
 
-    ToggleThisPopUp(){
-        if (targetBiz != null && targetBiz.placeID == this.placeID){
+    ToggleThisPopUp() {
+        if (targetBiz != null && targetBiz.placeID == this.placeID) {
             closePopUp();
             targetBiz = null;
-        }else{
+        } else {
             targetBiz = this;
             map.panTo(this.position)
             map.setZoom(18);
-            if (this.waitTime){
+            if (this.waitTime) {
                 openPopUp(this.name, this.placeID, this.waitTime);
             }
-            else{
+            else {
                 openPopUp(this.name, this.placeID);
             }
         }
-    
+
     }
 }
 
 // Run SHA-256 on data
-async function getHash(string){
+async function getHash(string) {
     const encoder = new TextEncoder();
     const data = encoder.encode(string);
     const hash = await crypto.subtle.digest('SHA-256', data);
     return hash;
-} 
-
-async function settleCoords(lat, lng){
-    let templat = await lat();
-    let templng = await lng();
-    return new google.maps.LatLng(templat,  templng)
 }
 
-    // set marker callback
-function setmarkerCallBack(thisObj){
+async function settleCoords(lat, lng) {
+    let templat = await lat();
+    let templng = await lng();
+    return new google.maps.LatLng(templat, templng)
+}
+
+// set marker callback
+function setmarkerCallBack(thisObj) {
     google.maps.event.addListener(thisObj.marker, "click", () => {
         thisObj.ToggleThisPopUp();
     });

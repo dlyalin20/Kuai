@@ -140,14 +140,6 @@
         width: 345px;
       }
 
-#search-area-button {
-  position: absolute;
-  /*width: 8em;
-  font-size: 1.5em;
-  height: 1.8em;
-  z-index: 1;*/
-  top: 80%;
-}
 
 #search-input {
   height: 40px;
@@ -162,6 +154,8 @@ hr {
 
 #all-directions-panel{
   position: relative;
+  flex-direction: column-reverse;
+  justify-content: flex-end;
   right: 0px;
   z-index: 4;
   background: white;

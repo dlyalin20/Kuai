@@ -1,59 +1,54 @@
-
+<span id="close_popup">X</span>
 <!-- js adds the content to these tags -->
 <!-- 
     Properties
     - bis_name
     - bis_time_average
  -->
-        {% load static %}
-        {% load Landing_extras %}
-        <link rel="stylesheet" type="text/css" href="{% static 'Landing/css/popup.css' %}">
-        <center>
-
-            <div class="tile is-ancestor is-2" style="height: 160px; width: 410px;">
-                <div class="tile is-parent">
-                    <article class="tile is-child notification is-white" style="height: fit-content;">
-                        <div class="content">
-                                <div class="columns">
-                                    <div class="column" style="padding: 0; margin: 0;">
-                                        <h1 class="title is-5" style="padding: 0; margin-bottom: 0; color: navy;"><b>
-                                            <a href="" id="bis_name">
-                                            </a>
-                                            </b><br></h1>
-                                            <span class="datainput" id="popup_wait_time" style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;" class="content" data-val="N/A">
-                                                Wait time:
-                                            </span>
-                                            <span class="datainput" id="popup_travel_time" style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;" class="content" data-val="N/A">
-                                                Travel time:
-                                            </span>
-                                            <span class="datainput" id="popup_total_time" style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;" class="content" data-val="N/A">
-                                                Total time:
-                                            </span>
-                                        <div id="popup-description"></div>
-                                        <div id="popup-input">
-                                            <label class="wait_time_input">How long was the wait?</label> <br>
-                                                    <button class="timeinput is-small button" value="5">5 mins</button>
-                                                    <button class="timeinput is-small button" value="10">10 mins</button>
-                                                    <button class="timeinput is-small button" value="15">15 mins</button>
-                                                    <button class="timeinput is-small button" value="20">20 mins</button>
-                                                    <input id="customtimeinput" type="number" placeholder="Custom" style="width: 7em;"/>
-                                        </div>
-                                                <div class="field">
-                                                    <div class="control">
-                                                        <button id="popupnext" class="button is-info is-small">
-                                                            <!-- next / submit -->
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                    </b>
-                                    </div>
-                                </div>
-                        </div>
-                      </article>
-                      <span id="close_popup">X</span>
+{% load static %}
+{% load Landing_extras %}
+<link rel="stylesheet" type="text/css" href="{% static 'Landing/css/popup.css' %}">
+<center>
+    <article class="tile is-child notification is-white" style="height: fit-content;">
+        <div class="content">
+            <h1 class="title is-5" style="padding: 0; margin-bottom: 0; color: navy;"><b>
+                    <a href="" id="bis_name">
+                    </a>
+                </b><br></h1>
+            <span class="datainput" id="popup_wait_time"
+                style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;" class="content"
+                data-val="N/A">
+                Wait time:
+            </span>
+            <span class="datainput" id="popup_travel_time"
+                style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;" class="content"
+                data-val="N/A">
+                Travel time:
+            </span>
+            <span class="datainput" id="popup_total_time"
+                style="white-space: nowrap; padding: 0; margin: 0; font-size: 15px; color: darkblue;" class="content"
+                data-val="N/A">
+                Total time:
+            </span>
+            <div id="popup-description"></div>
+            <div id="popup-input">
+                <label class="wait_time_input">How long was the wait?</label> <br>
+                <button class="timeinput is-small button" value="5">5 mins</button>
+                <button class="timeinput is-small button" value="10">10 mins</button>
+                <button class="timeinput is-small button" value="15">15 mins</button>
+                <button class="timeinput is-small button" value="20">20 mins</button>
+                <input id="customtimeinput" type="number" placeholder="Custom" style="width: 7em;" />
+            </div>
+            <div class="field">
+                <div class="control">
+                    <button id="popupnext" class="button is-info is-small">
+                        <!-- next / submit -->
+                    </button>
                 </div>
             </div>
-        </center>
-        
+            </b>
+        </div>
 
-       
+    </article>
+
+</center>

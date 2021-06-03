@@ -28,7 +28,10 @@
         <div id="show"></div>
         <div id="map"></div>
         <div id="all-directions-panel">
-            all routes
+            <div id="popup">
+
+                {% include 'Landing/popup.html' %}
+            </div>
         </div>
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -59,10 +62,6 @@
     <!---->
     <script src="{% static 'Landing/js/directions.js' %}"></script>
     <script src="{% static 'Landing/js/webSockets.js' %}" defer></script>
-    <div id="popup">
-
-        {% include 'Landing/popup.html' %}
-    </div>
 
 </body>
 

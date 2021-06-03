@@ -1,6 +1,7 @@
 // var autocomplete;
 var UserPos;
 const Google_Places_API_KEY = "jAIzaSyBzd999zA1_gyh7uB6KpUh-hBaYsl0vmIQ";
+const MINQUERYZOOM = 17;
 var map;
 // we are targeting a location, bring out the busness popup
 var targetingLocation = false;
@@ -11,6 +12,7 @@ var previousSearch = q;
 var markers = new Array(); // type: custom class busness
 const choices = $("#choices");
 var levelOfDepth = 0;
+
 const options = {
     enableHighAccuracy: true,
     // timeout: 5000, // => default infinity // take as much time as you need
@@ -159,8 +161,11 @@ function mainLoop(position) {
         // set up event listeners
         // let infowindow;
         map.addListener("idle", () => {
-            nearbySearch();
+            start_nearbySearch();
             console.log("zoom: " + map.getZoom());
+        });
+        map.addListener("center_changed", () => {
+            stoptimer();
         });
         $('#search-submit').click(function (event) { // Gives search results
             console.log("test");
@@ -183,8 +188,6 @@ function mainLoop(position) {
             });
         })
         $("#arrow").click(toggleSidePanel); // toggles side panel
-        
-        $("#search-area-button").click(nearbySearch); // searches the area around the center of the map
         loadDirections(); // load directions
         return true;
     })
@@ -218,57 +221,63 @@ function createTemps(result = lastsend) {
         });
     }
 }
+var pastZoom, pastCenter;
+var timer; // timer object to stop the nearby search if center changed
 
-function nearbySearch() { //plots the nearby locations
-    if (service) {
-        var mapbounds = map.getBounds();
+function stoptimer(){
+    clearTimeout(timer);
+}
 
-        var ne = mapbounds.getNorthEast();
-        var sw = mapbounds.getSouthWest();
-        // new google.maps.Marker({
-        //     position: ne
-        // }).setMap(map);
-        // new google.maps.Marker({
-        //     position: sw
-        // }).setMap(map);
-        var nelat = ne.lat();
-        var nelon = ne.lng();
-        var swlat = sw.lat();
-        var swlon = sw.lng();
-
-
-        console.log("query from local db");
-        let center = map.center;
-
-        queryDB(center.lat(), center.lng(), nelat, nelon, swlat, swlon);
-        levelOfDepth++;
-        console.log(mapbounds);
-
-        // console.log("query from nearby search");
-        // let request = {
-        //     bounds: mapbounds,
-        //     // add ranked by changed by options
-        //     // rankBy: google.maps.places.RankBy.DISTANCE,
-        //     // edit the type by options
-        //     type: "restaurant",
-        // }
-        // const locations = service.nearbySearch(request, (result, status)=>{
-        //     if (status == google.maps.places.PlacesServiceStatus.OK){
-        //         placeResultsToMarkers(result);
-        //         //only take xy coords and place id
-        //         var myResults = [];
-
-        //         result && result.map(v => {
-        //             let coords = v.geometry.location;     
-        //             let placeID = v.place_id;           
-        //             myResults.push({ coords, placeID });
-        //         })
-
-
-        //         createTemps(myResults);
-        //         lastsend = myResults;
-        //     }
-        // });      
+function nearbySearch(){
+    //do nearybySearch after 3 seconds
+    var mapbounds = map.getBounds();
+    var ne = mapbounds.getNorthEast();
+    var sw = mapbounds.getSouthWest();
+    // new google.maps.Marker({
+    //     position: ne
+    // }).setMap(map);
+    // new google.maps.Marker({
+    //     position: sw
+    // }).setMap(map);
+    var nelat = ne.lat();
+    var nelon = ne.lng();
+    var swlat = sw.lat();
+    var swlon = sw.lng();
+    console.log("query from local db");
+    let center = map.center;
+    queryDB(center.lat(), center.lng(), nelat, nelon, swlat, swlon);
+    levelOfDepth++;
+    console.log(mapbounds);
+    // console.log("query from nearby search");
+    let request = {
+        bounds: mapbounds,
+        // add ranked by changed by options
+        // rankBy: google.maps.places.RankBy.DISTANCE,
+        // edit the type by options
+        type: "restaurant",
+    }
+    const locations = service.nearbySearch(request, (result, status)=>{
+        if (status == google.maps.places.PlacesServiceStatus.OK){
+            placeResultsToMarkers(result);
+            //only take xy coords and place id
+            var myResults = [];
+            result && result.map(v => {
+                let coords = v.geometry.location;     
+                let placeID = v.place_id;           
+                myResults.push({ coords, placeID });
+            })
+            createTemps(myResults);
+            lastsend = myResults;
+        }
+    }); 
+}
+function start_nearbySearch() { //plots the nearby locations
+    mapzoom = map.getZoom()
+    if (service && mapzoom > MINQUERYZOOM && pastZoom != mapzoom || map.center != pastCenter) {
+        stoptimer();
+        timer = setTimeout(function() {
+            nearbySearch();
+          }, 3000);
     }
 }
 
@@ -286,9 +295,6 @@ async function placeResultsToMarkers(results,) {
             }, markers.length);
             markers.push(x);
         }
-
-
-
     }
 }
 

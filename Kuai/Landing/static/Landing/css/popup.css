@@ -54,11 +54,6 @@
 }
 
 #popup {
-    display: block;
-    position: fixed;
-    left: 30%;
-    width: 70%;
-    top: 58%;
     z-index: 2;
     text-align: center;
   }
@@ -69,6 +64,7 @@
     display: inherit;
     float: right;
     right: 1em;
+    top: 0;
     z-index: 2;
 }
 

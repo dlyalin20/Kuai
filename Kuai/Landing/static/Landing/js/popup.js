@@ -72,7 +72,7 @@ function popUpNext(event, setto=null){
             default:
                 //last step // leave
                 if (runAvg()){
-                    alert("Thank you, Bye!");
+                    
                     closePopUp();
                 }
                     
@@ -104,5 +104,5 @@ function openPopUp(name, place_id, wait_time = null){
     popup.find("#popup-input").hide(); 
     popup.find(".people_in_front").show();
     popup.find("#overflow_people").prop("checked", false );
-
+    
 }

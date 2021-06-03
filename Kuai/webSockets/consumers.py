@@ -31,7 +31,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             
         else:
             return ("error")
-        return("Data recieved and Stored")
+        return("recieved-waittime")
         # return 
 
     async def receive(self, text_data):

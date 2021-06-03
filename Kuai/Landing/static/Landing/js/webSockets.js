@@ -1,8 +1,13 @@
-const chatSocket = new WebSocket(
-    'ws://'
-    + window.location.host
-    + '/ws/go/SearchNearby'
-); 
+var chatSocket;
+connect()
+function connect(){
+    chatSocket = new WebSocket(
+        'ws://'
+        + window.location.host
+        + '/ws/go/SearchNearby'
+    ); 
+}
+
 var data;
 var bizHash = new hashtable();
 var timerId;
@@ -14,8 +19,12 @@ chatSocket.onmessage = function(e) {
     if (e.data.charAt(0) != "["){
         if (data == "bad inputs"){
             alert("bad inputs")
+        }if (data == "recieved-waittime"){
+            alert("Thank you, Bye!");
         }else{
+            // update the waittime for this
             console.log(data);
+            // check if the placeID is being currently displayed
         }
     }
     else{

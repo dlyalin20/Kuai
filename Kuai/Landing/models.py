@@ -251,7 +251,12 @@ class Business_Manager(models.Manager):
         except :
             print("Not a float")
             return(False)
-    
+    def getWaitTime(self, placeID):
+        qs = self.get_queryset()
+        qs = qs.filter(placeID = placeID)
+        target = qs.get()
+        return target.getAverage()
+
     def search(self, latitude, longitude, nelat, nelon, swlat, swlon):
         x = self.isFloatNum(latitude) and self.isFloatNum(longitude) 
         x = x and self.isFloatNum(nelat) and self.isFloatNum(nelon) and self.isFloatNum(swlat) and self.isFloatNum(swlon)

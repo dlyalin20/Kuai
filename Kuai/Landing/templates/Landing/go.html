@@ -32,6 +32,8 @@
     <script>
         {% if user.is_authenticated %}
         var is_authenticated = true;
+        {% else %}
+        var is_authenticated = false;
         {% endif %}
         var q = "{{q}}"; // get the query
         // console.log(q);

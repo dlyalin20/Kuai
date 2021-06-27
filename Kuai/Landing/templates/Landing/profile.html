@@ -45,7 +45,7 @@
   <td class="td"> </td> <!-- category-->
   <td class="td"> favorite['distance'] </td> <!--distance-->
   <td class="td">{{i.wait_time}}</td> <!--wait time-->
-  <td class="td"></td>
+  <td class="td">{{i.start_time}}</td>
   <td class="sorttable_nosort"><button>Go</button></td>
 </tr>
 
@@ -61,4 +61,11 @@
 
 
   </div>
+
+
+  <script src="{% static 'Landing/js/location.js' %}"></script>
+
+  <script
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBzd999zA1_gyh7uB6KpUh-hBaYsl0vmIQ&callback=initialize&libraries=places&v=weekly"></script>
+
 </html>

@@ -34,7 +34,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         return("recieved-waittime")
         # return 
 
-    async def receive(self, text_data):
+    async def receive(self, text_data):#request to 
         text_data_json = json.loads(text_data) #get sent json
         print(text_data_json)
         keys = text_data_json.keys()

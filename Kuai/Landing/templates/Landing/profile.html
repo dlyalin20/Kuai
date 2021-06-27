@@ -1,7 +1,10 @@
 {% load socialaccount %}
 <html>
   <head>
+    {% load static %}
     <title>Profile</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="{% static 'Landing/js/sorttable.js' %}"></script>
   </head>
   <style>
     #profile{
@@ -11,27 +14,51 @@
 
   {% block content %}
   {% include 'Landing/navbar.html' %}
+
 <div id="profile">
   <h1>Profile</h1>
 
   {% if user.is_authenticated %}
   <p>Welcome, {{ user.username }}!</p>
+  <img class="is-rounded" src="../../bios/Landing/pfps/UniversalSuperUser" alt="UniversalSuperUser" width="120" height="90">
 
-  <p>Wait times: 
-    <br>
 
-    {% for i in user.profile.all_time_updates.all %} 
-    
-      {{i.business.get_short_name}}:  {{i.wait_time}}
-      <br>
 
-    {% endfor%}</p>
-  <p></p>
-  {% else %}
-  <p>Welcome, friend!</p>
-  {% endif %}
+  <h1>My History: </h1>
+  <table class="sortable">
+  <thead class="thead">
+    <tr class="tr">
+        <th class="th">Name</th>
+        <th class="th">Category</th>
+        <th class="th">Distance</th>
+        <th class="th">Wait</th>
+        <th class="th">Time</th>
+        <!-- <th class="th">Sort By: <!---Add input here to sort by dif--></th> -->
+    </tr>
+
+</thead>
+{% for i in user.profile.all_time_updates.all %} 
+      
+
+<tr class="tr">
+  <td class="td">{{i.business.get_short_name}}</td> <!--name-->
+  <td class="td"> </td> <!-- category-->
+  <td class="td"> favorite['distance'] </td> <!--distance-->
+  <td class="td">{{i.wait_time}}</td> <!--wait time-->
+  <td class="td"></td>
+  <td class="sorttable_nosort"><button>Go</button></td>
+</tr>
+
+{% endfor%}
+  </table>
+
+
+{% else %}
+<p>Welcome, friend!</p>
+{% endif %}
 
   {% endblock %}
 
-  </dib>
+
+  </div>
 </html>

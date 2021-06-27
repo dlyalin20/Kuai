@@ -160,6 +160,7 @@ class waitData(models.Model):
     wait_time = models.FloatField(validators = [MinValueValidator(0)], null = False, blank = False)
    # # author = models.OneToOneField(User, max_length = 20, null = False, blank = False, on_delete=models.CASCADE)
     business = models.ForeignKey("Business", on_delete=models.CASCADE, related_name="review", null=True, blank=True)
+    time = models.DateTimeField
     expiration_time = models.DateTimeField(default = getExperationTime, null = False, blank = False,)
     author = models.ForeignKey("Profile", related_name='all_time_updates', on_delete=CASCADE)
 

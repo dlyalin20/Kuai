@@ -19,7 +19,8 @@ urlpatterns = [
     path('quickWaitTime', views.quickWaitTime, name="quickWaitTime"),
     path('longWaitTime', views.longWaitTime, name="longWaitTime"),
     path('longCapacity', views.longCapacity, name="longCapacity"),
-    path('testPopup', views.testing, name="testpopup")
+    path('testPopup', views.testing, name="testpopup"),
+    path("userAccount", views.userAccount, name="userAccount")
     # archive
     # path('autocomplete', views.autocomplete_view, name="autocomplete"),
 ]

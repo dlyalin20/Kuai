@@ -50,6 +50,15 @@
   </table>
 </div>
 <div id="map"></div>
+
+<script>
+  const userHistory = [
+{% for i in user.profile.all_time_updates.all %} 
+  "{{i.business.placeID}}" ,
+{% endfor %}
+  ];
+</script>
+
 {% else %}
 <p>Welcome, friend!</p>
 {% endif %}

@@ -1,12 +1,15 @@
 var geocoder; 
 var map;
+// Starting Function
 function initialize() {
+    console.log(userHistory);
     geocoder = new google.maps.Geocoder()
 
     getLocation();
 }
 
-
+/** Function that finds User Pos
+ */
 function getLocation() {
     const options = {
         enableHighAccuracy: true,
@@ -15,33 +18,37 @@ function getLocation() {
     };
     var x = document.getElementById("show");
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(mainLoop, function error(msg) { console.log(msg); }, options);
+        navigator.geolocation.getCurrentPosition(initMap, function error(msg) { 
+            console.log(msg); 
+            initMap();
+        }, options);
     }
     else {
         x.innerHTML = "Geolocation is not supported by this browser.";
-        mainLoop();
+        initMap();
     }
 
 }
 
-// @param location - location of User
-function mainLoop(hasLocation){
-    if (hasLocation != null){
-        initMap({ lat: hasLocation.coords.latitude, lng: hasLocation.coords.longitude })
-    }else if(true){ // display the last wait time entry coords
-    
-    }else{
-        // display stuyvesant
-        initMap({ lat: 40.7178149, lng: -74.0138422 })
-    }
 
-}
-
+/** Function that starts up the map
+ * 
+ * @param {GeolocationPosition} center Location of the User or null
+ */
 function initMap(center){
-    map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 18,
-        center: center,
-    });
-    var marker = new google.maps.Marker({ position: center, map: map });
+    if (center != null){
+        googleCenter = {lat: center.coords.latitude, lng: center.coords.longitude};
+        map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 18,
+            center: googleCenter,
+        });
+        var marker = new google.maps.Marker({ position: googleCenter, map: map });
+    }else{
+        map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 18,
+            center:{ lat: 40.7178149, lng: -74.0138422 }
+        });
+    }
+    
 
 }

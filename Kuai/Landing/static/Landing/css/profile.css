@@ -1,0 +1,8 @@
+#maincontent{
+    display: flex;
+   
+}
+#maincontent > * {
+    width: 50%;
+}
+

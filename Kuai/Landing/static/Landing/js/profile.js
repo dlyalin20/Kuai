@@ -1,5 +1,8 @@
 var geocoder; 
 var map;
+var markers = [];
+var bizHash = new hashtable();
+var service;
 // Starting Function
 function initialize() {
     console.log(userHistory);
@@ -49,6 +52,21 @@ function initMap(center){
             center:{ lat: 40.7178149, lng: -74.0138422 }
         });
     }
-    
+    service = new google.maps.places.PlacesService(map);
+    makeBusinesses(userHistory);
+}
 
+
+/**Creates and display Business objects from placeIDs, linking them to go-to buttons
+ * @param {String[]} place_ids list of place ids
+ */
+function makeBusinesses(place_ids){
+    for (i in place_ids){
+
+        let temp = new Business( place_ids[i], null, null, function(){
+            this.addHash(); //eventually adds hash        
+            this.showMarker(); // show marker 
+        }, i );
+        markers.push(temp);
+    }
 }

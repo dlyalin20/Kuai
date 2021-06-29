@@ -42,7 +42,7 @@ class Business {
             this.marker = new google.maps.Marker({
                 position: this.position
             });
-            setmarkerCallBack(self);
+            // setmarkerCallBack(self);
             if (callback) {
                 this.callback();
             }
@@ -64,6 +64,9 @@ class Business {
 
         this.position = pos;
         this.name = results.name;
+        this.marker = new google.maps.Marker({
+            position: this.position
+        });
     }
 
     async showMarker() {
@@ -154,4 +157,37 @@ function setmarkerCallBack(thisObj) {
     google.maps.event.addListener(thisObj.marker, "click", () => {
         thisObj.ToggleThisPopUp();
     });
+}
+
+function queryService(targetID, callback, index = false) {
+    if (targetID) { //!= ""
+        const request = {
+            placeId: targetID,
+            fields: ["name", "formatted_address", "place_id", "geometry"],
+        };
+        service.getDetails(request, (place, status) => {
+            if (
+                status === google.maps.places.PlacesServiceStatus.OK &&
+                place &&
+                place.geometry &&
+                place.geometry.location
+            ) {
+                // good
+                // console.log(place);
+                if (Number.isInteger(index)) {
+                    callback(place, index);
+                }
+                else {
+                    callback(place);
+                }
+            } else {
+                console.log(status);
+            }
+        })
+    }
+    else {
+        console.log("no target id");
+        callback(false);
+    }
+
 }

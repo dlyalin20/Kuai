@@ -394,38 +394,7 @@ function queryGeocoder(targetID, callback) {
         callback(false);
     }
 }
-function queryService(targetID, callback, index = false) {
-    if (targetID) { //!= ""
-        const request = {
-            placeId: targetID,
-            fields: ["name", "formatted_address", "place_id", "geometry"],
-        };
-        service.getDetails(request, (place, status) => {
-            if (
-                status === google.maps.places.PlacesServiceStatus.OK &&
-                place &&
-                place.geometry &&
-                place.geometry.location
-            ) {
-                // good
-                // console.log(place);
-                if (Number.isInteger(index)) {
-                    callback(place, index);
-                }
-                else {
-                    callback(place);
-                }
-            } else {
-                console.log(status);
-            }
-        })
-    }
-    else {
-        console.log("no target id");
-        callback(false);
-    }
 
-}
 function lockOn(targetID, callback) {
     queryGeocoder(targetID, results => {
         console.log(results);

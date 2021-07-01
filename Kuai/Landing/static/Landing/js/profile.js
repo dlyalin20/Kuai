@@ -61,12 +61,17 @@ function initMap(center){
  * @param {String[]} place_ids list of place ids
  */
 function makeBusinesses(place_ids){
-    for (i in place_ids){
-
-        let temp = new Business( place_ids[i], null, null, function(){
+    $('.HistoryButtons').each(function(i, obj){
+        
+        const parent = new Business( place_ids[i], null, null, function(){
             this.addHash(); //eventually adds hash        
             this.showMarker(); // show marker 
         }, i );
-        markers.push(temp);
-    }
+        markers.push(parent);
+        $(this).click(function(){
+            console.log("test");
+            parent.goTo(); // center on marker
+        })
+    })
+
 }

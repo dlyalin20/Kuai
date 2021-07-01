@@ -44,7 +44,7 @@
     <td class="td"> favorite['distance'] </td> <!--distance-->
     <td class="td">{{i.wait_time}}</td> <!--wait time-->
     <td class="td">{{i.start_time}}</td>
-    <td class="sorttable_nosort"><button>Go</button></td>
+    <td class="sorttable_nosort"><button class="HistoryButtons">Go</button></td>
   </tr>
 {% endfor%}
   </table>
@@ -72,7 +72,7 @@
 
   </div>
 
-
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="{% static 'Landing/js/location.js' %}"></script>
   <script src="{% static 'Landing/js/profile.js' %}"></script>
   <script

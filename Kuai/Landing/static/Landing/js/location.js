@@ -111,13 +111,18 @@ class Business {
             })
             .css("order", i)
             .appendTo(choices)
-
         // console.log(myDiv);
         // choices.append(myDiv);
 
 
     }
-
+    /**
+     * Center map on the Business marker
+     */
+    goTo(){
+        map.panTo(this.position)
+        map.setZoom(18);
+    }
     ToggleThisPopUp() {
         if (targetBiz != null && targetBiz.placeID == this.placeID) {
             closePopUp();
@@ -125,8 +130,7 @@ class Business {
         } else {
             load_route_to_biz(this);
             targetBiz = this;
-            map.panTo(this.position)
-            map.setZoom(18);
+            goTo();
             if (this.waitTime) {
                 openPopUp(this.name, this.placeID, this.waitTime);
             }

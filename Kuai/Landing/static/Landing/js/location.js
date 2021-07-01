@@ -43,16 +43,21 @@ class Business {
         if (!(location && name)) {
             //if we dont have location or name run Places Details request to get lat lng and name
             const hold = this;
-            let y = queryService(placeID, function (results) {
-                // fill in rest of info
-                let pos = results.geometry.location
-                hold.position = pos;
-                hold.name = results.name;
-                hold.marker = new google.maps.Marker({
-                    position: hold.position
+            this.pendinginfo = new Promise(function(accept, r){
+                queryService(placeID, function (results) {
+                    // fill in rest of info
+                    let pos = results.geometry.location
+                    hold.position = pos;
+                    hold.name = results.name;
+                    hold.marker = new google.maps.Marker({
+                        position: hold.position
+                    });
+                    hold.callback();
+                    accept();
+                    
                 });
-                hold.callback();
-            });
+            })
+            
         } else {
             // we have all the infomation just plug it in
             this.name = name;
@@ -67,7 +72,10 @@ class Business {
     }     
     }
 
-
+    async getName(){
+        await this.pendinginfo;
+        return this.name;        
+    }
     async showMarker() {
         if (!(this.position && this.marker)) {
             this.marker = new google.maps.Marker({
@@ -178,10 +186,10 @@ function queryService(targetID, callback, index = false) {
                 // good
                 // console.log(place);
                 if (Number.isInteger(index)) {
-                    callback(place, index);
+                    return callback(place, index);
                 }
                 else {
-                    callback(place);
+                    return callback(place);
                 }
             } else {
                 console.log(status);
@@ -190,7 +198,7 @@ function queryService(targetID, callback, index = false) {
     }
     else {
         console.log("no target id");
-        callback(false);
+        return callback(false);
     }
 
 }

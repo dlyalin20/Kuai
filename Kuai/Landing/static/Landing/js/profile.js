@@ -54,14 +54,24 @@ function initMap(center){
     }
     service = new google.maps.places.PlacesService(map);
     makeBusinesses(userHistory, markers).then(function(){
-        linkMarkerToButtons(userHistory, markers, ".HistoryButtons");
-    })
+        linkMarkerToButtons(userHistory, markers, ".HistoryButtons")
+        $(".HistoryName").each(async function(i, obj){
+            index = await bizHash.getIndex(userHistory[i])// find the index of the placeID in the marker array
+            parent = markers[index];
+            let parentName = await parent.getName()
+            $(this).html(String(parentName));
+            });
+    });
+        
+    
 }
 
 
 /**Creates display and adds Business objects from placeIDs to array
  * @param {String[]} place_ids list of place ids
  * @param {Business[]} markerarray list of Businesses
+ * @param {function(Business)} callback callback run after the Business object is created
+ }}
  */
 async function makeBusinesses(place_ids, markerarray){
     for (i in place_ids){
@@ -71,6 +81,7 @@ async function makeBusinesses(place_ids, markerarray){
             }, );
             markerarray.push(parent);    
         }
+
     }
 }
 
@@ -84,7 +95,6 @@ function linkMarkerToButtons(place_ids, markerarray, targetString){
     $(targetString).each(function(i, obj){
         $(this).click(async function(){
             const PlaceID = place_ids[i];
-            const hash = bizHash;
             index = await bizHash.getIndex(PlaceID)// find the index of the placeID in the marker array
             parent = markerarray[index];
             parent.goTo(); // center on marker

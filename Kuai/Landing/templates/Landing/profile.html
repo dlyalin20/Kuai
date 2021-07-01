@@ -29,7 +29,9 @@
   <table class="sortable">
   <thead class="thead">
     <tr class="tr">
-        <th class="th">Name</th>
+        <th class="th">
+          Name
+        </th>
         <th class="th">Category</th>
         <th class="th">Distance</th>
         <th class="th">Wait</th>
@@ -39,7 +41,7 @@
   </thead>
 {% for i in user.profile.all_time_updates.all %} 
   <tr class="tr">
-    <td class="td">{{i.business.get_short_name}}</td> <!--name-->
+    <td class="td"><span class="HistoryName">{{i.business.get_short_name}}</span></td> <!--name-->
     <td class="td"> </td> <!-- category-->
     <td class="td"> favorite['distance'] </td> <!--distance-->
     <td class="td">{{i.wait_time}}</td> <!--wait time-->

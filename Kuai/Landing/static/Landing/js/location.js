@@ -14,29 +14,35 @@ class hashtable {
         }
     }
 }
-
+var bizHash = new hashtable();
 var targetBiz;
 
 class Business {
     // location new google.maps.LatLng(location);
     //Call back is run after contructor is done
-    constructor(placeID, location = null, name = null, callback = null, array_index, waitTime = null) {
-        if (waitTime != null){
-            this.waitTime = Math.round(waitTime);
+    constructor(placeID,array_index, location = null, name = null, callback = null, waitTime = null) {
+        if (waitTime != null){ 
+            this.waitTime = Math.round(waitTime); // round wait time to a whole number
         }
-        
         this.placeID = placeID;
         this.infowindow = new google.maps.InfoWindow;
         this.callback = callback;
-        this.array_index_plus1 = array_index + 1; // plus one to avoid the number coming back as false
+        this.array_index_plus1 = array_index + 1; // plus one to avoid the number coming back from the hash as false
         if (!(location && name)) {
-            // run Places Details request to get lat lng and name
+            //if we dont have location or name run Places Details request to get lat lng and name
             const hold = this;
-            let y = queryService(placeID, function (x) {
-                hold.fillLocals(x);
+            let y = queryService(placeID, function (results) {
+                // fill in rest of info
+                let pos = results.geometry.location
+                hold.position = pos;
+                hold.name = results.name;
+                hold.marker = new google.maps.Marker({
+                    position: hold.position
+                });
                 hold.callback();
             });
         } else {
+            // we have all the infomation just plug it in
             this.name = name;
             this.position = location;
             this.marker = new google.maps.Marker({
@@ -45,29 +51,10 @@ class Business {
             // setmarkerCallBack(self);
             if (callback) {
                 this.callback();
-            }
-        }
-
-
-
-
+        }    
+    }     
     }
 
-    fillLocals(results) {
-        let pos = results.geometry.location
-        // temp = new Promise(accept, reject){
-        // }
-        // this.position = new google.maps.LatLng(pos.lat(),  pos.lng());
-        // let x = settleCoords(pos.lat,  pos.lng); // hold promise that we will await later
-        // console.log(x);
-        // this.position = x;
-
-        this.position = pos;
-        this.name = results.name;
-        this.marker = new google.maps.Marker({
-            position: this.position
-        });
-    }
 
     async showMarker() {
         if (!(this.position && this.marker)) {
@@ -130,7 +117,7 @@ class Business {
         } else {
             load_route_to_biz(this);
             targetBiz = this;
-            goTo();
+            this.goTo();
             if (this.waitTime) {
                 openPopUp(this.name, this.placeID, this.waitTime);
             }
@@ -194,4 +181,29 @@ function queryService(targetID, callback, index = false) {
         callback(false);
     }
 
+}
+
+class BusinessHolder{
+    constructor(){
+        this.MyHashTable = new hashtable;
+        this.MyBusinesses = [];
+    }
+    /**
+     * Adds Business
+     * @param {String} placeID 
+     * @param {int} array_index  
+     * @param {LatLngObject} location 
+     * @param {String} name 
+     * @param {Function} callback called after object is created
+     * @param {Float} waitTime what is the wait time at the location
+     * @return {Promise} Resolves to true if created or is duplicate, false if failed
+     */
+    async addBusiness(placeID, location = null, name = null, callback = null, waitTime = null){
+        if (!(await MyHashTable.doesExistorAdd(element.place_id, markers.length))) {
+            x = new Business(element.place_id, element.geometry.location, element.name, async function () {
+                this.showMarker();
+            }, MyBusinesses.length);
+            MyBusinesses.push(x);
+        }
+    }
 }

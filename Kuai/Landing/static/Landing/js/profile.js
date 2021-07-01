@@ -1,7 +1,7 @@
 var geocoder; 
 var map;
 var markers = [];
-var bizHash = new hashtable();
+
 var service;
 // Starting Function
 function initialize() {
@@ -53,25 +53,38 @@ function initMap(center){
         });
     }
     service = new google.maps.places.PlacesService(map);
-    makeBusinesses(userHistory);
+    makeBusinesses(userHistory, markers);
+    linkMarkerToButtons(markers, ".HistoryButtons");
 }
 
 
-/**Creates and display Business objects from placeIDs, linking them to go-to buttons
+/**Creates display and adds Business objects from placeIDs to array
  * @param {String[]} place_ids list of place ids
+ * @param {Business[]} markerarray list of Businesses
  */
-function makeBusinesses(place_ids){
-    $('.HistoryButtons').each(function(i, obj){
+async function makeBusinesses(place_ids, markerarray){
+    for (i in place_ids){
+        if (!(await bizHash.doesExistorAdd(place_ids[i], markerarray.length))) {
+            let parent = new Business( place_ids[i],i , null, null, function(){
+                this.addHash(); //eventually adds hash        
+                this.showMarker(); // show marker 
+            }, );
+            markerarray.push(parent);    
+        }
+    }
+}
+
+/**
+ * Links markers to buttons of a certain class
+ * @param {Business[]} markerarray 
+ * @param {String} targetString String of the class - starting with . (ex ".HistoryButtons")
+ */
+function linkMarkerToButtons(markerarray, targetString){
+    $(targetString).each(function(i, obj){
         
-        const parent = new Business( place_ids[i], null, null, function(){
-            this.addHash(); //eventually adds hash        
-            this.showMarker(); // show marker 
-        }, i );
-        markers.push(parent);
         $(this).click(function(){
-            console.log("test");
+            const parent = markerarray[i];
             parent.goTo(); // center on marker
         })
     })
-
 }

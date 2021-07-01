@@ -53,8 +53,9 @@ function initMap(center){
         });
     }
     service = new google.maps.places.PlacesService(map);
-    makeBusinesses(userHistory, markers);
-    linkMarkerToButtons(markers, ".HistoryButtons");
+    makeBusinesses(userHistory, markers).then(function(){
+        linkMarkerToButtons(userHistory, markers, ".HistoryButtons");
+    })
 }
 
 
@@ -65,8 +66,7 @@ function initMap(center){
 async function makeBusinesses(place_ids, markerarray){
     for (i in place_ids){
         if (!(await bizHash.doesExistorAdd(place_ids[i], markerarray.length))) {
-            let parent = new Business( place_ids[i],i , null, null, function(){
-                this.addHash(); //eventually adds hash        
+            let parent = new Business( place_ids[i],markerarray.length , null, null, function(){
                 this.showMarker(); // show marker 
             }, );
             markerarray.push(parent);    
@@ -76,15 +76,20 @@ async function makeBusinesses(place_ids, markerarray){
 
 /**
  * Links markers to buttons of a certain class
+ * @param {String[]} place_ids list of place ids
  * @param {Business[]} markerarray 
  * @param {String} targetString String of the class - starting with . (ex ".HistoryButtons")
  */
-function linkMarkerToButtons(markerarray, targetString){
+function linkMarkerToButtons(place_ids, markerarray, targetString){
     $(targetString).each(function(i, obj){
-        
-        $(this).click(function(){
-            const parent = markerarray[i];
+        $(this).click(async function(){
+            const PlaceID = place_ids[i];
+            const hash = bizHash;
+            index = await bizHash.getIndex(PlaceID)// find the index of the placeID in the marker array
+            parent = markerarray[index];
             parent.goTo(); // center on marker
+            
         })
-    })
+    }); 
+    
 }

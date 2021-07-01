@@ -2,16 +2,28 @@ class hashtable {
     constructor() {
         this.list = [];
     }
-    async doesExistorAdd(placeID, array_index_plus1) {
-        var x = await getHash(placeID)
+    async doesExistorAdd(placeID, array_index) {
+        var x = await getHash(placeID);
         var dv = new DataView(x);
         var hash = dv.getInt32();
         if (this.list[hash]) {
             return true;
         } else {
-            this.list[hash] = array_index_plus1;
+            this.list[hash] = parseInt(array_index)  + 1;// plus one to avoid the number coming back from the hash as false
             return false;
         }
+    }
+    /**
+     * Get the index in the array of a found PlaceID
+     * @param {String} placeID 
+     * @return {Int}
+     * @return {null}
+     */
+    async getIndex(placeID){
+        var x = await getHash(placeID);
+        var dv = new DataView(x);
+        var hash = dv.getInt32();
+        return this.list[hash] - 1 
     }
 }
 var bizHash = new hashtable();
@@ -27,7 +39,7 @@ class Business {
         this.placeID = placeID;
         this.infowindow = new google.maps.InfoWindow;
         this.callback = callback;
-        this.array_index_plus1 = array_index + 1; // plus one to avoid the number coming back from the hash as false
+        this.array_index = array_index; 
         if (!(location && name)) {
             //if we dont have location or name run Places Details request to get lat lng and name
             const hold = this;

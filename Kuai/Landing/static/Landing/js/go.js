@@ -486,17 +486,17 @@ async function plotListMarkers(results) {
     // turn this in to plant markers function
     for (let i = 0; i < results.length; i++) {
         await new Promise(function (accept, reject) {
-            const start = markers.length - 1;
+            const start = markers.length;
             var pointer = 0;
             for (let i = 0; i < data.length; i++) {
                 // choices.html("");
-                new Business(results[i].place_id, null, null, async function () {
+                new Business(results[i].place_id, start + pointer, null, null, async function () {
                     if (!await this.testHash()) {
                         this.pushDivDescription();
                         markers.push(temp);
                         pointer++;
                     }
-                }, start + pointer);
+                });
                 // console.log(placeLocation);
                 // createMarker(placeLocation);
                 // queryService(data[i], placeResult, i)

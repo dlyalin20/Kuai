@@ -34,10 +34,10 @@ function connect(){
                 clearMarkers();
                 for (let i = 0; i < data.length; i++){
                     // choices.html("");
-                    let temp = new Business(data[i][0], null, null, function(){
+                    let temp = new Business(data[i][0], i,null, null, function(){
                         this.addHash(); //eventually adds hash
                         this.pushDivDescription();             
-                    }, i, data[i][1]);
+                    },  data[i][1]);
                     // console.log(placeLocation);
                     // createMarker(placeLocation);
                     // queryService(data[i], placeResult, i)

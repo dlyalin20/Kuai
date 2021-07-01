@@ -86,13 +86,13 @@ class Business {
         this.marker.setMap(map);
     }
     addHash() {
-        bizHash.doesExistorAdd(this.placeID, this.array_index_plus1);
+        bizHash.doesExistorAdd(this.placeID, this.array_index);
     }
 
     async testHash() {
         //if place_id hash already exists returns true
         //else returns false
-        return await bizHash.doesExistorAdd(this.placeID, this.array_index_plus1);
+        return await bizHash.doesExistorAdd(this.placeID, this.array_index);
     }
     hideMarker() {
         if (this.marker) {
@@ -101,7 +101,7 @@ class Business {
     }
 
     async pushDivDescription() { // what happends when u click on the marker
-        var i = this.array_index_plus1;
+        var i = this.array_index + 1;
         if (!(this.position && this.marker)) {
             await this.position;
             this.marker = new google.maps.Marker({

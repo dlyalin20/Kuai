@@ -157,9 +157,9 @@ function mainLoop(position) {
             clearMarkers();
             for (let i = 0; i < result.markers.length; i++){
                 // choices.html("");
-                let temp = new Business(result.markers[i], null, null, function(){
+                let temp = new Business(result.markers[i], i, null, null, function(){
                     this.pushDivDescription();             
-                }, i);
+                });
                 // console.log(placeLocation);
                 // createMarker(placeLocation);
                 // queryService(data[i], placeResult, i)
@@ -249,10 +249,12 @@ function nearbySearch(){
     // new google.maps.Marker({
     //     position: sw
     // }).setMap(map);
-    var nelat = ne.lat();
-    var nelon = ne.lng();
-    var swlat = sw.lat();
-    var swlon = sw.lng();
+    const MARGINOFERROR = 0.0025;
+    var nelat = ne.lat() + MARGINOFERROR;
+    var nelon = ne.lng() + MARGINOFERROR;
+    var swlat = sw.lat() - MARGINOFERROR;
+    var swlon = sw.lng() - MARGINOFERROR;
+    console.log(nelat, nelon, swlat, swlon);
     console.log("query from local db");
     let center = map.center;
     queryDB(center.lat(), center.lng(), nelat, nelon, swlat, swlon);
@@ -300,9 +302,9 @@ async function placeResultsToMarkers(results,) {
         // createMarker(element);
         // placeResult(element, index);
         if (!(await bizHash.doesExistorAdd(element.place_id, markers.length))) {
-            x = new Business(element.place_id, element.geometry.location, element.name, async function () {
+            x = new Business(element.place_id, markers.length, element.geometry.location, element.name, async function () {
                 this.pushDivDescription();
-            }, markers.length);
+            });
             markers.push(x);
         }
     }

@@ -162,3 +162,16 @@ hr {
   text-align: center;
   width: 40%;
 }
+#MainSwitch{
+  position: absolute;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  top: 15%;
+  z-index: 100;
+  background-color: aquamarine;
+  border: 2px solid black;
+  
+}

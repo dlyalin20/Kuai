@@ -170,6 +170,7 @@ function mainLoop(position) {
     }).then(function (result) { //set up event listeners
         // set up event listeners
         // let infowindow;
+
         map.addListener("idle", () => {
             start_nearbySearch();
             console.log("zoom: " + map.getZoom());
@@ -198,6 +199,25 @@ function mainLoop(position) {
             });
         })
         $("#arrow").click(toggleSidePanel); // toggles side panel
+        $('#WaitTime').css('background-color', "mediumaquamarine")
+        $("#MainSwitch").attr("data-isHeat", 'f');
+        $("#MainSwitch").click(function(){
+                console.log($(this).attr("data-isHeat"));
+                if ($(this).attr("data-isHeat") == 't'){
+                    $(this).attr("data-isHeat", 'f');
+                    $('#WaitTime').css('background-color', "aquamarine");
+                    $('#HeatMap').css('background-color', "mediumaquamarine");
+                    // activate heat map
+                    activate_heatmap();
+                }else{
+                    $(this).attr("data-isHeat", 't');
+                    $('#HeatMap').css('background-color', "aquamarine")
+                    $('#WaitTime').css('background-color', "mediumaquamarine") 
+                    // activate wait time
+                    activate_waittime();
+                }
+            }
+        )
         loadDirections(); // load directions
         return true;
     })

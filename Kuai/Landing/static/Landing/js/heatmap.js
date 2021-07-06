@@ -1,7 +1,12 @@
+
+
 /**
- * renders a heat map of the user's visable surroundings 
- * @param {Business[]} bisArray
+ * renders a heat map of wait data in the user's visible surroundings
+ * @param {WeightedLocation[]} bisArray https://developers.google.com/maps/documentation/javascript/reference#WeightedLocation
  */
 function render(bisArray){
-    // for each wait biz, collect the wait time and plot on heat map
+    // for each waittime, collect the wait time and plot on heat map
+    for (i in bisArray){
+        bisArray[i]
+    }
 }

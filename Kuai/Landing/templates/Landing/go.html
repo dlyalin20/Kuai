@@ -17,7 +17,7 @@
         <span id="HeatMap">Heat Map</span>
         
         </div>
-        <div id="searchAndOptions">
+        <div id="searchAndOptions" class="goMap">
             <span id="search-container">
                 <input id="search-input" type="text"></input>
                 <button type="submit" id="search-submit" class="button is-rounded">Search</button>
@@ -28,13 +28,15 @@
             <div id="paras"></div>
             <div id="choices"></div>
         </div>
-        <div id="arrow"></div>
-        <div id="show"></div>
+        <div id="arrow" class="goMap"></div>
+        <div id="show" class="goMap"></div>
         <div id="map"></div>
-        <div id="all-directions-panel">
+        <div class="goMap">
+            <div id="all-directions-panel" >
             <div id="popup">
 
                 {% include 'Landing/popup.html' %}
+            </div>
             </div>
         </div>
     </div>

@@ -12,7 +12,7 @@ var previousSearch = q;
 var markers = new Array(); // type: custom class busness
 const choices = $("#choices");
 var levelOfDepth = 0;
-
+var heatMap = false;
 const options = {
     enableHighAccuracy: true,
     // timeout: 5000, // => default infinity // take as much time as you need
@@ -202,19 +202,18 @@ function mainLoop(position) {
         $('#WaitTime').css('background-color', "mediumaquamarine")
         $("#MainSwitch").attr("data-isHeat", 'f');
         $("#MainSwitch").click(function(){
-                console.log($(this).attr("data-isHeat"));
-                if ($(this).attr("data-isHeat") == 't'){
-                    $(this).attr("data-isHeat", 'f');
+                heatMap = !(heatMap);
+                if (heatMap){
                     $('#WaitTime').css('background-color', "aquamarine");
                     $('#HeatMap').css('background-color', "mediumaquamarine");
                     // activate heat map
-                    activate_heatmap();
+                    $('.goMap').hide();
                 }else{
                     $(this).attr("data-isHeat", 't');
                     $('#HeatMap').css('background-color', "aquamarine")
                     $('#WaitTime').css('background-color', "mediumaquamarine") 
                     // activate wait time
-                    activate_waittime();
+                    $('.goMap').show();
                 }
             }
         )

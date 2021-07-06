@@ -216,17 +216,22 @@ class BusinessHolder{
      * @param {String} name 
      * @param {Function} callback called after object is created
      * @param {Float} waitTime what is the wait time at the location
-     * @return {Promise} Resolves to true if created or is duplicate, false if failed
+     * @return {Business} Null if failed
      */
     async addBusiness(placeID, location = null, name = null, callback = null, waitTime = null){
-        if (!(await MyHashTable.doesExistorAdd(element.place_id, markers.length))) {
-            x = new Business(element.place_id, element.geometry.location, element.name, async function () {
-                this.showMarker();
-            }, MyBusinesses.length);
+        if (!(await MyHashTable.doesExistorAdd(element.place_id, markers.length))) { // check if in HashTable
+            x = new Business(placeID, location, name, callback, MyBusinesses.length);
             MyBusinesses.push(x);
+            return x;
+        }else{
+            return null;
         }
     }
 
-    
+    hideBusinessMarkers(){
+        for (i in this.MyBusinesses){
+            this.MyBusinesses[i].hideMarker();
+        }
+    }
 
 }

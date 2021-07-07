@@ -258,7 +258,7 @@ class Business_Manager(models.Manager):
     #     target = qs.get()
     #     return target.getAverage()
 
-    def search(self, latitude, longitude, nelat, nelon, swlat, swlon):
+    def search(self, latitude, longitude, nelat, nelon, swlat, swlon, heat):
         x = self.isFloatNum(latitude) and self.isFloatNum(longitude) 
         x = x and self.isFloatNum(nelat) and self.isFloatNum(nelon) and self.isFloatNum(swlat) and self.isFloatNum(swlon)
         if (x): 
@@ -278,12 +278,16 @@ class Business_Manager(models.Manager):
             qs = qs.annotate(distance=distance_raw_sql)
             qs = qs.order_by('distance')
             # .values_list("placeID", flat=True)
-            qs = qs[:20] # take only the first 20
             listOfPlaceIDs = []
-            for place in qs.iterator():
-                # get wait time average
-                listOfPlaceIDs.append([place.placeID, place.getAverage()])
-            # data = serialize("json", [ qs, ])
+            if heat:
+                for place in qs.iterator():
+                   listOfPlaceIDs.append([[place.lat, place.lon], place.getAverage()]) 
+            else:
+                qs = qs[:20] # take only the first 20      
+                for place in qs.iterator():
+                    # get wait time average
+                    listOfPlaceIDs.append([place.placeID, place.getAverage()])
+                # data = serialize("json", [ qs, ])
             print('qs: ' + str(listOfPlaceIDs))
             return listOfPlaceIDs
         return('bad inputs') #escape out

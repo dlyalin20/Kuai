@@ -11,14 +11,25 @@ function connect(){
     }
     chatSocket.onmessage = function(e) {
         // console.log(chatSocket);
-        if (e.data.charAt(0) != "["){
-            if (e.data == "bad inputs"){
+        var data = e.data;
+        if (data.charAt(0) != "["){
+            if (data.charAt(0) == 'h'){
+              data = data.slice(4);
+              data = JSON.parse(data);
+            //[[], ]
+              for(i in data){
+                data[i][0][0]
+                data[i][0][1]
+                data[i][1]
+              }
+            }
+            else if (data == "bad inputs"){
                 alert("bad inputs")
-            }else if (e.data == "recieved-waittime"){
+            }else if (data == "recieved-waittime"){
                 alert("Review recieved, Bye!");
                 nearbySearch();
             }else{
-                console.log(e.data);
+                console.log(data);
             }
         }
         else{
@@ -26,7 +37,7 @@ function connect(){
             if(data == null || data.length == 0){
                 console.log("No results found");
             }else{
-                console.log(e.data);
+                console.log(data);
                 bizHash = new hashtable();
                 // array found: display the markers on the map
                 // data[i].place_id ; data[i].lat, data[i].lon
@@ -36,7 +47,7 @@ function connect(){
                     // choices.html("");
                     let temp = new Business(data[i][0], i,null, null, function(){
                         this.addHash(); //eventually adds hash
-                        this.pushDivDescription();             
+                        this.pushDivDescription();
                     },  data[i][1]);
                     // console.log(placeLocation);
                     // createMarker(placeLocation);
@@ -47,12 +58,12 @@ function connect(){
         } 
     };
     
-    chatSocket.onclose = function(e) {
-        timerId = setInterval(function() {
-          console.log('Socket is closed. Reconnect will be attempted in 1 second.', e.reason);
-          connect();
-        }, 2000);
-      };
+    // chatSocket.onclose = function(e) {
+    //     timerId = setInterval(function() {
+    //       console.log('Socket is closed. Reconnect will be attempted in 1 second.', e.reason);
+    //       connect();
+    //     }, 2000);
+    //   };
 }
 
 var data;
@@ -61,21 +72,35 @@ var timerId;
 
 
 // remove default para later
-function queryDB( lat = 40.6237542, lon = -73.913696, nelat, nelon, swlat, swlon){
-    console.log(lat, lon);
+function queryDB( lat = 40.6237542, lon = -73.913696, nelat, nelon, swlat, swlon, heat){
     if (chatSocket && chatSocket.readyState == 1){
-        chatSocket.send(JSON.stringify({
-            'lat': lat,
-            'lon': lon,
-            'nelat': nelat,
-            'nelon': nelon,
-            'swlat': swlat,
-            'swlon': swlon,
-
-            })
-        )
-        
-    }    
+        if (heat === "heat"){
+            console.log(lat, lon);
+            chatSocket.send(JSON.stringify({
+                'lat': lat,
+                'lon': lon,
+                'nelat': nelat,
+                'nelon': nelon,
+                'swlat': swlat,
+                'swlon': swlon,
+                'heat': 't',
+                })
+            )
+        }else{
+            console.log(lat, lon);
+            chatSocket.send(JSON.stringify({
+                'lat': lat,
+                'lon': lon,
+                'nelat': nelat,
+                'nelon': nelon,
+                'swlat': swlat,
+                'swlon': swlon,
+                "heat" : 'f',
+                })
+            )
+            
+        }    
+    }
 }
 
 async function waitTimeAvgData(OverallTime, placeID){

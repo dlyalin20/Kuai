@@ -14,9 +14,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
     #     pass
     # @database_sync_to_async
     @sync_to_async
-    def nearbySearch(self, lat, lon, nelat, nelon, swlat, swlon):
+    def nearbySearch(self, lat, lon, nelat, nelon, swlat, swlon, heat):
         Business = apps.get_model('Landing', 'Business')
-        return Business.objects.search(lat, lon, nelat, nelon, swlat, swlon)
+        return Business.objects.search(lat, lon, nelat, nelon, swlat, swlon, heat)
     @sync_to_async
     def addToWait(self, waitTime, placeID, user):
         Business = apps.get_model('Landing', 'Business')
@@ -45,14 +45,20 @@ class ChatConsumer(AsyncWebsocketConsumer):
             nelon =text_data_json['nelon']
             swlat = text_data_json['swlat']
             swlon = text_data_json['swlon']
+            heat = (text_data_json['heat'] == 't')
             if (lat and lon and nelat and nelon and swlat and swlon):
-                # run nearby search
+                # run nearby search or heat- nearby search
                 print("recieved lat: " + str(lat) + ' lon: ' + str(lon) + " radius: ")
                 print("nelat: " + str(nelat) + ' nelon: ' + str(nelon))
                 print("swlat: " + str(swlat) + ' swlon: ' + str(swlon))
                 # qs = await database_sync_to_async(self.nearbySearch(lat, lon, radius))() #query dbs
-                qs = await self.nearbySearch(lat, lon, nelat, nelon, swlat, swlon)
-                await self.send(text_data=json.dumps(qs))
+                qs = await self.nearbySearch(lat, lon, nelat, nelon, swlat, swlon, heat)
+                if (heat):
+                    await self.send(text_data=("heat" + json.dumps(qs)))
+                else:
+                    await self.send(text_data=json.dumps(qs))
+                
+                
         elif ("finalData" in keys and text_data_json['finalData']):
             self.user = self.scope["user"]
             placeID = text_data_json['placeID']

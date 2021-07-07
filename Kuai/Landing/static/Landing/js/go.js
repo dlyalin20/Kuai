@@ -11,7 +11,6 @@ var autocomplete;
 var previousSearch = q;
 var markers = new Array(); // type: custom class busness
 const choices = $("#choices");
-var levelOfDepth = 0;
 var heatMap = false;
 const options = {
     enableHighAccuracy: true,
@@ -206,14 +205,15 @@ function mainLoop(position) {
                 if (heatMap){
                     $('#WaitTime').css('background-color', "aquamarine");
                     $('#HeatMap').css('background-color', "mediumaquamarine");
-                    // activate heat map
                     $('.goMap').hide();
+                    initHeat();
                 }else{
                     $(this).attr("data-isHeat", 't');
                     $('#HeatMap').css('background-color', "aquamarine")
                     $('#WaitTime').css('background-color', "mediumaquamarine") 
-                    // activate wait time
+                    deactivateHeat();
                     $('.goMap').show();
+                    
                 }
             }
         )
@@ -276,31 +276,35 @@ function nearbySearch(){
     console.log(nelat, nelon, swlat, swlon);
     console.log("query from local db");
     let center = map.center;
-    queryDB(center.lat(), center.lng(), nelat, nelon, swlat, swlon);
-    levelOfDepth++;
-    console.log(mapbounds);
-    // console.log("query from nearby search");
-    let request = {
-        bounds: mapbounds,
-        // add ranked by changed by options
-        // rankBy: google.maps.places.RankBy.DISTANCE,
-        // edit the type by options
-        type: "restaurant",
-    }
-    const locations = service.nearbySearch(request, (result, status)=>{
-        if (status == google.maps.places.PlacesServiceStatus.OK){
-            placeResultsToMarkers(result);
-            //only take xy coords and place id
-            var myResults = [];
-            result && result.map(v => {
-                let coords = v.geometry.location;     
-                let placeID = v.place_id;           
-                myResults.push({ coords, placeID });
-            })
-            createTemps(myResults);
-            lastsend = myResults;
+    if (heatMap){
+        queryDB(center.lat(), center.lng(), nelat, nelon, swlat, swlon, "heat");
+    }else{
+        queryDB(center.lat(), center.lng(), nelat, nelon, swlat, swlon);
+        // console.log("query from nearby search");
+    
+        let request = {
+            bounds: mapbounds,
+            // add ranked by changed by options
+            // rankBy: google.maps.places.RankBy.DISTANCE,
+            // edit the type by options
+            type: "restaurant",
         }
-    }); 
+        const locations = service.nearbySearch(request, (result, status)=>{
+            if (status == google.maps.places.PlacesServiceStatus.OK){
+                placeResultsToMarkers(result);
+                //only take xy coords and place id
+                var myResults = [];
+                result && result.map(v => {
+                    let coords = v.geometry.location;     
+                    let placeID = v.place_id;           
+                    myResults.push({ coords, placeID });
+                })
+                createTemps(myResults);
+                lastsend = myResults;
+            }
+        }); 
+    }
+
 }
 function start_nearbySearch() { //plots the nearby locations
     mapzoom = map.getZoom()

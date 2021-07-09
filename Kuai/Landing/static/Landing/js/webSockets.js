@@ -20,7 +20,7 @@ function connect(){
               var heatMapDataList = [];
               for(i in data){
                 const weightedData = {
-                  location: {lat: data[i][0][0], lng: data[i][0][1]},
+                  location:  new google.maps.LatLng(data[i][0][0], data[i][0][1]),
                   weight: data[i][1],
                 }
                 heatMapDataList.push(weightedData);

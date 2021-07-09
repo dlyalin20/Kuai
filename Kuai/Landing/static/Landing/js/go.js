@@ -203,17 +203,11 @@ function mainLoop(position) {
         $("#MainSwitch").click(function(){
                 heatMap = !(heatMap);
                 if (heatMap){
-                    $('#WaitTime').css('background-color', "aquamarine");
-                    $('#HeatMap').css('background-color', "mediumaquamarine");
-                    $('.goMap').hide();
+                    $(this).attr("data-isHeat", 'f');
                     initHeat();
                 }else{
                     $(this).attr("data-isHeat", 't');
-                    $('#HeatMap').css('background-color', "aquamarine")
-                    $('#WaitTime').css('background-color', "mediumaquamarine") 
-                    deactivateHeat();
-                    $('.goMap').show();
-                    
+                    deactivateHeat();                    
                 }
             }
         )

@@ -285,6 +285,11 @@ class Business_Manager(models.Manager):
                        average = place.getAverage();
                        if (average != "N/A"):
                           listOfPlaceIDs.append([[place.lat, place.lon], average])
+                    if (len(listOfPlaceIDs) > 0):
+                        return listOfPlaceIDs
+                    else:
+                        return "NoData"
+                    
 
                 else:
                     qs = qs[:20] # take only the first 20
@@ -292,9 +297,9 @@ class Business_Manager(models.Manager):
                         # get wait time average
                         listOfPlaceIDs.append([place.placeID, place.getAverage()])
                     # data = serialize("json", [ qs, ])
-                print('qs: ' + str(listOfPlaceIDs))
-                if (len(listOfPlaceIDs) > 0):
-                    return listOfPlaceIDs
+                    if (len(listOfPlaceIDs) > 0):
+                        return listOfPlaceIDs
+
             else:
                 return "No Waittimes"
         return('bad inputs') #escape out
@@ -333,8 +338,8 @@ class Business(models.Model):
 
     def getAverage(self):
     # average accounting for other times
-        # qs = self.review.filter(expiration_time__gt=Now()).values_list("wait_time", flat=True)
-        qs = self.review.values_list("wait_time", flat=True)
+        qs = self.review.filter(expiration_time__gt=Now()).values_list("wait_time", flat=True)
+        # qs = self.review.values_list("wait_time", flat=True)
         mySum = 0
         count = 0
         # print(qs.all())

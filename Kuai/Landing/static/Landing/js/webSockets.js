@@ -16,6 +16,10 @@ function connect(){
             if (data.charAt(0) == 'h'){
               data = data.slice(4);
               data = JSON.parse(data);
+            if (data == "NoData"){
+                popAlert("No Data in this area")
+            }
+            
             //[[[xcor, ycor], weight], ...]
               var heatMapDataList = [];
               for(i in data){
@@ -32,7 +36,8 @@ function connect(){
             }else if (data == "recieved-waittime"){
                 alert("Review recieved, Bye!");
                 nearbySearch();
-            }else{
+            }
+            else{
                 console.log(data);
             }
         }
@@ -118,4 +123,11 @@ async function waitTimeAvgData(OverallTime, placeID){
         chatSocket.send(data)
 
     }
+}
+
+/**
+ * Displays msg in a html element
+ */ 
+function popAlert(msg){
+    $("#msgBox").html(msg);
 }

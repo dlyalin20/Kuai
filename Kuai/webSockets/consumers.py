@@ -53,6 +53,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 print("swlat: " + str(swlat) + ' swlon: ' + str(swlon))
                 # qs = await database_sync_to_async(self.nearbySearch(lat, lon, radius))() #query dbs
                 qs = await self.nearbySearch(lat, lon, nelat, nelon, swlat, swlon, heat)
+                print('qs: ' + str(qs))
                 if (heat):
                     await self.send(text_data=("heat" + json.dumps(qs)))
                 else:

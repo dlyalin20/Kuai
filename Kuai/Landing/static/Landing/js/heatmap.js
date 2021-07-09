@@ -1,6 +1,7 @@
 
 const myheatmap = new google.maps.visualization.HeatmapLayer({
     data: [],
+    radius: 30,
     });
 
 /**

@@ -5,7 +5,7 @@ function connect(){
         'ws://'
         + window.location.host
         + '/ws/go/SearchNearby'
-    ); 
+    );
     chatSocket.onopen = function(){
         clearInterval(timerId);
     }
@@ -16,12 +16,16 @@ function connect(){
             if (data.charAt(0) == 'h'){
               data = data.slice(4);
               data = JSON.parse(data);
-            //[[], ]
+            //[[[xcor, ycor], weight], ...]
+              var heatMapDataList = [];
               for(i in data){
-                data[i][0][0]
-                data[i][0][1]
-                data[i][1]
+                const weightedData = {
+                  location: {lat: data[i][0][0], lng: data[i][0][1]},
+                  weight: data[i][1],
+                }
+                heatMapDataList.push(weightedData);
               }
+              render_heatmap(heatMapDataList)
             }
             else if (data == "bad inputs"){
                 alert("bad inputs")
@@ -55,9 +59,9 @@ function connect(){
                     markers.push(temp);
                 }
             }
-        } 
+        }
     };
-    
+
     // chatSocket.onclose = function(e) {
     //     timerId = setInterval(function() {
     //       console.log('Socket is closed. Reconnect will be attempted in 1 second.', e.reason);
@@ -98,8 +102,8 @@ function queryDB( lat = 40.6237542, lon = -73.913696, nelat, nelon, swlat, swlon
                 "heat" : 'f',
                 })
             )
-            
-        }    
+
+        }
     }
 }
 
@@ -112,7 +116,6 @@ async function waitTimeAvgData(OverallTime, placeID){
     console.log(data);
     if (chatSocket && chatSocket.readyState == 1){
         chatSocket.send(data)
-        
-    } 
-}
 
+    }
+}

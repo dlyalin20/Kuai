@@ -121,7 +121,7 @@ class AccountManager(BaseUserManager):
         user.business = business
         user.save(using=self._db)
         return user
-    
+
     def get_by_natural_key(self, username_):
         print(username_)
         return self.get(username=username_)
@@ -148,7 +148,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def natural_key(self):
         return self.username
-    
+
     def __str__(self):
         return self.username
 
@@ -164,7 +164,7 @@ class waitData(models.Model):
     expiration_time = models.DateTimeField(default = getExperationTime, null = False, blank = False,)
     author = models.ForeignKey("Profile", related_name='all_time_updates', on_delete=CASCADE)
 
-# 'business', 
+# 'business',
     REQUIRED_FIELDS = ['wait_time', 'author', 'business', 'expiration_time']
 
     def is_old(self):
@@ -175,7 +175,7 @@ class waitData(models.Model):
 
     def natural_key(self):
         return str(self.wait_time)
-    
+
     def __str__(self):
         return str(self.wait_time)
 
@@ -207,7 +207,7 @@ class Profile(models.Model):
 
     is_subscribed = models.BooleanField(default = False)
     subscription = models.OneToOneField(Subscriber, on_delete = SET_NULL, null = True, blank = True)
-    
+
     def create_subscriber(self):
         if self.is_subscribed:
             subscriber = Subscriber(last_pay_date = django.utils.timezone.utcnow())
@@ -236,17 +236,17 @@ class Profile(models.Model):
     def create_user_profile(sender, instance, created, **kwargs):
         if created and not instance.is_business and not instance.is_staff:
             Profile.objects.create(user = instance)
-    
+
     @receiver(post_save, sender=User)
     def save_user_profile(sender, instance, **kwargs):
         instance.profile.save()
-        return str(instance.pk) 
+        return str(instance.pk)
 
 
 class Business_Manager(models.Manager):
     def isFloatNum(self, targetString):
         print(targetString)
-        try : 
+        try :
             float(targetString)
             return(True)
         except :
@@ -259,9 +259,9 @@ class Business_Manager(models.Manager):
     #     return target.getAverage()
 
     def search(self, latitude, longitude, nelat, nelon, swlat, swlon, heat):
-        x = self.isFloatNum(latitude) and self.isFloatNum(longitude) 
+        x = self.isFloatNum(latitude) and self.isFloatNum(longitude)
         x = x and self.isFloatNum(nelat) and self.isFloatNum(nelon) and self.isFloatNum(swlat) and self.isFloatNum(swlon)
-        if (x): 
+        if (x):
             # Great circle distance formula
             gcd_formula = "6371 * acos(min(max(\
             cos(radians(%s)) * cos(radians(lat)) \
@@ -278,18 +278,25 @@ class Business_Manager(models.Manager):
             qs = qs.annotate(distance=distance_raw_sql)
             qs = qs.order_by('distance')
             # .values_list("placeID", flat=True)
-            listOfPlaceIDs = []
-            if heat:
-                for place in qs.iterator():
-                   listOfPlaceIDs.append([[place.lat, place.lon], place.getAverage()]) 
+            if (qs):
+                listOfPlaceIDs = []
+                if heat:
+                    for place in qs:
+                       average = place.getAverage();
+                       if (average != "N/A"):
+                          listOfPlaceIDs.append([[place.lat, place.lon], average])
+
+                else:
+                    qs = qs[:20] # take only the first 20
+                    for place in qs:
+                        # get wait time average
+                        listOfPlaceIDs.append([place.placeID, place.getAverage()])
+                    # data = serialize("json", [ qs, ])
+                print('qs: ' + str(listOfPlaceIDs))
+                if (len(listOfPlaceIDs) > 0):
+                    return listOfPlaceIDs
             else:
-                qs = qs[:20] # take only the first 20      
-                for place in qs.iterator():
-                    # get wait time average
-                    listOfPlaceIDs.append([place.placeID, place.getAverage()])
-                # data = serialize("json", [ qs, ])
-            print('qs: ' + str(listOfPlaceIDs))
-            return listOfPlaceIDs
+                return "No Waittimes"
         return('bad inputs') #escape out
 
     def addWaitTime(self, waitTime, placeID, user):
@@ -301,7 +308,7 @@ class Business_Manager(models.Manager):
             review.save()
             return review
         else:
-            return False    
+            return False
 def get_biz_expiration():
     return django.utils.timezone.now() + django.utils.timezone.timedelta(days=20)
 class Business(models.Model):
@@ -320,13 +327,14 @@ class Business(models.Model):
 
     def natural_key(self):
         return self.placeID
-     
+
     def __str__(self):
         return self.placeID
 
     def getAverage(self):
     # average accounting for other times
-        qs = self.review.filter(expiration_time__gt=Now()).values_list("wait_time", flat=True)
+        # qs = self.review.filter(expiration_time__gt=Now()).values_list("wait_time", flat=True)
+        qs = self.review.values_list("wait_time", flat=True)
         mySum = 0
         count = 0
         # print(qs.all())
@@ -358,6 +366,6 @@ class Staff_Profile(models.Model):
 
     def natural_key(self):
         return self.user.username
-    
+
     def __str__(self):
         return self.user.username

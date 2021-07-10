@@ -49,7 +49,15 @@ class Business {
                     let pos = results.geometry.location
                     hold.position = pos;
                     hold.name = results.name;
+                    const icon = {
+                        url: results.icon,
+                        size: new google.maps.Size(71, 71),
+                        origin: new google.maps.Point(0, 0),
+                        anchor: new google.maps.Point(17, 34),
+                        scaledSize: new google.maps.Size(25, 25),
+                      };
                     hold.marker = new google.maps.Marker({
+                        icon,
                         position: hold.position
                     });
                     hold.callback();
@@ -174,7 +182,7 @@ function queryService(targetID, callback, index = false) {
     if (targetID) { //!= ""
         const request = {
             placeId: targetID,
-            fields: ["name", "formatted_address", "place_id", "geometry"],
+            fields: ["name", "formatted_address", "place_id", "geometry", "icon", "photo"],
         };
         service.getDetails(request, (place, status) => {
             if (

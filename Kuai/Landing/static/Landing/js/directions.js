@@ -3,10 +3,11 @@ const directionsService = new google.maps.DirectionsService();
 var calculatedRoute;
 
 $('#all-directions-panel').hide();
-function loadDirections() {
+
+
+function initializeDirections(){
     directionsRenderer.setMap(map);
     directionsRenderer.setPanel(document.getElementById("all-directions-panel"));
-
 }
 //input: Business object 
 async function load_route_to_biz(biz) { //figure out the route to the biz 
@@ -15,7 +16,7 @@ async function load_route_to_biz(biz) { //figure out the route to the biz
     popup.find('#popup_total_time').attr('data-val', "N/A");
     if (UserPos) {
         directionsService.route(
-            {
+            {//options
                 origin: { location: UserPos }, // start at the user's location
                 destination: { placeId: biz.placeID }, // end at biz
                 travelMode: google.maps.TravelMode.WALKING, //add more methods of transport later

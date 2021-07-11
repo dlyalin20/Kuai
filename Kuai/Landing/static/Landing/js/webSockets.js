@@ -53,15 +53,16 @@ function connect(){
                 choices.html("");
                 clearMarkers();
                 for (let i = 0; i < data.length; i++){
-                    // choices.html("");
-                    let temp = new Business(data[i][0], i,null, null, function(){
+                    const bizOptions = {
+                        placeID: data[i][0],
+                        array_index: i, 
+                    }
+                    const x = new Business(bizOptions, function(){
                         this.addHash(); //eventually adds hash
                         this.pushDivDescription();
                     },  data[i][1]);
-                    // console.log(placeLocation);
-                    // createMarker(placeLocation);
-                    // queryService(data[i], placeResult, i)
-                    markers.push(temp);
+                    markers.push(x);
+                    
                 }
             }
         }
@@ -75,8 +76,7 @@ function connect(){
     //   };
 }
 
-var data;
-var bizHash = new hashtable();
+
 var timerId;
 
 
@@ -113,7 +113,7 @@ function queryDB( lat = 40.6237542, lon = -73.913696, nelat, nelon, swlat, swlon
 }
 
 async function waitTimeAvgData(OverallTime, placeID){
-    data =  JSON.stringify({
+    var data =  JSON.stringify({
         'finalData': true,
         'OverallTime': OverallTime,
         'placeID': placeID,

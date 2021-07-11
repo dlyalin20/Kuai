@@ -211,7 +211,6 @@ function mainLoop(position) {
                 }
             }
         )
-        loadDirections(); // load directions
         return true;
     })
 }
@@ -274,7 +273,6 @@ function nearbySearch(){
         queryDB(center.lat(), center.lng(), nelat, nelon, swlat, swlon, "heat");
     }else{
         queryDB(center.lat(), center.lng(), nelat, nelon, swlat, swlon);
-        // console.log("query from nearby search");
     
         let request = {
             bounds: mapbounds,
@@ -313,13 +311,19 @@ function start_nearbySearch() { //plots the nearby locations
 async function placeResultsToMarkers(results,) {
     // choices.html("");
     // clearMarkers();
-    var pointer = 0;
     for (let index = 0; index < results.length; index++) {
-        const element = results[index];
+        const result = results[index];
         // createMarker(element);
         // placeResult(element, index);
-        if (!(await bizHash.doesExistorAdd(element.place_id, markers.length))) {
-            x = new Business(element.place_id, markers.length, element.geometry.location, element.name, async function () {
+        if (!(await bizHash.doesExistorAdd(result.place_id, markers.length))) {
+            const bizOptions = {
+                placeID: result.place_id,
+                array_index: markers.length,
+                location: result.geometry.location,
+                name: result.name, 
+                icon: result.icon,
+            }
+            const x = new Business( bizOptions, function(){
                 this.pushDivDescription();
             });
             markers.push(x);
@@ -436,6 +440,7 @@ function initMap(result) {
         zoom: 18,
         center: result.target,
     });
+    initializeDirections()
 
     //marker for current location
     var marker = new google.maps.Marker({ position: result.target, map: map });

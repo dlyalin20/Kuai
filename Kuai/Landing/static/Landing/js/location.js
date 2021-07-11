@@ -29,26 +29,53 @@ class hashtable {
 var bizHash = new hashtable();
 var targetBiz;
 
+
+
 class Business {
     // location new google.maps.LatLng(location);
     //Call back is run after contructor is done
-    constructor(placeID,array_index, location = null, name = null, callback = null, waitTime = null) {
-        if (waitTime != null){ 
-            this.waitTime = Math.round(waitTime); // round wait time to a whole number
+    /**
+     * 
+     * @param {Object} options 
+        * @property {String} options.placeID  - Google PlaceID for biz
+        * @property {int} options.array_index  - what index is this object stored at
+        * @property {LatLngObject} options.location  - location
+        * @property {String} options.name  - name of the Biz
+        * @property {String} options.icon  - url for Biz icon
+        * @property {Float} options.waitTime - Passed wait time from our db
+     * @param {Function} callback  - callback function to be called after initialization
+     */
+    constructor(options, callback) {
+        if (options.waitTime != null){ 
+            this.waitTime = Math.round(options.waitTime); // round wait time to a whole number
         }
-        this.placeID = placeID;
+        this.placeID = options.placeID;
         this.infowindow = new google.maps.InfoWindow;
+        this.array_index = options.array_index; 
         this.callback = callback;
-        this.array_index = array_index; 
-        if (!(location && name)) {
-            //if we dont have location or name run Places Details request to get lat lng and name
+        if (options.location != null && options.name != null) {        
+            // we have all the infomation just plug it in
+            this.pendinginfo = true; // dont need to wait for the pending info
+            this.name = options.name;
+            this.position = options.location;
+            const markerOptions = {
+                position: this.position,
+            }
+            if (options.icon != null){
+                markerOptions.icon = options.icon;
+            }
+            this.marker = new google.maps.Marker(markerOptions);
+        } else {
+            //if we dont have essential info: run Places Details request
             const hold = this;
-            this.pendinginfo = new Promise(function(accept, r){
-                queryService(placeID, function (results) {
+            this.pendinginfo = new Promise(function(accept, r){ 
+                //save promise to test if the important information has arrived yet
+                queryService(hold.placeID, function (results) {
                     // fill in rest of info
                     let pos = results.geometry.location
                     hold.position = pos;
                     hold.name = results.name;
+                    
                     const icon = {
                         url: results.icon,
                         size: new google.maps.Size(71, 71),
@@ -57,40 +84,26 @@ class Business {
                         scaledSize: new google.maps.Size(25, 25),
                       };
                     hold.marker = new google.maps.Marker({
-                        icon,
+                        icon:icon,
                         position: hold.position
                     });
-                    hold.callback();
                     accept();
                     
                 });
             })
-            
-        } else {
-            // we have all the infomation just plug it in
-            this.name = name;
-            this.position = location;
-            this.marker = new google.maps.Marker({
-                position: this.position
-            });
-            // setmarkerCallBack(self);
-            if (callback) {
-                this.callback();
-        }    
+
+        } 
+        this.callback();   
     }     
-    }
+    
 
     async getName(){
         await this.pendinginfo;
         return this.name;        
     }
     async showMarker() {
-        if (!(this.position && this.marker)) {
-            this.marker = new google.maps.Marker({
-                position: await this.position
-            });
-            setmarkerCallBack(self);
-        }
+        await this.pendinginfo;
+        // setmarkerCallBack(self);
         this.marker.setMap(map);
     }
     addHash() {
@@ -109,13 +122,8 @@ class Business {
     }
 
     async pushDivDescription() { // what happends when u click on the marker
+        await this.pendinginfo;
         var i = this.array_index + 1;
-        if (!(this.position && this.marker)) {
-            await this.position;
-            this.marker = new google.maps.Marker({
-                position: this.position
-            });
-        }
         this.showMarker();
         let baseObject = `<div class='option-items'>` + i + '. ' + this.name + `<hr></div>`;
         console.log(baseObject);
@@ -143,8 +151,8 @@ class Business {
             closePopUp();
             targetBiz = null;
         } else {
-            load_route_to_biz(this);
             targetBiz = this;
+            load_route_to_biz(this);
             this.goTo();
             if (this.waitTime) {
                 openPopUp(this.name, this.placeID, this.waitTime);

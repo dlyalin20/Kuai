@@ -169,7 +169,7 @@ function mainLoop(position) {
     }).then(function (result) { //set up event listeners
         // set up event listeners
         // let infowindow;
-
+        var GeoMarker = new GeolocationMarker(map);
         map.addListener("idle", () => {
             start_nearbySearch();
             console.log("zoom: " + map.getZoom());

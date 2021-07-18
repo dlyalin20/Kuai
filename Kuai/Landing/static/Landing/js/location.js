@@ -46,6 +46,7 @@ class Business {
      * @param {Function} callback  - callback function to be called after initialization
      */
     constructor(options, callback) {
+        const hold = this;
         if (options.waitTime != null){ 
             this.waitTime = Math.round(options.waitTime); // round wait time to a whole number
         }
@@ -65,9 +66,10 @@ class Business {
                 markerOptions.icon = options.icon;
             }
             this.marker = new google.maps.Marker(markerOptions);
+            setmarkerCallBack(hold);
         } else {
             //if we dont have essential info: run Places Details request
-            const hold = this;
+            
             this.pendinginfo = new Promise(function(accept, r){ 
                 //save promise to test if the important information has arrived yet
                 queryService(hold.placeID, function (results) {
@@ -87,6 +89,7 @@ class Business {
                         icon:icon,
                         position: hold.position
                     });
+                    setmarkerCallBack(hold);
                     accept();
                     
                 });
@@ -181,8 +184,9 @@ async function settleCoords(lat, lng) {
 
 // set marker callback
 function setmarkerCallBack(thisObj) {
-    google.maps.event.addListener(thisObj.marker, "click", () => {
-        thisObj.ToggleThisPopUp();
+    const parent = thisObj;
+    google.maps.event.addListener(parent.marker, "click", () => {
+        parent.ToggleThisPopUp();
     });
 }
 

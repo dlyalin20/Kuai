@@ -18,7 +18,7 @@ async function load_route_to_biz(biz) { //figure out the route to the biz
         directionsService.route(
             {//options
                 origin: { location: UserPos }, // start at the user's location
-                destination: { placeId: biz.placeID }, // end at biz
+                destination: { location: biz.position }, // end at biz
                 travelMode: google.maps.TravelMode.WALKING, //add more methods of transport later
             },
             (response, status) => {

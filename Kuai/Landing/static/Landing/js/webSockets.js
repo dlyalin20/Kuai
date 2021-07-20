@@ -1,5 +1,5 @@
 var chatSocket;
-connect()
+
 function connect(){
     chatSocket = new WebSocket(
         'ws://'
@@ -14,22 +14,23 @@ function connect(){
         var data = e.data;
         if (data.charAt(0) != "["){
             if (data.charAt(0) == 'h'){
+               //build heatmap
               data = data.slice(4);
               data = JSON.parse(data);
-            if (data == "NoData"){
-                popAlert("No Data in this area")
-            }
-            
-            //[[[xcor, ycor], weight], ...]
-              var heatMapDataList = [];
-              for(i in data){
-                const weightedData = {
-                  location:  new google.maps.LatLng(data[i][0][0], data[i][0][1]),
-                  weight: data[i][1],
+                if (data == "NoData"){
+                    popAlert("No Data in this area")
+                }else{
+                    //[[[xcor, ycor], weight], ...]
+                    var heatMapDataList = [];
+                    for(i in data){
+                    const weightedData = {
+                        location:  new google.maps.LatLng(data[i][0][0], data[i][0][1]),
+                        weight: data[i][1],
+                    }
+                    heatMapDataList.push(weightedData);
+                    }
+                    render_heatmap(heatMapDataList)
                 }
-                heatMapDataList.push(weightedData);
-              }
-              render_heatmap(heatMapDataList)
             }
             else if (data == "bad inputs"){
                 alert("bad inputs")
@@ -42,7 +43,7 @@ function connect(){
             }
         }
         else{
-            data = JSON.parse(e.data);
+/*             data = JSON.parse(e.data);
             if(data == null || data.length == 0){
                 console.log("No results found");
             }else{
@@ -51,7 +52,7 @@ function connect(){
                 // array found: display the markers on the map
                 // data[i].place_id ; data[i].lat, data[i].lon
                 choices.html("");
-                clearMarkers();
+                // clearMarkers();
                 for (let i = 0; i < data.length; i++){
                     const bizOptions = {
                         placeID: data[i][0],
@@ -64,19 +65,18 @@ function connect(){
                     markers.push(x);
                     
                 }
-            }
+            } */
         }
     };
-
-    // chatSocket.onclose = function(e) {
-    //     timerId = setInterval(function() {
-    //       console.log('Socket is closed. Reconnect will be attempted in 1 second.', e.reason);
-    //       connect();
-    //     }, 2000);
-    //   };
+    chatSocket.onclose = function(e) {
+        timerId = setInterval(function() {
+          console.log('Socket is closed. Reconnect will be attempted in 1 second.', e.reason);
+          connect();
+        }, 2000);
+      };
 }
 
-
+connect()
 var timerId;
 
 
@@ -109,6 +109,19 @@ function queryDB( lat = 40.6237542, lon = -73.913696, nelat, nelon, swlat, swlon
             )
 
         }
+    }
+}
+
+/**
+ * Ask server for wait time data for a series of locations
+ * and/or cache location if location not in DB
+ * @param {Array.<{location: LatLngObject, placeID: String}>} param Array of object for each location
+ */
+function getsetData(param){
+    var data = JSON.stringify(param);
+    console.log(data);
+    if (chatSocket && chatSocket.readyState == 1){
+        chatSocket.send(data)
     }
 }
 

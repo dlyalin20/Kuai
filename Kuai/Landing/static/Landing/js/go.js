@@ -9,12 +9,12 @@ var targetingLocation = false;
 var sessionToken;
 var autocomplete;
 var previousSearch = q;
-var markers = new Array(); // type: custom class busness
+const BizHolder = new BusinessHolder();
 const choices = $("#choices");
 var heatMap = false;
 const options = {
     enableHighAccuracy: true,
-    // timeout: 5000, // => default infinity // take as much time as you need
+    // timeout: 5000, // => default infinity // uncomment in production
     maximumAge: 500,
 };
 var service; // only to be called after maps is initialized
@@ -148,7 +148,8 @@ function mainLoop(position) {
         initMap(result);
         service = new google.maps.places.PlacesService(map);
         return (result);
-    }).then(result => { //plot the markers
+    })
+/*     .then(result => { //plot the markers
         console.table(result);
         // plot markers
         if (result.markers && result.markers.length > 0) {
@@ -166,7 +167,8 @@ function mainLoop(position) {
             }
         }
         return true;
-    }).then(function (result) { //set up event listeners
+    }) */
+    .then(function (result) { //set up event listeners
         // set up event listeners
         // let infowindow;
         var GeoMarker = new GeolocationMarker(map);
@@ -272,8 +274,7 @@ function nearbySearch(){
     if (heatMap){
         queryDB(center.lat(), center.lng(), nelat, nelon, swlat, swlon, "heat");
     }else{
-        queryDB(center.lat(), center.lng(), nelat, nelon, swlat, swlon);
-    
+
         let request = {
             bounds: mapbounds,
             // add ranked by changed by options
@@ -283,18 +284,22 @@ function nearbySearch(){
         }
         const locations = service.nearbySearch(request, (result, status)=>{
             if (status == google.maps.places.PlacesServiceStatus.OK){
-                placeResultsToMarkers(result);
+                createBizs(result);
                 //only take xy coords and place id
                 var myResults = [];
                 result && result.map(v => {
-                    let coords = v.geometry.location;     
+                    let location = v.geometry.location;     
                     let placeID = v.place_id;           
-                    myResults.push({ coords, placeID });
+                    myResults.push({ location, placeID });
                 })
                 createTemps(myResults);
                 lastsend = myResults;
             }
         }); 
+        // queryDB(center.lat(), center.lng(), nelat, nelon, swlat, swlon);
+    
+
+        
     }
 
 }
@@ -307,27 +312,23 @@ function start_nearbySearch() { //plots the nearby locations
           }, 3000);
     }
 }
-
-async function placeResultsToMarkers(results,) {
-    // choices.html("");
-    // clearMarkers();
+// bug only one biz shows up
+async function createBizs(results) {
+    BizHolder.reset();
+    choices.html("");
     for (let index = 0; index < results.length; index++) {
         const result = results[index];
-        // createMarker(element);
-        // placeResult(element, index);
-        if (!(await bizHash.doesExistorAdd(result.place_id, markers.length))) {
-            const bizOptions = {
-                placeID: result.place_id,
-                array_index: markers.length,
-                location: result.geometry.location,
-                name: result.name, 
-                icon: result.icon,
-            }
-            const x = new Business( bizOptions, function(){
-                this.pushDivDescription();
-            });
-            markers.push(x);
+        const bizOptions = {
+            place_id: result.place_id,
+            location: result.geometry.location,
+            name: result.name, 
+            icon: result.icon,
         }
+        console.log(bizOptions)
+        await BizHolder.addBusiness(bizOptions, function(){
+            // console.table(bizOptions)
+            this.pushDivDescription();
+        })
     }
 }
 
@@ -555,11 +556,4 @@ function createMarker(place) {
     infowindow = new google.maps.InfoWindow;
 
 }
-function clearMarkers() {
-    for (var i = 0; i < markers.length; i++) {
-        markers[i].hideMarker();
 
-    }
-    markers = new Array();
-    bizHash = new hashtable();
-}

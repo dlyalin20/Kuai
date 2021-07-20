@@ -35,24 +35,24 @@ class Business {
     // location new google.maps.LatLng(location);
     //Call back is run after contructor is done
     /**
-     * 
      * @param {Object} options 
-        * @property {String} options.placeID  - Google PlaceID for biz
-        * @property {int} options.array_index  - what index is this object stored at
-        * @property {LatLngObject} options.location  - location
-        * @property {String} options.name  - name of the Biz
-        * @property {String} options.icon  - url for Biz icon
-        * @property {Float} options.waitTime - Passed wait time from our db
-     * @param {Function} callback  - callback function to be called after initialization
+     * @param {String} options.placeID  - Google PlaceID for biz
+     * @param {LatLngObject|undefined} options.location  - location
+     * @param {String|undefined} options.name  - name of the Biz
+     * @param {String|undefined} options.icon  - url for Biz icon
+     * @param {Float|undefined} options.waitTime - Passed wait time from our db
+     * @param {int} array_index  - what index is this object stored at
+     * @param {Function|undefined} callback  - callback function to be called after initialization
+
      */
-    constructor(options, callback) {
+    constructor(options, array_index, callback) {
         const hold = this;
         if (options.waitTime != null){ 
             this.waitTime = Math.round(options.waitTime); // round wait time to a whole number
         }
         this.placeID = options.placeID;
         this.infowindow = new google.maps.InfoWindow;
-        this.array_index = options.array_index; 
+        this.array_index = array_index; 
         this.callback = callback;
         if (options.location != null && options.name != null) {        
             // we have all the infomation just plug it in
@@ -96,7 +96,10 @@ class Business {
             })
 
         } 
-        this.callback();   
+        if (this.callback){
+            this.callback();   
+        }
+        
     }     
     
 
@@ -229,28 +232,45 @@ class BusinessHolder{
         this.MyBusinesses = [];
     }
     /**
-     * Adds Business
-     * @param {String} placeID 
-     * @param {int} array_index  
-     * @param {LatLngObject} location 
-     * @param {String} name 
-     * @param {Function} callback called after object is created
-     * @param {Float} waitTime what is the wait time at the location
-     * @return {Business} Null if failed
+     * adds Business
+     * @param {Object} options 
+     * @property {String} options.placeID  - Google PlaceID for biz
+     * @property {LatLngObject} options.location  - location
+     * @property {String} options.name  - name of the Biz
+     * @property {String} options.icon  - url for Biz icon
+     * @property {Float} options.waitTime - Passed wait time from our db
+     * @param {Function} callback  - callback function to be called after initialization
      */
-    async addBusiness(placeID, location = null, name = null, callback = null, waitTime = null){
-        if (!(await MyHashTable.doesExistorAdd(element.place_id, markers.length))) { // check if in HashTable
-            x = new Business(placeID, location, name, callback, MyBusinesses.length);
-            MyBusinesses.push(x);
-            return x;
-        }else{
-            return null;
+    async addBusiness(options, callback){
+        //Check if placeID not already found | Save hash with the index of the Bis
+        let notfound = !(await this.MyHashTable.doesExistorAdd(options.place_id, this.MyBusinesses.length));
+        if (notfound) { // check if in HashTable
+            let x = new Business(options, this.MyBusinesses.length, callback);
+            this.MyBusinesses.push(x);
         }
     }
 
-    hideBusinessMarkers(){
-        for (i in this.MyBusinesses){
+    hideMarkers(){
+        for (let i in this.MyBusinesses){
             this.MyBusinesses[i].hideMarker();
+        }
+    }
+    
+    reset(){
+        this.hideMarkers();
+        this.MyHashTable = new hashtable;
+        this.MyBusinesses = [];
+    }
+
+    /**
+     * Sets the wait time of a Busniess
+     * @param {String} place_id
+     * @param {Int} waitTime
+     */
+    async setWaitTime(place_id, waitTime){
+        let index = await bizHash.getIndex(place_id);
+        if (this.MyBusinesses[index]){
+            this.MyBusinesses[index].waitTime = waitTime;
         }
     }
 

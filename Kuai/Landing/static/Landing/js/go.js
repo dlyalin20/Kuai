@@ -222,52 +222,53 @@ var timer; // timer object to stop the nearby search if center changed
 function stoptimer(){
     clearTimeout(timer);
 }
-
+var popupclosed;
 function nearbySearch(){
-    //do nearybySearch after 3 seconds
-    var mapbounds = map.getBounds();
-    var ne = mapbounds.getNorthEast();
-    var sw = mapbounds.getSouthWest();
-    // new google.maps.Marker({
-    //     position: ne
-    // }).setMap(map);
-    // new google.maps.Marker({
-    //     position: sw
-    // }).setMap(map);
-    const MARGINOFERROR = 0.0025;
-    var nelat = ne.lat() + MARGINOFERROR;
-    var nelon = ne.lng() + MARGINOFERROR;
-    var swlat = sw.lat() - MARGINOFERROR;
-    var swlon = sw.lng() - MARGINOFERROR;
-    console.log(nelat, nelon, swlat, swlon);
-    console.log("query from local db");
-    let center = map.center;
-    if (heatMap){
-        queryDB(center.lat(), center.lng(), nelat, nelon, swlat, swlon, "heat");
-    }else{
+    if (popupclosed){
+        var mapbounds = map.getBounds();
+        var ne = mapbounds.getNorthEast();
+        var sw = mapbounds.getSouthWest();
+        // new google.maps.Marker({
+        //     position: ne
+        // }).setMap(map);
+        // new google.maps.Marker({
+        //     position: sw
+        // }).setMap(map);
+        const MARGINOFERROR = 0.0025;
+        var nelat = ne.lat() + MARGINOFERROR;
+        var nelon = ne.lng() + MARGINOFERROR;
+        var swlat = sw.lat() - MARGINOFERROR;
+        var swlon = sw.lng() - MARGINOFERROR;
+        console.log(nelat, nelon, swlat, swlon);
+        console.log("query from local db");
+        let center = map.center;
+        if (heatMap){
+            queryDB(center.lat(), center.lng(), nelat, nelon, swlat, swlon, "heat");
+        }else{
 
-        let request = {
-            bounds: mapbounds,
-            // add ranked by changed by options
-            // rankBy: google.maps.places.RankBy.DISTANCE,
-            // edit the type by options
-            type: "restaurant",
-        }
-        const locations = service.nearbySearch(request, (result, status)=>{
-            if (status == google.maps.places.PlacesServiceStatus.OK){
-                createBizs(result);
-                //only take xy coords and place id
-                var myResults = [];
-                result && result.map(v => {
-                    let location = v.geometry.location;     
-                    let placeID = v.place_id;           
-                    myResults.push({ location, placeID });
-                })
-                getsetData(myResults);
+            let request = {
+                bounds: mapbounds,
+                // add ranked by changed by options
+                // rankBy: google.maps.places.RankBy.DISTANCE,
+                // edit the type by options
+                type: "restaurant",
             }
-        });         
+            const locations = service.nearbySearch(request, (result, status)=>{
+                if (status == google.maps.places.PlacesServiceStatus.OK){
+                    createBizs(result);
+                    //only take xy coords and place id
+                    var myResults = [];
+                    result && result.map(v => {
+                        let location = v.geometry.location;     
+                        let placeID = v.place_id;           
+                        myResults.push({ location, placeID });
+                    })
+                    getsetData(myResults);
+                }
+            });         
+        }
+        
     }
-
 }
 function start_nearbySearch() { //plots the nearby locations
     mapzoom = map.getZoom()

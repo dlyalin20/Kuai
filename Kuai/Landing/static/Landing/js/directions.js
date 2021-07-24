@@ -14,10 +14,6 @@ function hideRoute(){
     directionsRenderer.setMap(null);
 }
 
-function unhideRoute(){
-    directionsRenderer.setMap(map);
-}
-
 //input: Business object 
 async function load_route_to_biz(biz) { //figure out the route to the biz 
     directionsRenderer.setMap(map);
@@ -43,7 +39,6 @@ async function load_route_to_biz(biz) { //figure out the route to the biz
                     }
                     finalduration = Math.round(totalduration / 60);
                     popup.find('#popup_travel_time').attr('data-val', finalduration);
-                    $('#all-directions-panel').show();
                     directionsRenderer.setDirections(response);
                     if (finalduration && biz.waitTime != "N/A"){
                         popup.find('#popup_total_time').attr('data-val', finalduration + biz.waitTime);

@@ -78,14 +78,17 @@ function popUpNext(event, setto=null){
 })
 // open to the other files
 function closePopUp(){
-    startedsession = false;
+    popupclosed = true;
     targetBiz = null;
     const popup = $("#popup");
     popup.hide();
     $('#all-directions-panel').hide();
+    hideRoute();
     popup.find("#popup-input").hide(); 
 }
 function openPopUp(name, place_id, wait_time = null){
+    popupclosed = false;
+    $('#all-directions-panel').show();
     const popup = $("#popup");
     popup.find(".timeinput").prop("disabled", false);
     popup.find("#customtimeinput").prop("disabled", false);

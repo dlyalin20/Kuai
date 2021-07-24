@@ -23,7 +23,12 @@ class hashtable {
         var x = await getHash(placeID);
         var dv = new DataView(x);
         var hash = dv.getInt32();
-        return this.list[hash] - 1 
+        if (this.list[hash]){
+            return this.list[hash] - 1 
+        }else{
+            return false;
+        }
+        
     }
 }
 var bizHash = new hashtable();
@@ -36,7 +41,7 @@ class Business {
     //Call back is run after contructor is done
     /**
      * @param {Object} options 
-     * @param {String} options.placeID  - Google PlaceID for biz
+     * @param {String} options.place_id  - Google PlaceID for biz
      * @param {LatLngObject|undefined} options.location  - location
      * @param {String|undefined} options.name  - name of the Biz
      * @param {String|undefined} options.icon  - url for Biz icon
@@ -50,7 +55,7 @@ class Business {
         if (options.waitTime != null){ 
             this.waitTime = Math.round(options.waitTime); // round wait time to a whole number
         }
-        this.placeID = options.placeID;
+        this.place_id = options.place_id;
         this.infowindow = new google.maps.InfoWindow;
         this.array_index = array_index; 
         this.callback = callback;
@@ -69,7 +74,6 @@ class Business {
             setmarkerCallBack(hold);
         } else {
             //if we dont have essential info: run Places Details request
-            
             this.pendinginfo = new Promise(function(accept, r){ 
                 //save promise to test if the important information has arrived yet
                 queryService(hold.placeID, function (results) {
@@ -234,7 +238,7 @@ class BusinessHolder{
     /**
      * adds Business
      * @param {Object} options 
-     * @property {String} options.placeID  - Google PlaceID for biz
+     * @property {String} options.place_id  - Google PlaceID for biz
      * @property {LatLngObject} options.location  - location
      * @property {String} options.name  - name of the Biz
      * @property {String} options.icon  - url for Biz icon
@@ -263,15 +267,29 @@ class BusinessHolder{
     }
 
     /**
-     * Sets the wait time of a Busniess
+     * Sets the wait time of a Businesses
      * @param {String} place_id
      * @param {Int} waitTime
      */
     async setWaitTime(place_id, waitTime){
-        let index = await bizHash.getIndex(place_id);
-        if (this.MyBusinesses[index]){
-            this.MyBusinesses[index].waitTime = waitTime;
+        const that = this;
+        this.MyHashTable.getIndex(place_id).then(function(index){
+            if (index && that.MyBusinesses[index]){
+                that.MyBusinesses[index].waitTime = waitTime;
+            }
+        })
+    }
+
+    /** Sets wait time for many Businesses asynchronously 
+     * @param {Array} BizData 2d array holding PlaceID and WaitTime data
+     * @param {String} BizData[][0] PlaceID
+     * @param {Int} BizData[][1] Waittime
+    */
+    async setManyWaitTimes(BizData){
+        for (let i in BizData){
+            this.setWaitTime(BizData[i][0], BizData[i][1]);
         }
     }
+
 
 }

@@ -136,18 +136,7 @@ class RegisterForm(forms.Form):
 
 # Create your views here.
 def index(request):
-    # same landing page; change top right display based on whether logged in or not
-    # if request.user.is_authenticated:
-    #     return HttpResponse("Hello authenticated!")
-    # simple search handler
     return render(request, "Landing/landing.html")
-
-# def search(request): 
-#     query = request.GET.get('q', "")
-#     if (query):
-#         print(query)
-#         pass
-#     return render(request, "Landing/advanced_search.html", {"q" : query})
     
 def business_view(request, ID):
     return render(request, "Landing/go.html") #temp link
@@ -170,7 +159,7 @@ def go(request):
         # print(method_list)
         # print(type(data))
         for i in data:
-            # print(i) 
+            print(i) 
             if (i['placeID'] and not Business.objects.filter(placeID=i['placeID']).exists()):
                 targetQuery = Business.objects.filter(placeID=i['placeID'])
                 if targetQuery.exists():#temp busness if exist then update time
@@ -205,13 +194,6 @@ def go(request):
 def login_view(request):
     if request.user.is_authenticated:
          return HttpResponseRedirect('/')
-    # if request.method == 'POST':
-    #     username = request.POST["username"]
-    #     password = request.POST["password"]
-    #     user = authenticate(request, username=username, password=password)
-    #     if user is not None:
-    #         login(request, user)
-    #         return HttpResponseRedirect('/')
     return render(request, "Landing/login.html", {
         "form":UserLoginForm()
     })
@@ -225,42 +207,6 @@ def profile(request):
         print(current_user.profile.birth_date)
     print(current_user._wrapped.username)
     return render(request, "Landing/profile.html")
-
-# def login_view(request):
-#     if request.user.is_authenticated:
-#          return HttpResponseRedirect('/')
-#     # if request.method == 'POST':
-#     #     username = request.POST["username"]
-#     #     password = request.POST["password"]
-#     #     user = authenticate(request, username=username, password=password)
-#     #     if user is not None:
-#     #         login(request, user)
-#     #         return HttpResponseRedirect('/')
-#     return render(request, "Landing/login.html", {
-#         "form":UserLoginForm()
-#     })
-
-# def logout_view(request):
-#     if not request.user.is_authenticated:
-#         return HttpResponseRedirect('/login')
-#     logout(request)
-#     return HttpResponseRedirect('/')
-
-# def register_view(request):
-#     if request.user.is_authenticated:
-#         return HttpResponseRedirect('')
-#     if request.method == 'POST':
-#         first_name = request.POST["first_name"]
-#         last_name = request.POST["last_name"]
-#         email = request.POST["email"]
-#         username = request.POST["username"]
-#         password = request.POST["password"]
-#         User.objects.create_user(username, email=email, password=password, first_name=first_name, last_name=last_name)
-#         return HttpResponseRedirect('/')
-#     return render(request, "Landing/register.html", {
-#        "form":RegisterForm()
-#     })
-
 
 # Route an account view that passes all arguments to account template; also updates fave-businesses and maybe history; updates pic; figures out time of day
 
@@ -288,42 +234,6 @@ def popup(request, placeID):
         'business' : business,
         'wait_time' : wait_time
     })
-
-def userAccount(request):
-    times = {0:"night", 1:"night",2:"night",3:"night",4:"night",5:"night",6:"morning",7:"morning",8:"morning",9:"morning",10:"morning",11:"morning",12:"day",13:"day",14:"day",15:"day",16:"day",17:"afternoon",18:"afternoon",19:"afternoon", 20:"afternoon", 21:"night", 22:"ngiht",23:"night",24:"night"}
-    t = time.localtime()[3]
-    return render(request, "Landing/userAccount.html", {
-        "time" : times.get(time.localtime()[3]),
-        "name" : request.user.username
-    }
-    )
-
-def quickWaitTime(request):
-    if request.method == 'POST':
-        form = request.POST
-        id = form["business"]
-        time = form["time"]
-        business = Business.objects.filter(placeID = id)[0]
-        addWaitTime(request, id, time)
-    return HttpResponseRedirect(f"/popup/{business.placeID}")
-
-def longWaitTime(request):
-    if request.method == 'POST':
-        form = request.POST
-        id = form['business']
-        time = form['time']
-        business = Business.objects.filter(placeID = id)[0]
-        addWaitTime(request, id, time)
-    return HttpResponseRedirect(f'/business_view/{business.placeID}')
-
-def longCapacity(request):
-    if request.method == 'POST':
-        form = request.POST
-        id = form['business']
-        cap = form['cap']
-        business = Business.objects.filter(placeID = id)[0]
-        addCapacity(request, id, cap)
-    return HttpResponseRedirect(f'/business_view/{business.placeID}')
 
 #def a(request):
 

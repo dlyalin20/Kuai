@@ -36,7 +36,6 @@ function getCookie(name) {
 }
 const csrftoken = getCookie('csrftoken');
 const input = document.getElementById('search-input');
-var lastsend;
 function initialize() {
     autocomplete = new google.maps.places.AutocompleteService();
     geocoder = new google.maps.Geocoder()
@@ -217,34 +216,6 @@ function mainLoop(position) {
     })
 }
 
-/*
-Input in a array of elements
-    - geometry
-        -location
-    - name
-*/
-function createTemps(result = lastsend) {
-    if (result != lastsend) {
-        var data = JSON.stringify(result);
-        console.log(data);
-
-        $.ajax({
-            headers: { "X-CSRFToken": csrftoken },
-            type: "POST",
-            url: window.location.pathname,
-            // The key needs to match your method's input parameter (case-sensitive).
-            data: data,
-            contentType: "application/json; charset=utf-8",
-            dataType: "json",
-            success: function (data) {
-                console.log(data);
-            },
-            error: function (errMsg) {
-                console.log(errMsg);
-            }
-        });
-    }
-}
 var pastZoom, pastCenter;
 var timer; // timer object to stop the nearby search if center changed
 
@@ -292,14 +263,9 @@ function nearbySearch(){
                     let placeID = v.place_id;           
                     myResults.push({ location, placeID });
                 })
-                createTemps(myResults);
-                lastsend = myResults;
+                getsetData(myResults);
             }
-        }); 
-        // queryDB(center.lat(), center.lng(), nelat, nelon, swlat, swlon);
-    
-
-        
+        });         
     }
 
 }

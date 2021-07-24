@@ -40,7 +40,7 @@ function runAvg(){
         return false;
     }
     console.log(waitTimeVal);
-    waitTimeAvgData(waitTimeVal, targetBiz.placeID);
+    waitTimeAvgData(waitTimeVal, targetBiz.place_id);
 
     return true;
 

@@ -282,9 +282,9 @@ class Business_Manager(models.Manager):
                 listOfPlaceIDs = []
                 if heat:
                     for place in qs:
-                       average = place.getAverage();
-                       if (average != "N/A"):
-                          listOfPlaceIDs.append([[place.lat, place.lon], average])
+                       waitTime = place.getAverage()
+                       if waitTime:
+                          listOfPlaceIDs.append([[place.lat, place.lon], waitTime])
                     if (len(listOfPlaceIDs) > 0):
                         return listOfPlaceIDs
                     else:
@@ -338,8 +338,8 @@ class Business(models.Model):
 
     def getAverage(self):
     # average accounting for other times
-        qs = self.review.filter(expiration_time__gt=Now()).values_list("wait_time", flat=True)
-        # qs = self.review.values_list("wait_time", flat=True)
+        # qs = self.review.filter(expiration_time__gt=Now()).values_list("wait_time", flat=True)
+        qs = self.review.values_list("wait_time", flat=True)
         mySum = 0
         count = 0
         # print(qs.all())
@@ -349,7 +349,7 @@ class Business(models.Model):
             mySum += waittime
             count += 1
         if mySum == 0:
-            return "N/A"
+            return False #no value found
         return (mySum / count)
 
     objects = Business_Manager()

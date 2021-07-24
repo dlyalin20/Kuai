@@ -12,7 +12,11 @@ function connect(){
     chatSocket.onmessage = function(e) {
         // console.log(chatSocket);
         var data = e.data;
-        if (data.charAt(0) != "["){
+        request = JSON.parse(data);
+        if (request.request == "updateWaitTimes"){
+            BizHolder.setManyWaitTimes(request.data)
+        }
+        else if (data.charAt(0) != "["){
             if (data.charAt(0) == 'h'){
                //build heatmap
               data = data.slice(4);
@@ -86,6 +90,7 @@ function queryDB( lat = 40.6237542, lon = -73.913696, nelat, nelon, swlat, swlon
         if (heat === "heat"){
             console.log(lat, lon);
             chatSocket.send(JSON.stringify({
+                "request":"NearbySearch",
                 'lat': lat,
                 'lon': lon,
                 'nelat': nelat,
@@ -98,6 +103,7 @@ function queryDB( lat = 40.6237542, lon = -73.913696, nelat, nelon, swlat, swlon
         }else{
             console.log(lat, lon);
             chatSocket.send(JSON.stringify({
+                "request":"NearbySearch",
                 'lat': lat,
                 'lon': lon,
                 'nelat': nelat,
@@ -118,18 +124,21 @@ function queryDB( lat = 40.6237542, lon = -73.913696, nelat, nelon, swlat, swlon
  * @param {Array.<{location: LatLngObject, placeID: String}>} param Array of object for each location
  */
 function getsetData(param){
-    var data = JSON.stringify(param);
+    var data = JSON.stringify({
+        "request":"getSetData",
+        "data": param,
+    });
     console.log(data);
     if (chatSocket && chatSocket.readyState == 1){
         chatSocket.send(data)
     }
 }
 
-async function waitTimeAvgData(OverallTime, placeID){
+async function waitTimeAvgData(OverallTime, place_id){
     var data =  JSON.stringify({
-        'finalData': true,
+        'request': "submitWaitTime",
         'OverallTime': OverallTime,
-        'placeID': placeID,
+        'place_id': place_id,
         })
     console.log(data);
     if (chatSocket && chatSocket.readyState == 1){

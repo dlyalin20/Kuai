@@ -9,8 +9,18 @@ function initializeDirections(){
     directionsRenderer.setMap(map);
     directionsRenderer.setPanel(document.getElementById("all-directions-panel"));
 }
+
+function hideRoute(){
+    directionsRenderer.setMap(null);
+}
+
+function unhideRoute(){
+    directionsRenderer.setMap(map);
+}
+
 //input: Business object 
 async function load_route_to_biz(biz) { //figure out the route to the biz 
+    directionsRenderer.setMap(map);
     const popup = $("#popup");
     popup.find('#popup_travel_time').attr('data-val', "Loading");
     popup.find('#popup_total_time').attr('data-val', "N/A");

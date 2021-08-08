@@ -18,17 +18,12 @@ function initHeat(){
     $('#HeatMap').css('background-color', "mediumaquamarine");
     $('.goMap').hide();
     myheatmap.setMap(map);
-    // hide markers
-    for (i in markers){
-        markers[i].hideMarker();
-    }
+    BizHolder.hideMarkers();
 }
 function deactivateHeat(){
     $('#HeatMap').css('background-color', "aquamarine")
-    $('#WaitTime').css('background-color', "mediumaquamarine") 
+    $('#WaitTime').css('background-color', "mediumaquamarine")
     myheatmap.setMap(null);
     $('.goMap').show();
-    for (i in markers){
-        markers[i].showMarker();
-    }
+    BizHolder.showMarkers();
 }

@@ -253,7 +253,11 @@ class BusinessHolder{
             this.MyBusinesses.push(x);
         }
     }
-
+    showMarkers(){
+        for (let i in this.MyBusinesses){
+            this.MyBusinesses[i].showMarker();
+        }
+    }
     hideMarkers(){
         for (let i in this.MyBusinesses){
             this.MyBusinesses[i].hideMarker();

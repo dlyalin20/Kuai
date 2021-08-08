@@ -2,8 +2,8 @@ class hashtable {
     constructor() {
         this.list = [];
     }
-    async doesExistorAdd(placeID, array_index) {
-        var x = await getHash(placeID);
+    async doesExistorAdd(place_id, array_index) {
+        var x = await getHash(place_id);
         var dv = new DataView(x);
         var hash = dv.getInt32();
         if (this.list[hash]) {
@@ -14,21 +14,21 @@ class hashtable {
         }
     }
     /**
-     * Get the index in the array of a found PlaceID
-     * @param {String} placeID 
+     * Get the index in the array of a found place_id
+     * @param {String} place_id
      * @return {Int}
      * @return {null}
      */
-    async getIndex(placeID){
-        var x = await getHash(placeID);
+    async getIndex(place_id){
+        var x = await getHash(place_id);
         var dv = new DataView(x);
         var hash = dv.getInt32();
         if (this.list[hash]){
-            return this.list[hash] - 1 
+            return this.list[hash] - 1
         }else{
             return false;
         }
-        
+
     }
 }
 var bizHash = new hashtable();
@@ -40,8 +40,8 @@ class Business {
     // location new google.maps.LatLng(location);
     //Call back is run after contructor is done
     /**
-     * @param {Object} options 
-     * @param {String} options.place_id  - Google PlaceID for biz
+     * @param {Object} options
+     * @param {String} options.place_id  - Google place_id for biz
      * @param {LatLngObject|undefined} options.location  - location
      * @param {String|undefined} options.name  - name of the Biz
      * @param {String|undefined} options.icon  - url for Biz icon
@@ -52,16 +52,15 @@ class Business {
      */
     constructor(options, array_index, callback) {
         const hold = this;
-        if (options.waitTime != null){ 
+        if (options.waitTime != null){
             this.waitTime = Math.round(options.waitTime); // round wait time to a whole number
         }
         this.place_id = options.place_id;
         this.infowindow = new google.maps.InfoWindow;
-        this.array_index = array_index; 
+        this.array_index = array_index;
         this.callback = callback;
-        if (options.location != null && options.name != null) {        
+        if (options.location != null && options.name != null) {
             // we have all the infomation just plug it in
-            this.pendinginfo = true; // dont need to wait for the pending info
             this.name = options.name;
             this.position = options.location;
             const markerOptions = {
@@ -71,17 +70,18 @@ class Business {
                 markerOptions.icon = options.icon;
             }
             this.marker = new google.maps.Marker(markerOptions);
+            this.pendinginfo = true; // dont need to wait for the pending info
             setmarkerCallBack(hold);
         } else {
             //if we dont have essential info: run Places Details request
-            this.pendinginfo = new Promise(function(accept, r){ 
+            this.pendinginfo = new Promise(function(accept, r){
                 //save promise to test if the important information has arrived yet
-                queryService(hold.placeID, function (results) {
+                queryService(hold.place_id, function (results) {
                     // fill in rest of info
                     let pos = results.geometry.location
                     hold.position = pos;
                     hold.name = results.name;
-                    
+
                     const icon = {
                         url: results.icon,
                         size: new google.maps.Size(71, 71),
@@ -95,21 +95,21 @@ class Business {
                     });
                     setmarkerCallBack(hold);
                     accept();
-                    
+
                 });
             })
 
-        } 
-        if (this.callback){
-            this.callback();   
         }
-        
-    }     
-    
+        if (this.callback){
+            this.callback();
+        }
+
+    }
+
 
     async getName(){
         await this.pendinginfo;
-        return this.name;        
+        return this.name;
     }
     async showMarker() {
         await this.pendinginfo;
@@ -117,13 +117,13 @@ class Business {
         this.marker.setMap(map);
     }
     addHash() {
-        bizHash.doesExistorAdd(this.placeID, this.array_index);
+        bizHash.doesExistorAdd(this.place_id, this.array_index);
     }
 
     async testHash() {
         //if place_id hash already exists returns true
         //else returns false
-        return await bizHash.doesExistorAdd(this.placeID, this.array_index);
+        return await bizHash.doesExistorAdd(this.place_id, this.array_index);
     }
     hideMarker() {
         if (this.marker) {
@@ -157,7 +157,7 @@ class Business {
         map.setZoom(18);
     }
     ToggleThisPopUp() {
-        if (targetBiz != null && targetBiz.placeID == this.placeID) {
+        if (targetBiz != null && targetBiz.place_id == this.place_id) {
             closePopUp();
             targetBiz = null;
         } else {
@@ -165,10 +165,10 @@ class Business {
             load_route_to_biz(this);
             this.goTo();
             if (this.waitTime) {
-                openPopUp(this.name, this.placeID, this.waitTime);
+                openPopUp(this.name, this.place_id, this.waitTime);
             }
             else {
-                openPopUp(this.name, this.placeID);
+                openPopUp(this.name, this.place_id);
             }
         }
 
@@ -237,13 +237,13 @@ class BusinessHolder{
     }
     /**
      * adds Business
-     * @param {Object} options 
+     * @param {Object} options
      * @property {String} options.place_id  - Google PlaceID for biz
-     * @property {LatLngObject} options.location  - location
-     * @property {String} options.name  - name of the Biz
-     * @property {String} options.icon  - url for Biz icon
-     * @property {Float} options.waitTime - Passed wait time from our db
-     * @param {Function} callback  - callback function to be called after initialization
+     * @property {LatLngObject|undefined} options.location  - location
+     * @property {String|undefined} options.name  - name of the Biz
+     * @property {String|undefined} options.icon  - url for Biz icon
+     * @property {Float|undefined} options.waitTime - Passed wait time from our db
+     * @param {Function|undefined} callback  - callback function to be called after initialization
      */
     async addBusiness(options, callback){
         //Check if placeID not already found | Save hash with the index of the Bis
@@ -259,7 +259,7 @@ class BusinessHolder{
             this.MyBusinesses[i].hideMarker();
         }
     }
-    
+
     reset(){
         this.hideMarkers();
         this.MyHashTable = new hashtable;
@@ -280,7 +280,7 @@ class BusinessHolder{
         })
     }
 
-    /** Sets wait time for many Businesses asynchronously 
+    /** Sets wait time for many Businesses asynchronously
      * @param {Array} BizData 2d array holding PlaceID and WaitTime data
      * @param {String} BizData[][0] PlaceID
      * @param {Int} BizData[][1] Waittime
@@ -290,6 +290,38 @@ class BusinessHolder{
             this.setWaitTime(BizData[i][0], BizData[i][1]);
         }
     }
+
+    /** Get Business object from place_id asynchronously
+      @param {String} place_id
+      @param {Function | null} callback
+      @returns {Business | null}
+    */
+    async getBusinessFromPlaceId(place_id, callback){
+      const that = this;
+      // For call back feature
+      if (callback){
+        callback(
+          await this.MyHashTable.getIndex(place_id).then(function(index){
+            if (index !== false){
+              return that.MyBusinesses[index];
+            }else{
+              return null;
+            }
+          })
+        )
+      }else{
+        //  for returning feature
+        var index = await this.MyHashTable.getIndex(place_id);
+        if (index !== false){
+          return that.MyBusinesses[index];
+        }else{
+          return null;
+        }
+      }
+
+
+    }
+
 
 
 }

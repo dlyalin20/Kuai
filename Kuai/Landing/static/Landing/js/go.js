@@ -108,8 +108,6 @@ function mainLoop(position) {
                                         accept(result);
                                     }
                                 })
-
-
                         });
                 }).then(res => {
                     return (result);
@@ -157,7 +155,7 @@ function mainLoop(position) {
             for (let i = 0; i < result.markers.length; i++){
                 // choices.html("");
                 let temp = new Business(result.markers[i], i, null, null, function(){
-                    this.pushDivDescription();             
+                    this.pushDivDescription();
                 });
                 // console.log(placeLocation);
                 // createMarker(placeLocation);
@@ -176,6 +174,7 @@ function mainLoop(position) {
             console.log("zoom: " + map.getZoom());
         });
         map.addListener("center_changed", () => {
+            closeAlert();
             stoptimer();
         });
         $('#search-submit').click(function (event) { // Gives search results
@@ -184,7 +183,6 @@ function mainLoop(position) {
             search((x, y) => {
                 queryGeocoder(x.place_id,
                     targetLocation => {
-
                         targetLocation = targetLocation.geometry.location
                         map.setCenter(targetLocation);
                     })
@@ -202,13 +200,14 @@ function mainLoop(position) {
         $('#WaitTime').css('background-color', "mediumaquamarine")
         $("#MainSwitch").attr("data-isHeat", 'f');
         $("#MainSwitch").click(function(){
+                closeAlert();
                 heatMap = !(heatMap);
                 if (heatMap){
                     $(this).attr("data-isHeat", 'f');
                     initHeat();
                 }else{
                     $(this).attr("data-isHeat", 't');
-                    deactivateHeat();                    
+                    deactivateHeat();
                 }
             }
         )
@@ -255,19 +254,19 @@ function nearbySearch(){
             }
             const locations = service.nearbySearch(request, (result, status)=>{
                 if (status == google.maps.places.PlacesServiceStatus.OK){
-                    createBizs(result);
+                    createBizs(result); // decrepritated, remove later
                     //only take xy coords and place id
                     var myResults = [];
                     result && result.map(v => {
-                        let location = v.geometry.location;     
-                        let placeID = v.place_id;           
+                        let location = v.geometry.location;
+                        let placeID = v.place_id;
                         myResults.push({ location, placeID });
                     })
                     getsetData(myResults);
                 }
-            });         
+            });
         }
-        
+
     }
 }
 function start_nearbySearch() { //plots the nearby locations
@@ -288,7 +287,7 @@ async function createBizs(results) {
         const bizOptions = {
             place_id: result.place_id,
             location: result.geometry.location,
-            name: result.name, 
+            name: result.name,
             icon: result.icon,
         }
         console.log(bizOptions)
@@ -313,7 +312,7 @@ function search(callback) {
         input: advQuery,
         fields: ["name", "geometry", "place_id"],
         sessionToken: sessionToken,
-        // 
+        //
     };
     if (UserPos) {
         console.log("Searching Near: " + UserPos);
@@ -502,7 +501,7 @@ async function plotListMarkers(results) {
             //             ` + (i + 1) + '. ' + thisMarkerLocation.name + '|' + thisMarkerLocation.geometry.location +
             //             `</div>`).on("click", function(){
             //                 map.setCenter(thisMarkerLocation.geometry.location)
-            //             });  
+            //             });
             //         accept(choices.append(newChoice));
 
             //     }else{
@@ -523,4 +522,3 @@ function createMarker(place) {
     infowindow = new google.maps.InfoWindow;
 
 }
-

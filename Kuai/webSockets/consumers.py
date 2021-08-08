@@ -28,7 +28,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             myprofile = user.profile
             myprofile.last_time_update = review
             myprofile.save()
-            
+
         else:
             return ("error")
         return("recieved-waittime")
@@ -47,10 +47,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 return Biz.getAverage()
             else: # other wise create new Business model
                 print('creating Biz')
-                Biz = Business(lat = bizData['location']['lat'], lon = bizData['location']['lng'], placeID = bizData['placeID']) 
+                Biz = Business(lat = bizData['location']['lat'], lon = bizData['location']['lng'], placeID = bizData['placeID'])
                 Biz.save()
 
-    async def receive(self, text_data):#request to 
+    async def receive(self, text_data):#request to
         text_data_json = json.loads(text_data) #get sent json
         print(text_data_json)
         keys = text_data_json.keys()
@@ -72,7 +72,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     qs = await self.nearbySearch(lat, lon, nelat, nelon, swlat, swlon, heat)
                     print('qs: ' + str(qs))
                     if (heat):
-                        await self.send(text_data=("heat" + json.dumps(qs)))
+                        formatedresponse = {
+                            "request" : "heatMapData",
+                            "data" : qs,
+                        }
+                        await self.send(json.dumps(formatedresponse))
                     else:
                         await self.send(text_data=json.dumps(qs))
             elif "submitWaitTime" == text_data_json['request']:
@@ -101,9 +105,3 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         "data" : response,
                     }
                     await self.send(text_data=json.dumps(formatedresponse))
-
-        
-       
-
-
-

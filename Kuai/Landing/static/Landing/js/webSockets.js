@@ -15,28 +15,27 @@ function connect(){
         request = JSON.parse(data);
         if (request.request == "updateWaitTimes"){
             BizHolder.setManyWaitTimes(request.data)
+        }else if (request.request == "heatMapData"){
+           //build heatmap
+          data = request.data
+            if (data == "NoData"){
+                popAlert("No Data in this area")
+            }else{
+                //[[[xcor, ycor], weight], ...]
+                var heatMapDataList = [];
+                for(i in data){
+                const weightedData = {
+                    location:  new google.maps.LatLng(data[i][0][0], data[i][0][1]),
+                    weight: data[i][1],
+                }
+                heatMapDataList.push(weightedData);
+                }
+                render_heatmap(heatMapDataList)
+            }
         }
         else if (data.charAt(0) != "["){
-            if (data.charAt(0) == 'h'){
-               //build heatmap
-              data = data.slice(4);
-              data = JSON.parse(data);
-                if (data == "NoData"){
-                    popAlert("No Data in this area")
-                }else{
-                    //[[[xcor, ycor], weight], ...]
-                    var heatMapDataList = [];
-                    for(i in data){
-                    const weightedData = {
-                        location:  new google.maps.LatLng(data[i][0][0], data[i][0][1]),
-                        weight: data[i][1],
-                    }
-                    heatMapDataList.push(weightedData);
-                    }
-                    render_heatmap(heatMapDataList)
-                }
-            }
-            else if (data == "bad inputs"){
+
+            if (data == "bad inputs"){
                 alert("bad inputs")
             }else if (data == "recieved-waittime"){
                 alert("Review recieved, Bye!");
@@ -60,14 +59,14 @@ function connect(){
                 for (let i = 0; i < data.length; i++){
                     const bizOptions = {
                         placeID: data[i][0],
-                        array_index: i, 
+                        array_index: i,
                     }
                     const x = new Business(bizOptions, function(){
                         this.addHash(); //eventually adds hash
                         this.pushDivDescription();
                     },  data[i][1]);
                     markers.push(x);
-                    
+
                 }
             } */
         }
@@ -147,9 +146,16 @@ async function waitTimeAvgData(OverallTime, place_id){
     }
 }
 
+
 /**
  * Displays msg in a html element
- */ 
+ */
 function popAlert(msg){
     $("#msgBox").html(msg);
+}
+/**
+ * closes msg
+ */
+function closeAlert(){
+    $("#msgBox").html("");
 }

@@ -20,11 +20,12 @@
   <h1>Profile</h1>
 
   {% if user.is_authenticated %}
-  <p>Welcome, {{ user.username }}!</p>
-  <img class="is-rounded" src="../../bios/Landing/pfps/UniversalSuperUser" alt="UniversalSuperUser" width="120" height="90">
 
 <div id="maincontent">
   <div>
+    <p>Welcome, {{ user.username }}!</p>
+    <img class="is-rounded" src="../../bios/Landing/pfps/UniversalSuperUser" alt="UniversalSuperUser" width="120" height="90">
+
   <h1>My History: </h1>
   <table class="sortable">
   <thead class="thead">
@@ -36,10 +37,10 @@
         <th class="th">Distance</th>
         <th class="th">Wait</th>
         <th class="th">Time</th>
-        <!-- <th class="th">Sort By: <!---Add input here to sort by dif--></th> 
+        <!-- <th class="th">Sort By: <!---Add input here to sort by dif--></th>
     </tr>
   </thead>
-{% for i in user.profile.all_time_updates.all %} 
+{% for i in user.profile.all_time_updates.all %}
   <tr class="tr">
     <td class="td"><span class="HistoryName">{{i.business.get_short_name}}</span></td> <!--name-->
     <td class="td"> </td> <!-- category-->
@@ -55,19 +56,22 @@
 
 <script>
   const userHistory = [
-{% for i in user.profile.all_time_updates.all %} 
+{% for i in user.profile.all_time_updates.all %}
   "{{i.business.placeID}}" ,
 {% endfor %}
   ];
 </script>
 
 {% else %}
+
+<!-- Not logged in -->
 <p>Welcome, friend!</p>
+
 {% endif %}
 
 
 
-</div> 
+</div>
 
   {% endblock %}
 
@@ -78,6 +82,9 @@
   <script src="{% static 'Landing/js/location.js' %}"></script>
   <script src="{% static 'Landing/js/profile.js' %}"></script>
   <script
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBzd999zA1_gyh7uB6KpUh-hBaYsl0vmIQ&callback=initialize&libraries=places&v=weekly"></script>
-
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBzd999zA1_gyh7uB6KpUh-hBaYsl0vmIQ&libraries=places&v=weekly"></script>
+  <script src="{% static 'Landing/js/geolocation-marker.js' %}"></script>
+  <script>
+      initialize();
+  </script>
 </html>

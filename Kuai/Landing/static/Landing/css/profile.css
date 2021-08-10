@@ -1,8 +1,24 @@
 #maincontent{
     display: flex;
-   
+    height: 100%;
 }
 #maincontent > * {
     width: 50%;
 }
 
+#map{
+    height:100%;
+}
+body{
+    height: 100vh;
+    flex-direction: column;
+    display: flex;
+}
+
+#profile{
+    flex-grow: 1;
+}
+
+.th{
+    padding-right: 2rem;
+}

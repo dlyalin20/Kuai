@@ -51,6 +51,7 @@ class Business {
 
      */
     constructor(options, array_index, callback) {
+        const markersize = new google.maps.Size(20, 32);
         const hold = this;
         if (options.waitTime != null){
             this.waitTime = Math.round(options.waitTime); // round wait time to a whole number
@@ -67,7 +68,11 @@ class Business {
                 position: this.position,
             }
             if (options.icon != null){
-                markerOptions.icon = options.icon;
+                const image = {
+                    url: options.icon,
+                    scaledSize: markersize,
+                }
+                markerOptions.icon = image;
             }
             this.marker = new google.maps.Marker(markerOptions);
             this.pendinginfo = true; // dont need to wait for the pending info
@@ -84,10 +89,7 @@ class Business {
 
                     const icon = {
                         url: results.icon,
-                        size: new google.maps.Size(71, 71),
-                        origin: new google.maps.Point(0, 0),
-                        anchor: new google.maps.Point(17, 34),
-                        scaledSize: new google.maps.Size(25, 25),
+                        scaledSize: markersize,
                       };
                     hold.marker = new google.maps.Marker({
                         icon:icon,

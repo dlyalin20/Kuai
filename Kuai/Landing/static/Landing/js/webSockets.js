@@ -45,31 +45,7 @@ function connect(){
                 console.log(data);
             }
         }
-        else{
-/*             data = JSON.parse(e.data);
-            if(data == null || data.length == 0){
-                console.log("No results found");
-            }else{
-                console.log(data);
-                bizHash = new hashtable();
-                // array found: display the markers on the map
-                // data[i].place_id ; data[i].lat, data[i].lon
-                choices.html("");
-                // clearMarkers();
-                for (let i = 0; i < data.length; i++){
-                    const bizOptions = {
-                        placeID: data[i][0],
-                        array_index: i,
-                    }
-                    const x = new Business(bizOptions, function(){
-                        this.addHash(); //eventually adds hash
-                        this.pushDivDescription();
-                    },  data[i][1]);
-                    markers.push(x);
 
-                }
-            } */
-        }
     };
     chatSocket.onclose = function(e) {
         timerId = setInterval(function() {

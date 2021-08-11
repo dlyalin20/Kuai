@@ -185,3 +185,26 @@ hr {
     background: aquamarine;
     border: black 1px solid;
 }
+#heatKey{
+  position: fixed;
+  /* width: 500px; */
+  height: 50px;
+  left: 0px;
+  bottom: 0px;
+  display: flex;
+  z-index: 2;
+  border: 3px solid black
+}
+#heatKey > div{
+  z-index: 1;
+}
+
+#heatKey > div::before {
+    position: relative;
+    bottom: 2.5em;
+    display: inline-block;
+    content: attr(data-content)  "\00000a |";
+    text-align: center;
+    white-space: pre-line;
+    width: inherit;
+  }

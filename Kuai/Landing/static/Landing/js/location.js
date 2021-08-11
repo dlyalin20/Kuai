@@ -157,9 +157,8 @@ class Business {
         map.setZoom(18);
     }
     ToggleThisPopUp() {
-        if (targetBiz != null && targetBiz.place_id == this.place_id) {
+        if (targetBiz != null && targetBiz == this) {
             closePopUp();
-            targetBiz = null;
         } else {
             targetBiz = this;
             load_route_to_biz(this);

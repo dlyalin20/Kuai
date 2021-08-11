@@ -88,8 +88,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     print("recieved waitTime: " + str(waitTime) + " placeID: "+ str(placeID))
                     # add to db
                     qs = await self.addToWait(waitTime, placeID, self.user)
-                    await self.send(text_data=qs)
-                await self.send("bad input")
+                    formatedresponse = {
+                        "request" : "message",
+                        "data" : qs,
+                    }                    
+                    await self.send(text_data=json.dumps(formatedresponse))
+                formatedresponse = {
+                    "request" : "message",
+                    "data" : "bad input",
+                }
+                await self.send(text_data=json.dumps(formatedresponse))
             elif "getSetData" == text_data_json['request']:
                 #run getSetData
                 data = text_data_json['data']

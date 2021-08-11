@@ -33,8 +33,8 @@ function connect(){
                 render_heatmap(heatMapDataList)
             }
         }
-        else if (data.charAt(0) != "["){
-
+        else if (request.request == "message"){
+            data = request.data;
             if (data == "bad inputs"){
                 alert("bad inputs")
             }else if (data == "recieved-waittime"){

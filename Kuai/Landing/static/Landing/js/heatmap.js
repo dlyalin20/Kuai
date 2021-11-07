@@ -26,6 +26,7 @@ function buildKey(){
         $("#heatKey").append(singleColor);    
     }
 }
+
 buildKey();
 $("#heatKey").hide();
 /** Create intervals to explain the heat map key
